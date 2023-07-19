@@ -1,9 +1,9 @@
 package com.gxx.neworklibrary
 
 data class Response<T>(
-    private val errorCode: Int? = -9999,
-    private val errorMsg: String? = "",
-    private val data: T? = null
+    private var errorCode: Int? = -9999,
+    private var errorMsg: String? = "",
+    private var data: T? = null
 ) {
     fun isSuccess(): Boolean {
         return errorCode == 0
