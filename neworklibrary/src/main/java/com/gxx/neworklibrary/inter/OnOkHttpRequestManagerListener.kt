@@ -8,5 +8,5 @@ import com.gxx.neworklibrary.OkHttpRequestManager
   * @description 拿到 OkHttpRequestManager
   **/
 interface OnOkHttpRequestManagerListener {
-    fun onOkHttpRequestManager():OkHttpRequestManager
+    fun onGetOkHttpRequestManager():OkHttpRequestManager
 }
