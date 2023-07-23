@@ -12,6 +12,8 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+
+
 rootProject.name = "NetWorkSdkKotlin"
 include ':app'
 include ':neworklibrary'

@@ -1,8 +1,7 @@
 package com.gxx.neworklibrary
 
-import com.gxx.networksdkkotlin.ApiException
-import com.gxx.networksdkkotlin.NetworkException
-import com.gxx.networksdkkotlin.TimeoutException
+import com.gxx.neworklibrary.exception.NetworkException
+import com.gxx.neworklibrary.exception.TimeoutException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -20,7 +19,7 @@ object RequestHelper {
                     // 根据具体的错误码抛出对应的异常
                     -1 -> throw NetworkException(response.getCode(), response.getMessage())
                     -2 -> throw TimeoutException(response.getCode(), response.getMessage())
-                    else -> throw ApiException(response.getCode(), response.getMessage())
+                   // else -> throw AbsApiException(response.getCode(), response.getMessage())
                 }
             }
         }.catch { throwable: Throwable ->

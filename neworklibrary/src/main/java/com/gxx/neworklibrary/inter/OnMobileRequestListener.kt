@@ -13,9 +13,11 @@ interface OnMobileRequestListener {
      */
    suspend fun doGetRequest(
         method: String,
-        urlMapString: Map<String, Any>,
+        urlMap: Map<String, Any>,
         isSync: Boolean,
-        requestResultValue: Int
+        requestResultValue: Int,
+        onRequestSuccessListener: OnRequestSuccessListener,
+        onRequestFailListener: OnRequestFailListener
     )
 
 }

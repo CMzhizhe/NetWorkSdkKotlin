@@ -4,7 +4,7 @@ import com.gxx.neworklibrary.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class ApiRequestRepository {
+/*class ApiRequestRepository {
     suspend fun <T> process(call: suspend () -> Response<T>): Flow<RequestResult<Response<T>>> {
         return RequestHelper.request(call).map { result ->
             when (result) {
@@ -31,4 +31,4 @@ class ApiRequestRepository {
             propagateError(errorHandler.next, error, result)
         }
     }
-}
+}*/

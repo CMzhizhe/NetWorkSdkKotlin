@@ -1,6 +1,8 @@
 package com.gxx.neworklibrary.inter
 
 import com.gxx.neworklibrary.OkHttpRequestManager
+import com.gxx.neworklibrary.exception.AbsApiException
+import com.gxx.neworklibrary.resultcall.AbsRequestResultImpl
 
 /**
   * @date 创建时间: 2023/7/21
@@ -9,4 +11,7 @@ import com.gxx.neworklibrary.OkHttpRequestManager
   **/
 interface OnOkHttpRequestManagerListener {
     fun onGetOkHttpRequestManager():OkHttpRequestManager
+
+    fun onApiExceptions(): MutableList<AbsApiException>
+
 }

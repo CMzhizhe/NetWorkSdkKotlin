@@ -1,9 +1,10 @@
 package com.gxx.neworklibrary
 
 import android.util.Log
-import com.gxx.networksdkkotlin.ApiException
-import com.gxx.networksdkkotlin.LoginException
-import com.gxx.networksdkkotlin.NetworkException
+import com.google.android.gms.common.api.ApiException
+import com.gxx.neworklibrary.exception.LoginException
+import com.gxx.neworklibrary.exception.NetworkException
+
 
 interface ErrorHandler {
     var next: ErrorHandler?
@@ -11,7 +12,7 @@ interface ErrorHandler {
 }
 
 
-class LoginErrorHandler(override var next: ErrorHandler? = null) : ErrorHandler {
+/*class LoginErrorHandler(override var next: ErrorHandler? = null) : ErrorHandler {
     override suspend fun handleError(error: ApiException, result: RequestResult.Error): Boolean {
         return if (error is LoginException) {
             // 处理需要登录的情况，例如跳转到登录页面或显示提示信息
@@ -21,7 +22,8 @@ class LoginErrorHandler(override var next: ErrorHandler? = null) : ErrorHandler 
             false
         }
     }
-}
+}*/
+/*
 class NetWorkErrorHandler(override var next: ErrorHandler? = null) : ErrorHandler {
     override suspend fun handleError(error: ApiException, result: RequestResult.Error): Boolean {
         return if (error is NetworkException) {
@@ -36,5 +38,6 @@ class NetWorkErrorHandler(override var next: ErrorHandler? = null) : ErrorHandle
         }
     }
 }
+*/
 
 

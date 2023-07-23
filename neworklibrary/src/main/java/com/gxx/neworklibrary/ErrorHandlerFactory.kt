@@ -1,5 +1,6 @@
 package com.gxx.neworklibrary
 
+/*
 object ErrorHandlerFactory {
     private val errorHandlerChain: MutableList<ErrorHandler> by lazy {
         createErrorHandlerChain()
@@ -17,3 +18,4 @@ object ErrorHandlerFactory {
         return errorHandlerChain.first()
     }
 }
+*/
