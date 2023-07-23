@@ -1,12 +1,13 @@
 package com.gxx.neworklibrary
 
 import com.gxx.neworklibrary.apiservice.BaseApiService
-import com.gxx.neworklibrary.exception.base.ResponeThrowable
+import com.gxx.neworklibrary.exception.ApiException
 import com.gxx.neworklibrary.inter.OnFactoryListener
 import com.gxx.neworklibrary.inter.OnInterceptorListener
 import com.gxx.neworklibrary.inter.OnOkHttpRequestManagerListener
 import com.gxx.neworklibrary.inter.OnResponseBodyTransformJsonListener
-import com.gxx.neworklibrary.request.AbsRequest
+import com.gxx.neworklibrary.request.MobileRequest
+import com.gxx.neworklibrary.request.base.AbsRequest
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -18,22 +19,17 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
     private var mRequestUrl: String = ""//连接地址
     private var mRetryOnConnectionFailure = false
     private var mIsDebug = false
-    private var mExceptions = mutableListOf<ResponeThrowable>()
+    private var mExceptions = mutableListOf<ApiException>()
     private var mOnFactoryListener: OnFactoryListener? = null
-    private var mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener? = null
     private var mOnInterceptorListener: OnInterceptorListener? = null
     private var mRetrofit:Retrofit?=null
-    private var mAbsRequest = AbsRequest()
+
 
 
     private constructor(builder: Builder) {
         //做检查操作
         if (builder.getRequestUrl().isEmpty()){
             throw IllegalStateException("请求地址是空的")
-        }
-
-        if (builder.getOnResponseBodyTransformJsonListener() == null){
-            throw IllegalStateException("BaseBean 解析器为设置")
         }
 
 
@@ -43,11 +39,8 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
         this.mReadTimeout = builder.getReadTimeout()
         this.mIsDebug = builder.getIsDebug()
         this.mRetryOnConnectionFailure = builder.getRetryOnConnectionFailure()
-        this.mOnResponseBodyTransformJsonListener = builder.getOnResponseBodyTransformJsonListener()
         this.mOnInterceptorListener = builder.getOnInterceptorListener()
         this.mOnFactoryListener = builder.getOnFactoryListener()
-
-        mAbsRequest.setOnResponseBodyTransformJsonListener(mOnResponseBodyTransformJsonListener!!)
 
 
         val logInterceptor = HttpLoggingInterceptor()
@@ -88,12 +81,7 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
                 reBuilder.addConverterFactory(converterFactory)
             }
         }
-
-
         mRetrofit = reBuilder.build()
-
-        mAbsRequest.setOnOkHttpRequestManagerListener(this)
-
     }
 
     /**
@@ -123,10 +111,9 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
         private var mRequestUrl: String = ""//连接地址
         private var mRetryOnConnectionFailure = false
         private var mIsDebug = false
-        private var mExceptions = mutableListOf<ResponeThrowable>()
+        private var mExceptions = mutableListOf<ApiException>()
         private var mOnFactoryListener: OnFactoryListener? = null //Factory
         private var mOnInterceptorListener: OnInterceptorListener? = null // 拦截器
-        private var mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener? = null//BaseBean 解析器
 
 
         fun getConnectTimeoutSecond(): Int {
@@ -149,7 +136,7 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
             return mIsDebug
         }
 
-        fun getExceptions(): MutableList<ServerApiException> {
+        fun getExceptions(): MutableList<ApiException> {
             return mExceptions
         }
 
@@ -161,19 +148,14 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
             return mOnInterceptorListener
         }
 
-        fun getOnResponseBodyTransformJsonListener():OnResponseBodyTransformJsonListener?{
-            return mOnResponseBodyTransformJsonListener
-        }
+
 
         fun setRequestUrl(url:String):Builder{
             this.mRequestUrl = url
             return this
         }
 
-        fun setOnResponseBodyTransformJsonListener(listener:OnResponseBodyTransformJsonListener):Builder{
-            this.mOnResponseBodyTransformJsonListener = listener
-            return this
-        }
+
 
         /**
          * @date 创建时间: 2023/7/20
@@ -200,7 +182,7 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
          * @auther gaoxiaoxiong
          * @description 设置 AbsApiException
          **/
-        fun setApiExceptions(exceptions: MutableList<ResponeThrowable>) : Builder{
+        fun setApiExceptions(exceptions: MutableList<ApiException>) : Builder{
             this.mExceptions = exceptions
             return this
         }
@@ -254,11 +236,9 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
         return this
     }
 
-    override fun onApiExceptions(): MutableList<ResponeThrowable> {
+    override fun onApiExceptions(): MutableList<ApiException> {
        return mExceptions
     }
 
-    fun getMobileRequest():AbsRequest{
-        return mAbsRequest
-    }
+
 }

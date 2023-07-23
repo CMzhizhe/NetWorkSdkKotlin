@@ -24,8 +24,8 @@ interface OnRequestListener {
         bodyMap: Map<String, Any>?=null,
         emRequestType: EmRequestType,
         emResultType: EmResultType,
-        onRequestSuccessListener: OnRequestSuccessListener,
-        onRequestFailListener: OnRequestFailListener
+        onRequestSuccessListener: OnRequestSuccessListener?,
+        onRequestFailListener: OnRequestFailListener?
     )
 
     fun doSyncRequest(
@@ -34,7 +34,7 @@ interface OnRequestListener {
         bodyMap: Map<String, Any>?=null,
         emRequestType: EmSyncRequestType,
         emResultType: EmResultType,
-        onRequestSuccessListener: OnRequestSuccessListener,
-        onRequestFailListener: OnRequestFailListener
+        onRequestSuccessListener: OnRequestSuccessListener?,
+        onRequestFailListener: OnRequestFailListener?
     )
 }

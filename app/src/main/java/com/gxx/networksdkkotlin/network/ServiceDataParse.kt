@@ -3,6 +3,7 @@ package com.gxx.networksdkkotlin.network
 import com.google.gson.JsonElement
 import com.gxx.networksdkkotlin.MoshiUtil
 import com.gxx.networksdkkotlin.bean.BaseBean
+import com.gxx.neworklibrary.exception.ExceptionHandle
 import com.gxx.neworklibrary.inter.OnIParserListener
 import com.gxx.neworklibrary.resultcall.AbsRequestResultImpl
 import com.squareup.moshi.JsonAdapter
@@ -15,6 +16,12 @@ import java.lang.reflect.ParameterizedType
  **/
 open class ServiceDataParse<T> : AbsRequestResultImpl() {
     private val TAG = "ServiceDataParse"
+
+    /**
+     * @date 创建时间: 2023/7/23
+     * @auther gaoxiaoxiong
+     * @description 成功结果回调
+     **/
     override fun onRequestSuccess(
         method: String,
         targetElement: JsonElement?,
@@ -30,7 +37,7 @@ open class ServiceDataParse<T> : AbsRequestResultImpl() {
             } catch (e: Exception) {
                 e.printStackTrace()
                 //处理解析异常
-                onRequestFail(null,"","解析异常", null,onIParserListener)
+                onRequestFail(e,"","解析异常", null,onIParserListener)
             }
 
             onRequestDataSuccess(if (result == null) null else result as T)
@@ -43,6 +50,11 @@ open class ServiceDataParse<T> : AbsRequestResultImpl() {
         }
     }
 
+    /**
+     * @date 创建时间: 2023/7/23
+     * @auther gaoxiaoxiong
+     * @description 失败接口的调用
+     **/
     override fun onRequestFail(
         throwable: Throwable?,
         status: String?,
@@ -51,7 +63,11 @@ open class ServiceDataParse<T> : AbsRequestResultImpl() {
         onIParserListener: OnIParserListener?
     ) {
         if (throwable!=null){
+            val responeThrowable = ExceptionHandle ().handleException(e = throwable)
+            //自定义解析错误处理
+            if (responeThrowable.code == ExceptionHandle.ERROR.UNKNOWN.toString()){
 
+            }
         }
         onRequestDataFail(status?:"", failMsg?:"", onIParserListener as BaseBean?)
         onRequestBaseBeanFail(onIParserListener as BaseBean? )

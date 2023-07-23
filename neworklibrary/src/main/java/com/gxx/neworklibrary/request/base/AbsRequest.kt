@@ -1,4 +1,4 @@
-package com.gxx.neworklibrary.request
+package com.gxx.neworklibrary.request.base
 
 import com.google.gson.Gson
 import com.gxx.neworklibrary.constans.EmRequestType
@@ -43,12 +43,10 @@ abstract class AbsRequest(
         bodyMap: Map<String, Any>?,
         emRequestType: EmRequestType,
         emResultType: EmResultType,
-        onRequestSuccessListener: OnRequestSuccessListener,
-        onRequestFailListener: OnRequestFailListener
+        onRequestSuccessListener: OnRequestSuccessListener?,
+        onRequestFailListener: OnRequestFailListener?
     ) {
-        if (method.isEmpty()) {
-            throw IllegalStateException("method 是空的")
-        }
+
 
         doComposeMapRequest(
             method,
@@ -76,8 +74,8 @@ abstract class AbsRequest(
         bodyMap: Map<String, Any>?,
         emRequestType: EmSyncRequestType,
         emResultType: EmResultType,
-        onRequestSuccessListener: OnRequestSuccessListener,
-        onRequestFailListener: OnRequestFailListener
+        onRequestSuccessListener: OnRequestSuccessListener?,
+        onRequestFailListener: OnRequestFailListener?
     ) {
         if (method.isEmpty()) {
             throw IllegalStateException("method 是空的")
@@ -107,7 +105,7 @@ abstract class AbsRequest(
         urlMap: Map<String, Any> = mutableMapOf(),
         bodyMap: Map<String, Any> = mutableMapOf(),
         emRequestType: EmRequestType,
-        onRequestFailListener: OnRequestFailListener
+        onRequestFailListener: OnRequestFailListener?
     ): Flow<OnIParserListener?> {
         val aipService = mOnOkHttpRequestManagerListener
             .onGetOkHttpRequestManager()
@@ -167,7 +165,7 @@ abstract class AbsRequest(
             emit(mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, it))
         }.catch {
             it.printStackTrace()
-            onRequestFailListener.onRequestFail(
+            onRequestFailListener?.onRequestFail(
                 it,
                 null,
                 null,
@@ -188,7 +186,7 @@ abstract class AbsRequest(
         urlMap: Map<String, Any> = mutableMapOf(),
         bodyMap: Map<String, Any> = mutableMapOf(),
         emRequestType: EmSyncRequestType,
-        onRequestFailListener: OnRequestFailListener
+        onRequestFailListener: OnRequestFailListener?
     ): OnIParserListener? {
         var onIParserListener: OnIParserListener? = null
         kotlin.runCatching {
@@ -236,7 +234,7 @@ abstract class AbsRequest(
             onIParserListener = mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, jsString)
         }.onFailure {
             it.printStackTrace()
-            onRequestFailListener.onRequestFail(
+            onRequestFailListener?.onRequestFail(
                 it,
                 null,
                 null,

@@ -1,7 +1,5 @@
 package com.gxx.neworklibrary.resultcall
 
-import com.google.gson.JsonElement
-import com.gxx.neworklibrary.inter.OnIParserListener
 import com.gxx.neworklibrary.inter.OnRequestFailListener
 import com.gxx.neworklibrary.inter.OnRequestSuccessListener
 
@@ -10,6 +8,6 @@ import com.gxx.neworklibrary.inter.OnRequestSuccessListener
  * @auther gaoxiaoxiong
  * @description 结果回调处理
  **/
-abstract class AbsRequestResultImpl: OnRequestSuccessListener, OnRequestFailListener {
+abstract class AbsRequestResultImpl : OnRequestSuccessListener, OnRequestFailListener {
 
 }
