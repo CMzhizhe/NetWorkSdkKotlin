@@ -1,8 +1,7 @@
 package com.gxx.neworklibrary.inter
 
 import com.gxx.neworklibrary.OkHttpRequestManager
-import com.gxx.neworklibrary.exception.AbsApiException
-import com.gxx.neworklibrary.resultcall.AbsRequestResultImpl
+import com.gxx.neworklibrary.exception.base.AbsApiException
 
 /**
   * @date 创建时间: 2023/7/21

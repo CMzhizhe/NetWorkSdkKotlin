@@ -7,7 +7,7 @@ import com.gxx.neworklibrary.inter.OnResponseBodyTransformJsonListener
 import okhttp3.ResponseBody
 
 class ServiceDataTransform: OnResponseBodyTransformJsonListener {
-    override suspend fun onResponseBodyTransformJson(
+    override  fun onResponseBodyTransformJson(
         method: String,
         jsString: String
     ): OnIParserListener {

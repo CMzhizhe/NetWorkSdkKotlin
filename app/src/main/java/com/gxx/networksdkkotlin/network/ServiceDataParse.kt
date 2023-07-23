@@ -1,17 +1,12 @@
 package com.gxx.networksdkkotlin.network
 
-import android.util.Log
 import com.google.gson.JsonElement
-import com.gxx.networksdkkotlin.BuildConfig
 import com.gxx.networksdkkotlin.MoshiUtil
 import com.gxx.networksdkkotlin.bean.BaseBean
 import com.gxx.neworklibrary.inter.OnIParserListener
 import com.gxx.neworklibrary.resultcall.AbsRequestResultImpl
 import com.squareup.moshi.JsonAdapter
 import java.lang.reflect.ParameterizedType
-import java.net.ConnectException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 
 /**
  * @date 创建时间: 2023/7/22
@@ -56,11 +51,7 @@ open class ServiceDataParse<T> : AbsRequestResultImpl() {
         onIParserListener: OnIParserListener?
     ) {
         if (throwable!=null){
-            if (throwable is SocketTimeoutException || throwable is ConnectException || throwable is UnknownHostException) {
-                if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "出现网络异常")
-                }
-            }
+
         }
         onRequestDataFail(status?:"", failMsg?:"", onIParserListener as BaseBean?)
         onRequestBaseBeanFail(onIParserListener as BaseBean? )

@@ -1,9 +1,8 @@
 package com.gxx.neworklibrary
 
-import android.util.Log
+
 import com.google.android.gms.common.api.ApiException
-import com.gxx.neworklibrary.exception.LoginException
-import com.gxx.neworklibrary.exception.NetworkException
+
 
 
 interface ErrorHandler {

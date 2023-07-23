@@ -13,5 +13,5 @@ interface OnResponseBodyTransformJsonListener {
      * @param method 请求的方法名称
      * @param jsString 服务器拿到的结果集
      **/
-    suspend fun onResponseBodyTransformJson(method:String,jsString: String):OnIParserListener
+    fun onResponseBodyTransformJson(method:String,jsString: String):OnIParserListener
 }
