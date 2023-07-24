@@ -3,7 +3,8 @@ package com.gxx.networksdkkotlin.network.pase
 import com.google.gson.JsonElement
 import com.gxx.networksdkkotlin.MoshiUtil
 import com.gxx.networksdkkotlin.bean.BaseBean
-import com.gxx.neworklibrary.exception.ExceptionHandle
+import com.gxx.neworklibrary.error.exception.ExceptionHandle
+import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
 import com.gxx.neworklibrary.inter.OnIParserListener
 import com.gxx.neworklibrary.resultcall.AbsRequestResultImpl
 import com.squareup.moshi.JsonAdapter
@@ -63,7 +64,7 @@ open class ServiceDataParse<T> : AbsRequestResultImpl() {
         onIParserListener: OnIParserListener?
     ) {
         if (throwable!=null){
-            val responeThrowable = ExceptionHandle().handleException(e = throwable)
+            val responeThrowable = ErrorHandlerFactory.netWorkException(throwable)
             //自定义解析错误处理
             if (responeThrowable.code == ExceptionHandle.ERROR.UNKNOWN.toString()){
 

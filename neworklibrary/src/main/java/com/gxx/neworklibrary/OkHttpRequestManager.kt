@@ -1,7 +1,7 @@
 package com.gxx.neworklibrary
 
 import com.gxx.neworklibrary.apiservice.BaseApiService
-import com.gxx.neworklibrary.exception.ApiException
+import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.inter.OnFactoryListener
 import com.gxx.neworklibrary.inter.OnInterceptorListener
 import com.gxx.neworklibrary.inter.OnOkHttpRequestManagerListener
@@ -102,7 +102,7 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
         private var mRequestUrl: String = ""//连接地址
         private var mRetryOnConnectionFailure = false
         private var mIsDebug = false
-        private var mExceptions = mutableListOf<ApiException>()
+        private var mExceptions = mutableListOf<AbsApiException>()
         private var mOnFactoryListener: OnFactoryListener? = null //Factory
         private var mOnInterceptorListener: OnInterceptorListener? = null // 拦截器
 
@@ -127,7 +127,7 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
             return mIsDebug
         }
 
-        fun getExceptions(): MutableList<ApiException> {
+        fun getExceptions(): MutableList<AbsApiException> {
             return mExceptions
         }
 

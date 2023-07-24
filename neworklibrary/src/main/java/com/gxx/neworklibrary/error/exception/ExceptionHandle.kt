@@ -1,4 +1,4 @@
-package com.gxx.neworklibrary.exception
+package com.gxx.neworklibrary.error.exception
 
 import android.net.ParseException
 import com.google.gson.JsonParseException
