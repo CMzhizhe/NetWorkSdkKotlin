@@ -1,17 +1,19 @@
 package com.gxx.neworklibrary
 
-class ErrorHandlerBuilder {
-    private val errorHandlerList: MutableList<ErrorHandler> = mutableListOf()
+import com.gxx.neworklibrary.inter.OnErrorHandler
 
-    fun addErrorHandler(errorHandler: ErrorHandler): ErrorHandlerBuilder {
-        errorHandlerList.add(errorHandler)
+class ErrorHandlerBuilder {
+    private val onErrorHandlerList: MutableList<OnErrorHandler> = mutableListOf()
+
+    fun addErrorHandler(onErrorHandler: OnErrorHandler): ErrorHandlerBuilder {
+        onErrorHandlerList.add(onErrorHandler)
         return this
     }
 
-    fun build(): MutableList<ErrorHandler> {
-        errorHandlerList.reduceRight { left, right ->
+    fun build(): MutableList<OnErrorHandler> {
+        onErrorHandlerList.reduceRight { left, right ->
             left.apply { next = right }
         }
-        return errorHandlerList
+        return onErrorHandlerList
     }
 }

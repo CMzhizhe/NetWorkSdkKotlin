@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
-import com.gxx.networksdkkotlin.network.ServiceDataParse
+import com.gxx.networksdkkotlin.network.pase.ServiceDataParse
 import com.gxx.neworklibrary.bean.Banner
 import kotlinx.coroutines.launch
 

@@ -2,15 +2,18 @@ package com.gxx.networksdkkotlin.network
 
 import com.gxx.networksdkkotlin.network.factory.FactoryImpl
 import com.gxx.networksdkkotlin.network.intercept.InterceptImpl
+import com.gxx.networksdkkotlin.network.pase.ServiceDataParse
 import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform
 import com.gxx.neworklibrary.OkHttpRequestManager
+import com.gxx.neworklibrary.exception.ApiException
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.MobileRequest
 
 
-class MAFRequest {
+object MAFRequest {
     private var mOkHttpRequestManager: OkHttpRequestManager? = null
     private var mMobileRequest: MobileRequest? = null
+    private var mApiExceptions = mutableListOf<ApiException>()
 
     /**
      * @date 创建时间: 2023/7/22
@@ -24,7 +27,8 @@ class MAFRequest {
             .setOnFactoryListener(FactoryImpl())
             .setOnInterceptorListener(InterceptImpl())
             .builder()
-        //网络请求构建完成
+
+        //设置BaseBean的解析
         mMobileRequest = MobileRequest(mOkHttpRequestManager!!,ServiceDataTransform())
     }
 

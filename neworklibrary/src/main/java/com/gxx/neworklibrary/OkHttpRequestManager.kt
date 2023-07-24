@@ -5,9 +5,6 @@ import com.gxx.neworklibrary.exception.ApiException
 import com.gxx.neworklibrary.inter.OnFactoryListener
 import com.gxx.neworklibrary.inter.OnInterceptorListener
 import com.gxx.neworklibrary.inter.OnOkHttpRequestManagerListener
-import com.gxx.neworklibrary.inter.OnResponseBodyTransformJsonListener
-import com.gxx.neworklibrary.request.MobileRequest
-import com.gxx.neworklibrary.request.base.AbsRequest
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -19,12 +16,9 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
     private var mRequestUrl: String = ""//连接地址
     private var mRetryOnConnectionFailure = false
     private var mIsDebug = false
-    private var mExceptions = mutableListOf<ApiException>()
     private var mOnFactoryListener: OnFactoryListener? = null
     private var mOnInterceptorListener: OnInterceptorListener? = null
     private var mRetrofit:Retrofit?=null
-
-
 
     private constructor(builder: Builder) {
         //做检查操作
@@ -32,16 +26,13 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
             throw IllegalStateException("请求地址是空的")
         }
 
-
         this.mConnectTimeoutSecond = builder.getConnectTimeoutSecond()
-        this.mExceptions = builder.getExceptions()
         this.mRequestUrl = builder.getRequestUrl()
         this.mReadTimeout = builder.getReadTimeout()
         this.mIsDebug = builder.getIsDebug()
         this.mRetryOnConnectionFailure = builder.getRetryOnConnectionFailure()
         this.mOnInterceptorListener = builder.getOnInterceptorListener()
         this.mOnFactoryListener = builder.getOnFactoryListener()
-
 
         val logInterceptor = HttpLoggingInterceptor()
         if (mIsDebug) {
@@ -149,13 +140,10 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
         }
 
 
-
         fun setRequestUrl(url:String):Builder{
             this.mRequestUrl = url
             return this
         }
-
-
 
         /**
          * @date 创建时间: 2023/7/20
@@ -177,15 +165,7 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
             return this
         }
 
-        /**
-         * @date 创建时间: 2023/7/20
-         * @auther gaoxiaoxiong
-         * @description 设置 AbsApiException
-         **/
-        fun setApiExceptions(exceptions: MutableList<ApiException>) : Builder{
-            this.mExceptions = exceptions
-            return this
-        }
+
 
         /**
          * @date 创建时间: 2023/7/20
@@ -235,10 +215,5 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
     override fun onGetOkHttpRequestManager(): OkHttpRequestManager {
         return this
     }
-
-    override fun onApiExceptions(): MutableList<ApiException> {
-       return mExceptions
-    }
-
 
 }

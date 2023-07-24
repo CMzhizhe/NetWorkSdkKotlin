@@ -47,6 +47,9 @@ abstract class AbsRequest(
         onRequestFailListener: OnRequestFailListener?
     ) {
 
+        if (method.isEmpty()) {
+            throw IllegalStateException("method 是空的")
+        }
 
         doComposeMapRequest(
             method,
@@ -80,8 +83,7 @@ abstract class AbsRequest(
         if (method.isEmpty()) {
             throw IllegalStateException("method 是空的")
         }
-       val listener = doSyncComposeMapRequest(method,urlMap?: mutableMapOf(),bodyMap?: mutableMapOf(),emRequestType,onRequestFailListener)
-           ?: return
+       val listener = doSyncComposeMapRequest(method,urlMap?: mutableMapOf(),bodyMap?: mutableMapOf(),emRequestType,onRequestFailListener) ?: return
         mJsonParseResult.doIParseResult(
             method,
             emResultType,

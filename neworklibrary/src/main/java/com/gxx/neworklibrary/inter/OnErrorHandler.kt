@@ -1,12 +1,11 @@
-package com.gxx.neworklibrary
+package com.gxx.neworklibrary.inter
+
+import com.gxx.neworklibrary.RequestResult
+import com.gxx.neworklibrary.exception.ApiException
 
 
-import com.google.android.gms.common.api.ApiException
-
-
-
-interface ErrorHandler {
-    var next: ErrorHandler?
+interface OnErrorHandler {
+    var next: OnErrorHandler?
     suspend fun handleError(error: ApiException, result: RequestResult.Error): Boolean
 }
 

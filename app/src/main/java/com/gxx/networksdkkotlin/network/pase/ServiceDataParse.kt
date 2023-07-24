@@ -1,4 +1,4 @@
-package com.gxx.networksdkkotlin.network
+package com.gxx.networksdkkotlin.network.pase
 
 import com.google.gson.JsonElement
 import com.gxx.networksdkkotlin.MoshiUtil
@@ -63,7 +63,7 @@ open class ServiceDataParse<T> : AbsRequestResultImpl() {
         onIParserListener: OnIParserListener?
     ) {
         if (throwable!=null){
-            val responeThrowable = ExceptionHandle ().handleException(e = throwable)
+            val responeThrowable = ExceptionHandle().handleException(e = throwable)
             //自定义解析错误处理
             if (responeThrowable.code == ExceptionHandle.ERROR.UNKNOWN.toString()){
 
