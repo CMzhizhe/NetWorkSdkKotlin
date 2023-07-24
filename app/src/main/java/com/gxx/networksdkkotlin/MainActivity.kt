@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
-import com.gxx.networksdkkotlin.network.pase.ServiceDataParse
+import com.gxx.networksdkkotlin.network.pase.DataParseSuFaCall
 import com.gxx.neworklibrary.bean.Banner
 import kotlinx.coroutines.launch
 
@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch{
             // 使用ApiRequestController进行请求
             MyApplication.getMAFRequest().getRequest("banner/json", mutableMapOf(),object :
-                ServiceDataParse<MutableList<Banner>>() {
+                DataParseSuFaCall<MutableList<Banner>>() {
                 override fun onRequestDataSuccess(data: MutableList<Banner>?) {
                     super.onRequestDataSuccess(data)
                     if(BuildConfig.DEBUG) {

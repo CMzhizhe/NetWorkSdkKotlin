@@ -2,7 +2,7 @@ package com.gxx.networksdkkotlin.network
 
 import com.gxx.networksdkkotlin.network.factory.FactoryImpl
 import com.gxx.networksdkkotlin.network.intercept.InterceptImpl
-import com.gxx.networksdkkotlin.network.pase.ServiceDataParse
+import com.gxx.networksdkkotlin.network.pase.DataParseSuFaCall
 import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform
 import com.gxx.neworklibrary.OkHttpRequestManager
 import com.gxx.neworklibrary.model.RqParamModel
@@ -41,8 +41,8 @@ object MAFRequest {
     suspend fun <T> getRequest(
         method: String,
         urlMap: Map<String, Any> = mutableMapOf(),
-        serviceDataParse: ServiceDataParse<T>
+        dataParseSuFaCall: DataParseSuFaCall<T>
     ) {
-        mMobileRequest?.get(RqParamModel(method=method,null,urlMap = urlMap),serviceDataParse,serviceDataParse)
+        mMobileRequest?.get(RqParamModel(method=method,null,urlMap = urlMap),dataParseSuFaCall,dataParseSuFaCall)
     }
 }
