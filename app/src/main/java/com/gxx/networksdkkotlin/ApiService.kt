@@ -1,5 +1,6 @@
 package com.gxx.networksdkkotlin
 
+import com.gxx.networksdkkotlin.bean.Response
 import com.gxx.neworklibrary.bean.Banner
 import retrofit2.http.GET
 
