@@ -4,11 +4,9 @@ package com.gxx.neworklibrary.error.factory
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.ExceptionHandle
 import com.gxx.neworklibrary.inter.OnErrorHandler
-import com.gxx.neworklibrary.model.ErrorPart
 
 
 object ErrorHandlerFactory {
-    private val mErrorPartList = mutableListOf<ErrorPart>()
     private val mErrorHandlers = mutableListOf<OnErrorHandler>()
 
     /**
@@ -51,18 +49,19 @@ object ErrorHandlerFactory {
     /**
      * @date 创建时间: 2023/7/24
      * @auther gaoxiaoxiong
-     * @description 添加错误part
+     * @description 添加错误处理的 ErrorHandler
      **/
-    fun addErrorHandler(errorPart: ErrorPart): ErrorHandlerFactory {
-        mErrorPartList.add(errorPart)
+    fun addErrorHandler(onErrorHandler: OnErrorHandler): ErrorHandlerFactory {
+        mErrorHandlers.add(onErrorHandler)
         return this
     }
 
+
+
     fun build(): MutableList<OnErrorHandler> {
-        mErrorPartList.reduceRight { left, right ->
+        mErrorHandlers.reduceRight { left, right ->
             left.apply {
-                this.onErrorHandler.next = right.onErrorHandler
-                mErrorHandlers.add(this.onErrorHandler)
+                this.next = right
             }
         }
         return mErrorHandlers

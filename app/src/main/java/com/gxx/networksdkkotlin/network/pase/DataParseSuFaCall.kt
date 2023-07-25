@@ -1,9 +1,8 @@
 package com.gxx.networksdkkotlin.network.pase
 
 import com.google.gson.JsonElement
-import com.gxx.networksdkkotlin.MoshiUtil
+import com.gxx.networksdkkotlin.util.MoshiUtil
 import com.gxx.networksdkkotlin.bean.BaseBean
-import com.gxx.networksdkkotlin.network.error.exception.LoginApiException
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.ExceptionHandle
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
@@ -66,9 +65,9 @@ open class DataParseSuFaCall<T> : AbsRequestResultImpl() {
         onIParserListener: OnIParserListener?
     ) {
         if (throwable!=null){
-            val responeThrowable = ErrorHandlerFactory.netWorkException(throwable)
+            val resPoneThrowable = ErrorHandlerFactory.netWorkException(throwable)
             //自定义解析错误处理
-            if (responeThrowable.code == ExceptionHandle.ERROR.UNKNOWN.toString() && throwable is AbsApiException){
+            if (resPoneThrowable.code == ExceptionHandle.ERROR.UNKNOWN.toString() && throwable is AbsApiException){
                 ErrorHandlerFactory.propaGateError(ErrorHandlerFactory.getErrorHandlers().first(),throwable)
             }
         }

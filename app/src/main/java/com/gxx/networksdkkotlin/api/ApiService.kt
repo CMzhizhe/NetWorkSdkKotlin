@@ -1,4 +1,4 @@
-package com.gxx.networksdkkotlin
+package com.gxx.networksdkkotlin.api
 
 import com.gxx.networksdkkotlin.bean.Response
 import com.gxx.neworklibrary.bean.Banner

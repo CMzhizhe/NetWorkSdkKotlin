@@ -1,14 +1,15 @@
 package com.gxx.networksdkkotlin.network
 
-import com.gxx.networksdkkotlin.network.error.exception.LoginApiException
 import com.gxx.networksdkkotlin.network.error.handler.LoginErrorHandler
+import com.gxx.networksdkkotlin.network.error.handler.PayErrorHandler
+import com.gxx.networksdkkotlin.network.error.handler.TokenErrorHandler
+import com.gxx.networksdkkotlin.network.error.handler.UnErrorHandler
 import com.gxx.networksdkkotlin.network.factory.FactoryImpl
 import com.gxx.networksdkkotlin.network.intercept.InterceptImpl
 import com.gxx.networksdkkotlin.network.pase.DataParseSuFaCall
 import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform
 import com.gxx.neworklibrary.OkHttpRequestManager
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
-import com.gxx.neworklibrary.model.ErrorPart
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.MobileRequest
 
@@ -30,8 +31,14 @@ object MAFRequest {
             .setOnFactoryListener(FactoryImpl())
             .setOnInterceptorListener(InterceptImpl())
             .builder()
+
         //添加自定义ErrorHandler
-        ErrorHandlerFactory.addErrorHandler(ErrorPart(LoginApiException(),LoginErrorHandler()))
+        ErrorHandlerFactory
+            .addErrorHandler(LoginErrorHandler())
+            .addErrorHandler(PayErrorHandler())
+            .addErrorHandler(TokenErrorHandler())
+            .addErrorHandler(UnErrorHandler())
+            .build()
 
         //设置BaseBean的解析
         mMobileRequest = MobileRequest(mOkHttpRequestManager!!,ServiceDataTransform())
