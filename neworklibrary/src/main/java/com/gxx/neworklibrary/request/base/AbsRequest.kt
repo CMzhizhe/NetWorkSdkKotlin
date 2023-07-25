@@ -1,5 +1,6 @@
 package com.gxx.neworklibrary.request.base
 
+import android.util.Log
 import com.google.gson.Gson
 import com.gxx.neworklibrary.constans.EmRequestType
 import com.gxx.neworklibrary.constans.EmResultType
@@ -9,6 +10,7 @@ import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import com.gxx.neworklibrary.util.MultipartBodyUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import okhttp3.ResponseBody
 
 
 /**
@@ -112,60 +114,56 @@ abstract class AbsRequest(
         val aipService = mOnOkHttpRequestManagerListener
             .onGetOkHttpRequestManager()
             .createBaseApi()
-        val responseBody = when (emRequestType) {
-            EmRequestType.GET -> {
-                aipService.getJson(method, urlMap ?: mutableMapOf())
-            }
+        var responseBody:ResponseBody? = null
+        kotlin.runCatching {
+            responseBody = when (emRequestType) {
+                EmRequestType.GET -> {
+                    aipService.getJson(method, urlMap ?: mutableMapOf())
+                }
 
-            EmRequestType.POST -> {
-                if (bodyMap.isNotEmpty()) {
-                    aipService.postJson(
+                EmRequestType.POST -> {
+                    if (bodyMap.isNotEmpty()) {
+                        aipService.postJson(
                             method,
                             urlMap,
                             mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
                         )
-                } else {
-                    aipService.postJson(method, urlMap ?: mutableMapOf())
+                    } else {
+                        aipService.postJson(method, urlMap ?: mutableMapOf())
+                    }
                 }
-            }
 
-            EmRequestType.POST_FORM -> {
-                if (bodyMap.isNotEmpty()) {
-                    aipService.postForm(method, urlMap, bodyMap)
-                } else {
-                    aipService.postForm(method, urlMap)
+                EmRequestType.POST_FORM -> {
+                    if (bodyMap.isNotEmpty()) {
+                        aipService.postForm(method, urlMap, bodyMap)
+                    } else {
+                        aipService.postForm(method, urlMap)
+                    }
                 }
-            }
 
-            EmRequestType.PUT -> {
-                if (bodyMap.isNotEmpty()) {
-                    aipService.putJson(
+                EmRequestType.PUT -> {
+                    if (bodyMap.isNotEmpty()) {
+                        aipService.putJson(
                             method,
                             urlMap,
                             mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
                         )
-                } else {
-                    aipService.putJson(method, urlMap)
+                    } else {
+                        aipService.putJson(method, urlMap)
+                    }
+                }
+
+                EmRequestType.PUT_FORM -> {
+                    if (bodyMap.isNotEmpty()) {
+                        aipService
+                            .putForm(method, urlMap, bodyMap)
+                    } else {
+                        aipService
+                            .putForm(method, urlMap)
+                    }
                 }
             }
-
-            EmRequestType.PUT_FORM -> {
-                if (bodyMap.isNotEmpty()) {
-                    aipService
-                        .putForm(method, urlMap, bodyMap)
-                } else {
-                    aipService
-                        .putForm(method, urlMap)
-                }
-            }
-        }
-
-
-        return flow<String> {
-            emit(responseBody.string())
-        }.transform<String, OnIParserListener?> {
-            emit(mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, it))
-        }.catch {
+        }.onFailure {
             it.printStackTrace()
             onRequestFailListener?.onRequestFail(
                 it,
@@ -174,8 +172,28 @@ abstract class AbsRequest(
                 null,
                 null
             )
-            emit(null)
-        }.flowOn(Dispatchers.IO)
+        }
+        if (responseBody == null){
+            return flow {
+                emit(null)
+            }
+        }else{
+            return flow<String> {
+                emit(responseBody!!.string())
+            }.transform<String, OnIParserListener?> {
+                emit(mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, it))
+            }.catch {
+                it.printStackTrace()
+                onRequestFailListener?.onRequestFail(
+                    it,
+                    null,
+                    null,
+                    null,
+                    null
+                )
+                emit(null)
+            }.flowOn(Dispatchers.IO)
+        }
     }
 
     /**
