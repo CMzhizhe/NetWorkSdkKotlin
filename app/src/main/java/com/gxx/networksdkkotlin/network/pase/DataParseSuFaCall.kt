@@ -3,6 +3,8 @@ package com.gxx.networksdkkotlin.network.pase
 import com.google.gson.JsonElement
 import com.gxx.networksdkkotlin.MoshiUtil
 import com.gxx.networksdkkotlin.bean.BaseBean
+import com.gxx.networksdkkotlin.network.error.exception.LoginApiException
+import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.ExceptionHandle
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
 import com.gxx.neworklibrary.inter.OnIParserListener
@@ -66,8 +68,8 @@ open class DataParseSuFaCall<T> : AbsRequestResultImpl() {
         if (throwable!=null){
             val responeThrowable = ErrorHandlerFactory.netWorkException(throwable)
             //自定义解析错误处理
-            if (responeThrowable.code == ExceptionHandle.ERROR.UNKNOWN.toString()){
-
+            if (responeThrowable.code == ExceptionHandle.ERROR.UNKNOWN.toString() && throwable is AbsApiException){
+                ErrorHandlerFactory.propaGateError(ErrorHandlerFactory.getErrorHandlers().first(),throwable)
             }
         }
         onRequestDataFail(status?:"", failMsg?:"", onIParserListener as BaseBean?)

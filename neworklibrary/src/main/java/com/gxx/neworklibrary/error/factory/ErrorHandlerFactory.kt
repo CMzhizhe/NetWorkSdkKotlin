@@ -1,6 +1,7 @@
 package com.gxx.neworklibrary.error.factory
 
 
+import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.ExceptionHandle
 import com.gxx.neworklibrary.inter.OnErrorHandler
 import com.gxx.neworklibrary.model.ErrorPart
@@ -10,7 +11,12 @@ object ErrorHandlerFactory {
     private val mErrorPartList = mutableListOf<ErrorPart>()
     private val mErrorHandlers = mutableListOf<OnErrorHandler>()
 
-    private fun getErrorHandlers():MutableList<OnErrorHandler>{
+    /**
+      * @date 创建时间: 2023/7/25
+      * @auther gxx
+      * @description 拿到自己处理错误的Handler
+      **/
+    fun getErrorHandlers():MutableList<OnErrorHandler>{
         return mErrorHandlers
     }
 
@@ -23,6 +29,24 @@ object ErrorHandlerFactory {
     fun netWorkException(e: Throwable): ExceptionHandle.ResponeThrowable {
         return ExceptionHandle().handleException(e = e)
     }
+
+    /**
+      * @date 创建时间: 2023/7/25
+      * @auther gxx
+      * @description 错误Handler处理
+      **/
+    fun propaGateError(
+        errorHandler: OnErrorHandler?,
+        error: AbsApiException
+    ){
+
+        if (errorHandler == null || errorHandler.handleError(error)) {
+             //错误已处理
+        } else {
+            propaGateError(errorHandler.next, error)
+        }
+    }
+
 
     /**
      * @date 创建时间: 2023/7/24

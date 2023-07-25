@@ -10,7 +10,7 @@ import com.gxx.neworklibrary.inter.OnErrorHandler
  * @description 错误handler处理
  **/
 class LoginErrorHandler(override var next: OnErrorHandler?) : OnErrorHandler {
-    override suspend fun handleError(error: AbsApiException): Boolean {
+    override  fun handleError(error: AbsApiException): Boolean {
         if (error is LoginApiException){
 
             return true

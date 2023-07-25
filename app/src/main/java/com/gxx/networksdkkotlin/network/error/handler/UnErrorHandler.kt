@@ -5,7 +5,7 @@ import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.inter.OnErrorHandler
 
 class UnErrorHandler (override var next: OnErrorHandler?) : OnErrorHandler {
-    override suspend fun handleError(error: AbsApiException): Boolean {
+    override  fun handleError(error: AbsApiException): Boolean {
         if (error is TokenApiException){
 
             return true

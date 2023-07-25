@@ -1,10 +1,14 @@
 package com.gxx.networksdkkotlin.network
 
+import com.gxx.networksdkkotlin.network.error.exception.LoginApiException
+import com.gxx.networksdkkotlin.network.error.handler.LoginErrorHandler
 import com.gxx.networksdkkotlin.network.factory.FactoryImpl
 import com.gxx.networksdkkotlin.network.intercept.InterceptImpl
 import com.gxx.networksdkkotlin.network.pase.DataParseSuFaCall
 import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform
 import com.gxx.neworklibrary.OkHttpRequestManager
+import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
+import com.gxx.neworklibrary.model.ErrorPart
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.MobileRequest
 
@@ -27,7 +31,7 @@ object MAFRequest {
             .setOnInterceptorListener(InterceptImpl())
             .builder()
         //添加自定义ErrorHandler
-
+        ErrorHandlerFactory.addErrorHandler(ErrorPart(LoginApiException(),LoginErrorHandler()))
 
         //设置BaseBean的解析
         mMobileRequest = MobileRequest(mOkHttpRequestManager!!,ServiceDataTransform())
