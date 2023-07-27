@@ -1,50 +1,92 @@
 package com.gxx.neworklibrary
 
 import com.gxx.neworklibrary.apiservice.BaseApiService
-import com.gxx.neworklibrary.error.exception.AbsApiException
-import com.gxx.neworklibrary.inter.OnFactoryListener
-import com.gxx.neworklibrary.inter.OnInterceptorListener
-import com.gxx.neworklibrary.inter.OnOkHttpRequestManagerListener
+import com.gxx.neworklibrary.okbuild.OkBuilder
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 
-class OkHttpRequestManager : OnOkHttpRequestManagerListener {
-    private var mConnectTimeoutSecond = 10//连接时间
-    private var mReadTimeout = 10//读写时间
-    private var mRequestUrl: String = ""//连接地址
-    private var mRetryOnConnectionFailure = false
-    private var mIsDebug = false
-    private var mOnFactoryListener: OnFactoryListener? = null
-    private var mOnInterceptorListener: OnInterceptorListener? = null
-    private var mRetrofit:Retrofit?=null
+/**
+ * @date 创建时间: 2023/7/27
+ * @auther gxx
+ * @description 管理所有的 Retrofit
+ **/
+object OkHttpRequestManager {
+    private val TAG = "OkHttpRequestManager"
+    private var mMapBuilder = hashMapOf<String, OkBuilder>()//构建的 OkBuilder
+    private var mMapRetrofit = hashMapOf<String, Retrofit>() // 根据域名构建的 Retrofit
 
-    private constructor(builder: Builder) {
-        //做检查操作
-        if (builder.getRequestUrl().isEmpty()){
-            throw IllegalStateException("请求地址是空的")
+
+    /**
+     * @date 创建时间: 2023/7/27
+     * @auther gxx
+     * @description 添加 OkBuilder
+     **/
+    fun addOkBuilder(builder: OkBuilder): OkHttpRequestManager {
+        mMapBuilder[builder.getRequestUrl()] = builder
+        return this
+    }
+
+    /**
+      * @date 创建时间: 2023/7/27
+      * @auther gxx
+      * @description 自定义参数的配置。添加，自己定义的 Retrofit
+     * @param baseUrl 基本的baseUrl
+     * @param retrofit 用户自己创建的
+      **/
+    fun addRetrofit(baseUrl: String,retrofit: Retrofit): OkHttpRequestManager{
+        if (baseUrl.isEmpty()){
+            throw IllegalStateException("RequestUrl is empty")
+        }
+        //判断mRequestUrl 是否 /结尾
+        if (baseUrl.last().toString()!="/"){
+            throw IllegalStateException("RequestUrl is 需要以 '/' 结尾，形如www.xxx.com/")
+        }
+        mMapRetrofit[baseUrl] = retrofit
+        return this
+    }
+
+    /**
+     * @date 创建时间: 2023/7/27
+     * @auther gxx
+     * @description 通过okBuilders 创建 Retrofits
+     **/
+    fun create() {
+        if (mMapBuilder.isEmpty()) {
+            throw IllegalStateException("未配置任何的 OkBuilder")
         }
 
-        this.mConnectTimeoutSecond = builder.getConnectTimeoutSecond()
-        this.mRequestUrl = builder.getRequestUrl()
-        this.mReadTimeout = builder.getReadTimeout()
-        this.mIsDebug = builder.getIsDebug()
-        this.mRetryOnConnectionFailure = builder.getRetryOnConnectionFailure()
-        this.mOnInterceptorListener = builder.getOnInterceptorListener()
-        this.mOnFactoryListener = builder.getOnFactoryListener()
-
-        val logInterceptor = HttpLoggingInterceptor()
-        if (mIsDebug) {
-            logInterceptor.level = HttpLoggingInterceptor.Level.BODY
-        } else {
-            logInterceptor.level = HttpLoggingInterceptor.Level.NONE
+        for (baseUrl in mMapBuilder.keys) {
+            if (mMapBuilder[baseUrl] == null) {
+                continue
+            }
+            mMapRetrofit[baseUrl] = createRetrofit(mMapBuilder[baseUrl]!!)
         }
+    }
+
+    /**
+     * @date 创建时间: 2023/7/27
+     * @auther gxx
+     * @description 返回retrofit
+     **/
+    fun getRetrofit(baseUrl: String): Retrofit? {
+        return mMapRetrofit[baseUrl]
+    }
+
+    /**
+     * @date 创建时间: 2023/7/27
+     * @auther gxx
+     * @description 构建 retrofit
+     **/
+    fun createRetrofit(builder: OkBuilder): Retrofit {
+        val mRequestUrl = builder.getRequestUrl()
+        val mRetryOnConnectionFailure = builder.getRetryOnConnectionFailure()
+        val mOnInterceptorListener = builder.getOnInterceptorListener()
+        val mOnFactoryListener = builder.getOnFactoryListener()
 
         val okBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
-            .connectTimeout(mConnectTimeoutSecond.toLong(), TimeUnit.SECONDS)
-            .readTimeout(mReadTimeout.toLong(), TimeUnit.SECONDS)
-            .addInterceptor(logInterceptor)
+            .connectTimeout(builder.getConnectTimeoutSecond().toLong(), TimeUnit.SECONDS)
+            .readTimeout(builder.getReadTimeout().toLong(), TimeUnit.SECONDS)
             .retryOnConnectionFailure(mRetryOnConnectionFailure) //是否失败重新请求连接
 
         mOnInterceptorListener?.let {
@@ -59,7 +101,7 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
 
 
         val reBuilder: Retrofit.Builder = Retrofit.Builder()
-            .baseUrl(this.mRequestUrl)
+            .baseUrl(mRequestUrl)
             .client(okBuilder.build())
 
 
@@ -72,148 +114,34 @@ class OkHttpRequestManager : OnOkHttpRequestManagerListener {
                 reBuilder.addConverterFactory(converterFactory)
             }
         }
-        mRetrofit = reBuilder.build()
+        return reBuilder.build()
+    }
+
+
+    /**
+     * @date 创建时间: 2023/7/21
+     * @auther gxx
+     * @description 获取公共API
+     * @param url 请求的地址
+     **/
+    fun <T> getApi(url: String, clazz: Class<T>): T {
+        if (url.isEmpty() || mMapRetrofit[url] == null) {
+            throw IllegalStateException("请先执行addOkBuilder")
+        }
+        return mMapRetrofit[url]!!.create(clazz)
     }
 
     /**
-      * @date 创建时间: 2023/7/21
-      * @auther gxx
-      * @description 构建 BaseApiService
-      **/
-    fun createBaseApi():BaseApiService{
-        return getApi(BaseApiService::class.java)
-    }
-
-    /**
-      * @date 创建时间: 2023/7/21
-      * @auther gxx
-      * @description 获取公共API
-      **/
-    fun <T> getApi(clazz: Class<T>): T {
-        if (mRetrofit == null){
-            throw IllegalStateException("请先builder")
+     * @date 创建时间: 2023/7/21
+     * @auther gxx
+     * @description 构建 BaseApiService
+     * @param baseUrl 请求的地址
+     **/
+    fun onGetBaseApiService(baseUrl: String): BaseApiService {
+        if (mMapRetrofit[baseUrl] == null) {
+            throw IllegalStateException("请先执行addOkBuilder")
         }
-        return mRetrofit!!.create(clazz)
-    }
-
-    class Builder {
-        private var mConnectTimeoutSecond = 10//连接时间
-        private var mReadTimeout = 10//读写时间
-        private var mRequestUrl: String = ""//连接地址
-        private var mRetryOnConnectionFailure = false
-        private var mIsDebug = false
-        private var mExceptions = mutableListOf<AbsApiException>()
-        private var mOnFactoryListener: OnFactoryListener? = null //Factory
-        private var mOnInterceptorListener: OnInterceptorListener? = null // 拦截器
-
-
-        fun getConnectTimeoutSecond(): Int {
-            return mConnectTimeoutSecond
-        }
-
-        fun getReadTimeout(): Int {
-            return mReadTimeout
-        }
-
-        fun getRequestUrl(): String {
-            return mRequestUrl
-        }
-
-        fun getRetryOnConnectionFailure(): Boolean {
-            return mRetryOnConnectionFailure
-        }
-
-        fun getIsDebug(): Boolean {
-            return mIsDebug
-        }
-
-        fun getExceptions(): MutableList<AbsApiException> {
-            return mExceptions
-        }
-
-        fun getOnFactoryListener(): OnFactoryListener? {
-            return mOnFactoryListener
-        }
-
-        fun getOnInterceptorListener(): OnInterceptorListener? {
-            return mOnInterceptorListener
-        }
-
-
-        fun setRequestUrl(url:String):Builder{
-            this.mRequestUrl = url
-            return this
-        }
-
-        /**
-         * @date 创建时间: 2023/7/20
-         * @auther gaoxiaoxiong
-         * @description 设置intercept
-         **/
-        fun setOnInterceptorListener(listener: OnInterceptorListener): Builder {
-            this.mOnInterceptorListener = listener
-            return this
-        }
-
-        /**
-         * @date 创建时间: 2023/7/20
-         * @auther gaoxiaoxiong
-         * @description 设置工厂factory
-         **/
-        fun setOnFactoryListener(listener: OnFactoryListener): Builder {
-            this.mOnFactoryListener = listener
-            return this
-        }
-
-
-
-        /**
-         * @date 创建时间: 2023/7/20
-         * @auther gaoxiaoxiong
-         * @description 设置连接的时间
-         **/
-        fun setConnectTimeoutSecond(connectionTimeOut: Int): Builder {
-            this.mConnectTimeoutSecond = connectionTimeOut
-            return this
-        }
-
-        /**
-         * @date 创建时间: 2023/7/20
-         * @auther gaoxiaoxiong
-         * @description 设置读写时间
-         **/
-        fun setReadTimeout(readTimeout: Int): Builder {
-            this.mReadTimeout = readTimeout
-            return this
-        }
-
-        /**
-         * @date 创建时间: 2023/7/20
-         * @auther gaoxiaoxiong
-         * @description 设置是否尝试重连
-         **/
-        fun setRetryOnConnectionFailure(retryOnConnectionFailure: Boolean): Builder {
-            this.mRetryOnConnectionFailure = retryOnConnectionFailure
-            return this
-        }
-
-        /**
-         * @date 创建时间: 2023/7/20
-         * @auther gaoxiaoxiong
-         * @description 是否开发者模式
-         **/
-        fun setIsDebug(isDebug: Boolean): Builder {
-            this.mIsDebug = isDebug
-            return this
-        }
-
-        fun builder():OkHttpRequestManager{
-            return OkHttpRequestManager(this)
-        }
-    }
-
-    override fun onGetOkHttpRequestManager(): OkHttpRequestManager {
-        return this
+        return getApi(baseUrl, BaseApiService::class.java)
     }
 
 }

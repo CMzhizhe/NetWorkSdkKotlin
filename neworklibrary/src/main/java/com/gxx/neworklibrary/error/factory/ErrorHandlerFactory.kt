@@ -6,7 +6,7 @@ import com.gxx.neworklibrary.error.exception.ExceptionHandle
 import com.gxx.neworklibrary.inter.OnErrorHandler
 
 
-object ErrorHandlerFactory {
+class ErrorHandlerFactory {
     private val mErrorHandlers = mutableListOf<OnErrorHandler>()
 
     /**
@@ -45,7 +45,6 @@ object ErrorHandlerFactory {
         }
     }
 
-
     /**
      * @date 创建时间: 2023/7/24
      * @auther gaoxiaoxiong
@@ -57,16 +56,12 @@ object ErrorHandlerFactory {
     }
 
 
-
-    fun build(): MutableList<OnErrorHandler> {
+    fun init():ErrorHandlerFactory{
         mErrorHandlers.reduceRight { left, right ->
             left.apply {
                 this.next = right
             }
         }
-        return mErrorHandlers
+        return this
     }
-
-
-
 }
