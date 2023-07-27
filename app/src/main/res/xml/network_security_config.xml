@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <!-- 信任系统预装 CA 证书 -->
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- 支持 Android 7.0 以上调试时，信任 Charles 等抓包工具的证书 -->
+    <debug-overrides cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>

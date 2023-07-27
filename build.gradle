@@ -1,6 +1,19 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id 'com.android.application' version '7.0.3' apply false
-    id 'com.android.library' version '7.0.3' apply false
+    id 'com.android.application' version '7.2.0' apply false
+    id 'com.android.library' version '7.2.0' apply false
     id 'org.jetbrains.kotlin.android' version '1.8.0' apply false
+}
+
+subprojects {
+    project.configurations.all {
+        // 统一项目依赖库的版本
+        resolutionStrategy.eachDependency { details ->
+            switch (details.requested.group) {
+                case "androidx.core":
+                    details.useVersion "1.7.0"
+                    break
+            }
+        }
+    }
 }
