@@ -1,11 +1,11 @@
 package com.gxx.neworklibrary.request.base
 
-import android.util.Log
 import com.google.gson.Gson
+import com.gxx.neworklibrary.OkHttpRequestManager
 import com.gxx.neworklibrary.constans.EmRequestType
-import com.gxx.neworklibrary.constans.EmResultType
 import com.gxx.neworklibrary.constans.EmSyncRequestType
 import com.gxx.neworklibrary.inter.*
+import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import com.gxx.neworklibrary.util.MultipartBodyUtils
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +19,6 @@ import okhttp3.ResponseBody
  * @description 请求的封装
  **/
 abstract class AbsRequest(
-    private val mOnOkHttpRequestManagerListener: OnOkHttpRequestManagerListener,
     private val mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener
 ) : OnRequestListener {
     private val TAG = "MobileRequest"
@@ -31,32 +30,29 @@ abstract class AbsRequest(
     /**
      * @author gaoxiaoxiong
      * @date 创建时间: 2023/6/24/024
-     * @description  get 请求
-     * @param method 整个接口名称，包含域名在内
-     * @param urlMapString 拼接在url后面
-     * @param bodyMap 放到body里面
+     * @description  异步 请求
+     * @param rqParamModel 请求参数的封装
      * @param emRequestType 请求类型
-     * @param emResultType 希望的结果
-     * @param  requestResultValue 希望服务器给的集合的结果
      */
     override suspend fun doRequest(
-        method: String,
-        urlMap: Map<String, Any>?,
-        bodyMap: Map<String, Any>?,
+        rqParamModel: RqParamModel,
         emRequestType: EmRequestType,
-        emResultType: EmResultType,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
+        if (rqParamModel.baseUrl.isEmpty()) {
+            throw IllegalStateException("baseUrl 是空的")
+        }
 
-        if (method.isEmpty()) {
-            throw IllegalStateException("method 是空的")
+        if (rqParamModel.funName.isEmpty()) {
+            throw IllegalStateException("funName 是空的")
         }
 
         doComposeMapRequest(
-            method,
-            urlMap ?: mutableMapOf(),
-            bodyMap ?: mutableMapOf(),
+            rqParamModel.baseUrl,
+            rqParamModel.funName,
+            rqParamModel.urlMap ?: mutableMapOf(),
+            rqParamModel.bodyMap ?: mutableMapOf(),
             emRequestType,
             onRequestFailListener
         ).collect {
@@ -64,8 +60,8 @@ abstract class AbsRequest(
                 return@collect
             }
             mJsonParseResult.doIParseResult(
-                method,
-                emResultType,
+                "${rqParamModel.baseUrl}${rqParamModel.funName}",
+                rqParamModel.emResultType,
                 listener = it,
                 onRequestSuccessListener,
                 onRequestFailListener
@@ -73,48 +69,61 @@ abstract class AbsRequest(
         }
     }
 
+
     override fun doSyncRequest(
-        method: String,
-        urlMap: Map<String, Any>?,
-        bodyMap: Map<String, Any>?,
+        rqParamModel: RqParamModel,
         emRequestType: EmSyncRequestType,
-        emResultType: EmResultType,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-        if (method.isEmpty()) {
-            throw IllegalStateException("method 是空的")
+        if (rqParamModel.baseUrl.isEmpty()) {
+            throw IllegalStateException("baseUrl 是空的")
         }
-       val listener = doSyncComposeMapRequest(method,urlMap?: mutableMapOf(),bodyMap?: mutableMapOf(),emRequestType,onRequestFailListener) ?: return
+
+        if (rqParamModel.funName.isEmpty()) {
+            throw IllegalStateException("funName 是空的")
+        }
+
+        val listener = doSyncComposeMapRequest(
+            rqParamModel.baseUrl,
+            rqParamModel.funName,
+            rqParamModel.urlMap ?: mutableMapOf(),
+            rqParamModel.bodyMap ?: mutableMapOf(),
+            emRequestType,
+            onRequestFailListener
+        ) ?: return
         mJsonParseResult.doIParseResult(
-            method,
-            emResultType,
+            "${rqParamModel.baseUrl}${rqParamModel.funName}",
+            rqParamModel.emResultType,
             listener,
             onRequestSuccessListener,
             onRequestFailListener
         )
     }
 
+
     /**
      * @date 创建时间: 2023/7/21
      * @auther gxx
      * @description 异步请求
-     * @param method 请求的方法名称
+     * @param baseUrl baseUrl
+     * @param funName 接口名称
      * @param urlMap 连接后面的参数
      * @param bodyMap 针对post,put使用
      * @param emRequestType 请求的类型
      **/
     private suspend fun doComposeMapRequest(
-        method: String,
+        baseUrl: String,
+        funName: String,
         urlMap: Map<String, Any> = mutableMapOf(),
         bodyMap: Map<String, Any> = mutableMapOf(),
         emRequestType: EmRequestType,
         onRequestFailListener: OnRequestFailListener?
     ): Flow<OnIParserListener?> {
-        val aipService = mOnOkHttpRequestManagerListener
-            .onGetOkHttpRequestManager()
-            .createBaseApi()
-        var responseBody:ResponseBody? = null
+        val method = "${baseUrl}${funName}"
+        val aipService = OkHttpRequestManager
+            .onGetBaseApiService(baseUrl)
+        var responseBody: ResponseBody? = null
         kotlin.runCatching {
             responseBody = when (emRequestType) {
                 EmRequestType.GET -> {
@@ -173,11 +182,11 @@ abstract class AbsRequest(
                 null
             )
         }
-        if (responseBody == null){
+        if (responseBody == null) {
             return flow {
                 emit(null)
             }
-        }else{
+        } else {
             return flow<String> {
                 emit(responseBody!!.string())
             }.transform<String, OnIParserListener?> {
@@ -202,56 +211,69 @@ abstract class AbsRequest(
      * @description 同步请求
      **/
     private fun doSyncComposeMapRequest(
-        method: String,
+        baseUrl: String,
+        funName: String,
         urlMap: Map<String, Any> = mutableMapOf(),
         bodyMap: Map<String, Any> = mutableMapOf(),
         emRequestType: EmSyncRequestType,
         onRequestFailListener: OnRequestFailListener?
     ): OnIParserListener? {
+        val method = "${baseUrl}${funName}"
         var onIParserListener: OnIParserListener? = null
         kotlin.runCatching {
-            val aipService = mOnOkHttpRequestManagerListener
-                .onGetOkHttpRequestManager()
-                .createBaseApi()
+            val aipService = OkHttpRequestManager
+                .onGetBaseApiService(baseUrl)
             val responseBody = when (emRequestType) {
                 EmSyncRequestType.GET_SYNC -> {
                     aipService
                         .getSyncJson(method, urlMap)
                 }
+
                 EmSyncRequestType.POST_SYNC -> {
-                    if (bodyMap.isNotEmpty()){
+                    if (bodyMap.isNotEmpty()) {
                         aipService
-                            .postSyncJson(method,urlMap,mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap)))
-                    }else{
+                            .postSyncJson(
+                                method,
+                                urlMap,
+                                mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
+                            )
+                    } else {
                         aipService
-                            .postSyncJson(method,urlMap)
+                            .postSyncJson(method, urlMap)
                     }
                 }
 
                 EmSyncRequestType.POST_SYNC_FORM -> {
-                    if (bodyMap.isNotEmpty()){
-                        aipService.postSyncForm(method,urlMap,bodyMap)
-                    }else{
-                        aipService.postSyncForm(method,urlMap)
+                    if (bodyMap.isNotEmpty()) {
+                        aipService.postSyncForm(method, urlMap, bodyMap)
+                    } else {
+                        aipService.postSyncForm(method, urlMap)
                     }
                 }
+
                 EmSyncRequestType.PUT_SYNC -> {
-                    if (bodyMap.isNotEmpty()){
-                        aipService.putSyncJson(method,urlMap,mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap)))
-                    }else{
-                        aipService.putSyncJson(method,urlMap)
+                    if (bodyMap.isNotEmpty()) {
+                        aipService.putSyncJson(
+                            method,
+                            urlMap,
+                            mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
+                        )
+                    } else {
+                        aipService.putSyncJson(method, urlMap)
                     }
                 }
+
                 EmSyncRequestType.PUT_SYNC_FORM -> {
-                    if (bodyMap.isNotEmpty()){
-                        aipService.postSyncForm(method,urlMap,bodyMap)
-                    }else{
-                        aipService.postSyncForm(method,urlMap)
+                    if (bodyMap.isNotEmpty()) {
+                        aipService.postSyncForm(method, urlMap, bodyMap)
+                    } else {
+                        aipService.postSyncForm(method, urlMap)
                     }
                 }
             }
             val jsString = responseBody.string()
-            onIParserListener = mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, jsString)
+            onIParserListener =
+                mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, jsString)
         }.onFailure {
             it.printStackTrace()
             onRequestFailListener?.onRequestFail(

@@ -3,6 +3,7 @@ package com.gxx.networksdkkotlin.network.pase
 import com.google.gson.JsonElement
 import com.gxx.networksdkkotlin.util.MoshiUtil
 import com.gxx.networksdkkotlin.bean.BaseBean
+import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.ExceptionHandle
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
@@ -65,10 +66,10 @@ open class DataParseSuFaCall<T> : AbsRequestResultImpl() {
         onIParserListener: OnIParserListener?
     ) {
         if (throwable!=null){
-            val resPoneThrowable = ErrorHandlerFactory.netWorkException(throwable)
+            val resPoneThrowable = WanAndroidMAFRequest.mErrorHandlerFactory.netWorkException(throwable)
             //自定义解析错误处理
             if (resPoneThrowable.code == ExceptionHandle.ERROR.UNKNOWN.toString() && throwable is AbsApiException){
-                ErrorHandlerFactory.propaGateError(ErrorHandlerFactory.getErrorHandlers().first(),throwable)
+                WanAndroidMAFRequest.mErrorHandlerFactory.propaGateError(WanAndroidMAFRequest.mErrorHandlerFactory.getErrorHandlers().first(),throwable)
             }
         }
         onRequestDataFail(status?:"", failMsg?:"", onIParserListener as BaseBean?)

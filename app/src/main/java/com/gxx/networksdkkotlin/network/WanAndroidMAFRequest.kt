@@ -8,40 +8,47 @@ import com.gxx.networksdkkotlin.network.factory.FactoryImpl
 import com.gxx.networksdkkotlin.network.intercept.InterceptImpl
 import com.gxx.networksdkkotlin.network.pase.DataParseSuFaCall
 import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform
+import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.OkHttpRequestManager
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
 import com.gxx.neworklibrary.model.RqParamModel
+import com.gxx.neworklibrary.okbuild.OkBuilder
 import com.gxx.neworklibrary.request.MobileRequest
 
+/**
+  * @date 创建时间: 2023/7/27
+  * @auther gxx
+  * @description 用户自定义的 一个网络请求
+  **/
+object WanAndroidMAFRequest {
+    private var mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
+    //配置的第一个域名
+    private const val REQUEST_URL_FIRST = "https://www.wanandroid.com/"
+    //自定义错误factory的构建
+    val mErrorHandlerFactory = ErrorHandlerFactory()
 
-object MAFRequest {
-    private var mOkHttpRequestManager: OkHttpRequestManager? = null
-    private var mMobileRequest: MobileRequest? = null
-
-
-    /**
-     * @date 创建时间: 2023/7/22
-     * @auther gaoxiaoxiong
-     * @description 初始化
-     **/
-    fun init() {
-        mOkHttpRequestManager = OkHttpRequestManager.Builder()
-            .setRequestUrl("https://www.wanandroid.com/")
-            .setIsDebug(true)
-            .setOnFactoryListener(FactoryImpl())
-            .setOnInterceptorListener(InterceptImpl())
-            .builder()
-
+    init {
         //添加自定义ErrorHandler
-        ErrorHandlerFactory
+        mErrorHandlerFactory
             .addErrorHandler(LoginErrorHandler())
             .addErrorHandler(PayErrorHandler())
             .addErrorHandler(TokenErrorHandler())
             .addErrorHandler(UnErrorHandler())
-            .build()
+            .init()
+    }
 
-        //设置BaseBean的解析
-        mMobileRequest = MobileRequest(mOkHttpRequestManager!!,ServiceDataTransform())
+    /**
+      * @date 创建时间: 2023/7/27
+      * @auther gxx
+      * @description 构建 OkBuilder
+      **/
+    fun createOkBuilder():OkBuilder{
+        return OkBuilder()
+            .setRequestUrl(REQUEST_URL_FIRST)
+            .setIsDebug(BuildConfig.DEBUG)
+            .setOnFactoryListener(FactoryImpl())
+            .setOnInterceptorListener(InterceptImpl())
+            .build()
     }
 
     /**
@@ -50,10 +57,17 @@ object MAFRequest {
      * @description get 请求
      **/
     suspend fun <T> getRequest(
-        method: String,
+        funName: String,
         urlMap: Map<String, Any> = mutableMapOf(),
         dataParseSuFaCall: DataParseSuFaCall<T>
     ) {
-        mMobileRequest?.get(RqParamModel(method=method,null,urlMap = urlMap),dataParseSuFaCall,dataParseSuFaCall)
+        mMobileRequest.get(
+            RqParamModel(
+                baseUrl = REQUEST_URL_FIRST,
+                funName = funName,
+                null,
+                urlMap = urlMap
+            ), dataParseSuFaCall, dataParseSuFaCall
+        )
     }
 }

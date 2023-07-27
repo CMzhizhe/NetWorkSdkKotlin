@@ -7,9 +7,8 @@ import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.base.AbsRequest
 
 class MobileRequest(
-    mOnOkHttpRequestManagerListener: OnOkHttpRequestManagerListener,
     mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener
-) : AbsRequest(mOnOkHttpRequestManagerListener, mOnResponseBodyTransformJsonListener),
+) : AbsRequest(mOnResponseBodyTransformJsonListener),
     OnMobileRequestListener {
 
     override suspend fun get(
@@ -19,11 +18,8 @@ class MobileRequest(
     ) {
         rqParamModel.let {
             doRequest(
-                it.method,
-                it.urlMap,
-                null,
+                rqParamModel,
                 EmRequestType.GET,
-                it.emResultType,
                 onRequestSuccessListener,
                 onRequestFailListener
             )
@@ -38,11 +34,8 @@ class MobileRequest(
     ) {
         rqParamModel.let {
             doSyncRequest(
-                it.method,
-                it.urlMap,
-                null,
+                rqParamModel,
                 EmSyncRequestType.GET_SYNC,
-                it.emResultType,
                 onRequestSuccessListener,
                 onRequestFailListener
             )
@@ -56,11 +49,8 @@ class MobileRequest(
     ) {
         rqParamModel.let {
             doRequest(
-                it.method,
-                it.urlMap,
-                it.bodyMap,
+                rqParamModel,
                 EmRequestType.POST,
-                it.emResultType,
                 onRequestSuccessListener,
                 onRequestFailListener
             )
@@ -74,11 +64,8 @@ class MobileRequest(
     ) {
         rqParamModel.let {
             doSyncRequest(
-                it.method,
-                it.urlMap,
-                it.bodyMap,
+                rqParamModel,
                 EmSyncRequestType.POST_SYNC,
-                it.emResultType,
                 onRequestSuccessListener,
                 onRequestFailListener
             )
@@ -92,11 +79,8 @@ class MobileRequest(
     ) {
         rqParamModel.let {
             doRequest(
-                it.method,
-                it.urlMap,
-                it.bodyMap,
+                rqParamModel,
                 EmRequestType.POST_FORM,
-                it.emResultType,
                 onRequestSuccessListener,
                 onRequestFailListener
             )
@@ -110,11 +94,8 @@ class MobileRequest(
     ) {
         rqParamModel.let {
             doSyncRequest(
-                it.method,
-                it.urlMap,
-                it.bodyMap,
+                rqParamModel,
                 EmSyncRequestType.POST_SYNC_FORM,
-                it.emResultType,
                 onRequestSuccessListener,
                 onRequestFailListener
             )
@@ -128,11 +109,8 @@ class MobileRequest(
     ) {
         rqParamModel.let {
             doRequest(
-                it.method,
-                it.urlMap,
-                it.bodyMap,
+                rqParamModel,
                 EmRequestType.PUT,
-                it.emResultType,
                 onRequestSuccessListener,
                 onRequestFailListener
             )
@@ -146,11 +124,8 @@ class MobileRequest(
     ) {
         rqParamModel.let {
             doSyncRequest(
-                it.method,
-                it.urlMap,
-                it.bodyMap,
+                rqParamModel,
                 EmSyncRequestType.PUT_SYNC,
-                it.emResultType,
                 onRequestSuccessListener,
                 onRequestFailListener
             )
@@ -164,11 +139,8 @@ class MobileRequest(
     ) {
         rqParamModel.let {
             doRequest(
-                it.method,
-                it.urlMap,
-                it.bodyMap,
+                rqParamModel,
                 EmRequestType.PUT_FORM,
-                it.emResultType,
                 onRequestSuccessListener,
                 onRequestFailListener
             )
@@ -182,11 +154,8 @@ class MobileRequest(
     ) {
         rqParamModel.let {
             doSyncRequest(
-                it.method,
-                it.urlMap,
-                it.bodyMap,
+                rqParamModel,
                 EmSyncRequestType.PUT_SYNC_FORM,
-                it.emResultType,
                 onRequestSuccessListener,
                 onRequestFailListener
             )
