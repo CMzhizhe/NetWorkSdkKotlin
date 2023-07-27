@@ -14,6 +14,12 @@ import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.okbuild.OkBuilder
 import com.gxx.neworklibrary.request.MobileRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
+import java.util.concurrent.Flow
+import kotlin.coroutines.Continuation
 
 /**
   * @date 创建时间: 2023/7/27
@@ -21,9 +27,9 @@ import com.gxx.neworklibrary.request.MobileRequest
   * @description 用户自定义的 一个网络请求
   **/
 object WanAndroidMAFRequest {
-    private var mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
+    var mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
     //配置的第一个域名
-    private const val REQUEST_URL_FIRST = "https://www.wanandroid.com/"
+    const val REQUEST_URL_FIRST = "https://www.wanandroid.com/"
     //自定义错误factory的构建
     val mErrorHandlerFactory = ErrorHandlerFactory()
 
@@ -70,4 +76,23 @@ object WanAndroidMAFRequest {
             ), dataParseSuFaCall, dataParseSuFaCall
         )
     }
+
+    suspend inline fun <reified T> createRequestFlow(funName: String) = callbackFlow<T>{
+        val dataParseSuFaCall = object : DataParseSuFaCall<T>(){
+            override fun onRequestDataSuccess(data: T?) {
+                super.onRequestDataSuccess(data)
+                trySend(data!!)
+            }
+        }
+        mMobileRequest.get(
+            RqParamModel(
+                baseUrl = REQUEST_URL_FIRST,
+                funName = funName,
+                null,
+                urlMap = mutableMapOf()
+            ), dataParseSuFaCall, dataParseSuFaCall
+        )
+        awaitClose()
+    }
+
 }

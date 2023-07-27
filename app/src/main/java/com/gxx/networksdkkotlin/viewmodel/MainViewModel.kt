@@ -27,7 +27,7 @@ class MainViewModel: ViewModel() {
       **/
     fun readBanner(){
         viewModelScope.launch(exceptionHandler){
-            WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
+          /*  WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
                 DataParseSuFaCall<MutableList<Banner>>() {
                 override fun onRequestDataSuccess(data: MutableList<Banner>?) {
                     super.onRequestDataSuccess(data)
@@ -36,7 +36,14 @@ class MainViewModel: ViewModel() {
                         Log.d(TAG, "是否主线程 = ${Looper.getMainLooper() == Looper.myLooper()}");
                     }
                 }
-            })
+            })*/
+
+            WanAndroidMAFRequest.createRequestFlow<MutableList<Banner>?>("banner/json").collect{
+                if(BuildConfig.DEBUG){
+                    Log.d(TAG, "json = ${Gson().toJson(it)}");
+                    Log.d(TAG, "是否主线程 = ${Looper.getMainLooper() == Looper.myLooper()}");
+                }
+            }
         }
     }
 }
