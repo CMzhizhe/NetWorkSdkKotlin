@@ -11,7 +11,7 @@ class BaseBean(var method: String? = null,
         return jsonElement
     }
 
-    override fun sorceJsonString(): String? {
+    override fun sourceJsonString(): String? {
         return resourceJsonString;
     }
 
