@@ -122,7 +122,7 @@ abstract class AbsRequest(
     ): Flow<OnIParserListener?> {
         val method = "${baseUrl}${funName}"
         val aipService = OkHttpRequestManager
-            .onGetBaseApiService(baseUrl)
+            .getBaseApiService(baseUrl)
         var responseBody: ResponseBody? = null
         kotlin.runCatching {
             responseBody = when (emRequestType) {
@@ -222,7 +222,7 @@ abstract class AbsRequest(
         var onIParserListener: OnIParserListener? = null
         kotlin.runCatching {
             val aipService = OkHttpRequestManager
-                .onGetBaseApiService(baseUrl)
+                .getBaseApiService(baseUrl)
             val responseBody = when (emRequestType) {
                 EmSyncRequestType.GET_SYNC -> {
                     aipService
