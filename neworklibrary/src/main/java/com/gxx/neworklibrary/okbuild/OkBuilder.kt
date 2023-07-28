@@ -1,7 +1,6 @@
 package com.gxx.neworklibrary.okbuild
 
 
-import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.inter.OnFactoryListener
 import com.gxx.neworklibrary.inter.OnInterceptorListener
 
@@ -16,7 +15,6 @@ class OkBuilder {
     private var mRequestUrl: String = ""//连接地址
     private var mRetryOnConnectionFailure = false
     private var mIsDebug = false
-    private var mExceptions = mutableListOf<AbsApiException>()
     private var mOnFactoryListener: OnFactoryListener? = null //Factory
     private var mOnInterceptorListener: OnInterceptorListener? = null // 拦截器
 
@@ -41,9 +39,6 @@ class OkBuilder {
         return mIsDebug
     }
 
-    fun getExceptions(): MutableList<AbsApiException> {
-        return mExceptions
-    }
 
     fun getOnFactoryListener(): OnFactoryListener? {
         return mOnFactoryListener
