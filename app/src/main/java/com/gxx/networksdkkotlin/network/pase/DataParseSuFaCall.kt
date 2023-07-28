@@ -9,7 +9,6 @@ import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
 import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.ExceptionHandle
-import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
 import com.gxx.neworklibrary.inter.OnIParserListener
 import com.gxx.neworklibrary.resultcall.AbsRequestResultImpl
 import com.squareup.moshi.JsonAdapter
@@ -72,7 +71,7 @@ open class DataParseSuFaCall<T> : AbsRequestResultImpl() {
             val resPoneThrowable = WanAndroidMAFRequest.mErrorHandlerFactory.netWorkException(throwable)
             //自定义解析错误处理
             if (resPoneThrowable.code == ExceptionHandle.ERROR.UNKNOWN.toString() && throwable is AbsApiException){
-                WanAndroidMAFRequest.mErrorHandlerFactory.propaGateError(WanAndroidMAFRequest.mErrorHandlerFactory.getErrorHandlers().first(),throwable)
+                WanAndroidMAFRequest.mErrorHandlerFactory.rollGateError(WanAndroidMAFRequest.mErrorHandlerFactory.getErrorHandlers().first(),throwable)
             }
         }
         if(BuildConfig.DEBUG){
