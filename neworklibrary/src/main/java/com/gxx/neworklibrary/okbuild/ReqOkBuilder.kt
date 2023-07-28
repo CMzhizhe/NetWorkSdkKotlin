@@ -10,7 +10,7 @@ import com.gxx.neworklibrary.launreq.AbsLaunchUrlReq
   * @auther gxx
   * @description ok的Builder
   **/
-class OkBuilder {
+class ReqOkBuilder {
     private var mConnectTimeoutSecond = 10//连接时间
     private var mReadTimeout = 10//读写时间
     private var mRequestUrl: String = ""//连接地址
@@ -54,7 +54,7 @@ class OkBuilder {
     }
 
 
-    fun setRequestUrl(url:String):OkBuilder{
+    fun setRequestUrl(url:String):ReqOkBuilder{
         this.mRequestUrl = url
         return this
     }
@@ -64,7 +64,7 @@ class OkBuilder {
      * @auther gaoxiaoxiong
      * @description 设置intercept
      **/
-    fun setOnInterceptorListener(listener: OnInterceptorListener): OkBuilder {
+    fun setOnInterceptorListener(listener: OnInterceptorListener): ReqOkBuilder {
         this.mOnInterceptorListener = listener
         return this
     }
@@ -74,7 +74,7 @@ class OkBuilder {
      * @auther gaoxiaoxiong
      * @description 设置工厂factory
      **/
-    fun setOnFactoryListener(listener: OnFactoryListener): OkBuilder {
+    fun setOnFactoryListener(listener: OnFactoryListener): ReqOkBuilder {
         this.mOnFactoryListener = listener
         return this
     }
@@ -86,7 +86,7 @@ class OkBuilder {
      * @auther gaoxiaoxiong
      * @description 设置连接的时间
      **/
-    fun setConnectTimeoutSecond(connectionTimeOut: Int): OkBuilder {
+    fun setConnectTimeoutSecond(connectionTimeOut: Int): ReqOkBuilder {
         this.mConnectTimeoutSecond = connectionTimeOut
         return this
     }
@@ -96,7 +96,7 @@ class OkBuilder {
      * @auther gaoxiaoxiong
      * @description 设置读写时间
      **/
-    fun setReadTimeout(readTimeout: Int): OkBuilder {
+    fun setReadTimeout(readTimeout: Int): ReqOkBuilder {
         this.mReadTimeout = readTimeout
         return this
     }
@@ -106,7 +106,7 @@ class OkBuilder {
      * @auther gaoxiaoxiong
      * @description 设置是否尝试重连
      **/
-    fun setRetryOnConnectionFailure(retryOnConnectionFailure: Boolean): OkBuilder {
+    fun setRetryOnConnectionFailure(retryOnConnectionFailure: Boolean): ReqOkBuilder {
         this.mRetryOnConnectionFailure = retryOnConnectionFailure
         return this
     }
@@ -116,7 +116,7 @@ class OkBuilder {
      * @auther gaoxiaoxiong
      * @description 是否开发者模式
      **/
-    fun setIsDebug(isDebug: Boolean): OkBuilder {
+    fun setIsDebug(isDebug: Boolean): ReqOkBuilder {
         this.mIsDebug = isDebug
         return this
     }
@@ -126,7 +126,7 @@ class OkBuilder {
       * @auther gxx
       * @description 配置 请求，域名，错误工厂 的抽象类
       **/
-    fun setAbsLaunchUrlReq(absLaunchUrlReq: AbsLaunchUrlReq): OkBuilder {
+    fun setAbsLaunchUrlReq(absLaunchUrlReq: AbsLaunchUrlReq): ReqOkBuilder {
         this.mAbsLaunchUrlReq = absLaunchUrlReq
         return this
     }
@@ -136,7 +136,7 @@ class OkBuilder {
       * @auther gxx
       * @description 构建
       **/
-    fun build():OkBuilder{
+    fun build():ReqOkBuilder{
         if (mRequestUrl.isEmpty()){
             throw IllegalStateException("RequestUrl is empty")
         }

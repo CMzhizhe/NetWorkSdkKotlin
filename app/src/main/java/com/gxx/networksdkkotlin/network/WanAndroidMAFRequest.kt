@@ -13,11 +13,11 @@ import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
 import com.gxx.neworklibrary.launreq.AbsLaunchUrlReq
 import com.gxx.neworklibrary.model.RqParamModel
-import com.gxx.neworklibrary.okbuild.OkBuilder
+import com.gxx.neworklibrary.okbuild.ReqOkBuilder
 import com.gxx.neworklibrary.request.MobileRequest
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.callbackFlow
+import retrofit2.Retrofit
 
 /**
   * @date 创建时间: 2023/7/27
@@ -43,12 +43,12 @@ object WanAndroidMAFRequest : AbsLaunchUrlReq() {
     }
 
     /**
-      * @date 创建时间: 2023/7/27
-      * @auther gxx
-      * @description 构建 OkBuilder
-      **/
-    fun createOkBuilder():OkBuilder{
-        return OkBuilder()
+     * @date 创建时间: 2023/7/27
+     * @auther gxx
+     * @description 构建 OkBuilder
+     **/
+    override fun createReqOkBuilder(): ReqOkBuilder? {
+        return ReqOkBuilder()
             .setRequestUrl(REQUEST_URL_FIRST)
             .setIsDebug(BuildConfig.DEBUG)
             .setOnFactoryListener(FactoryImpl())
@@ -56,6 +56,16 @@ object WanAndroidMAFRequest : AbsLaunchUrlReq() {
             .setOnInterceptorListener(InterceptImpl())
             .build()
     }
+
+    /**
+      * @date 创建时间: 2023/7/28
+      * @auther gxx
+      * @description 创建 Retrofit
+      **/
+    override fun createRetrofit2(): Retrofit? {
+        return null
+    }
+
 
     /**
      * @date 创建时间: 2023/7/22
@@ -99,16 +109,6 @@ object WanAndroidMAFRequest : AbsLaunchUrlReq() {
         }
     }
 
-    override fun getBaseUrl(): String {
-       return REQUEST_URL_FIRST
-    }
 
-    override fun getMobileRequest(): MobileRequest {
-        return mMobileRequest
-    }
-
-    override fun getErrorHandlerFactory(): ErrorHandlerFactory {
-        return mErrorHandlerFactory
-    }
 
 }
