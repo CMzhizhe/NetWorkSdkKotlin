@@ -1,6 +1,7 @@
 package com.gxx.neworklibrary
 
 import com.gxx.neworklibrary.apiservice.BaseApiService
+import com.gxx.neworklibrary.launreq.AbsLaunchUrlReq
 import com.gxx.neworklibrary.okbuild.OkBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -11,18 +12,17 @@ import java.util.concurrent.TimeUnit
  * @auther gxx
  * @description 管理所有的 Retrofit
  **/
-object OkHttpRequestManager {
+object OkHttpManager {
     private val TAG = "OkHttpRequestManager"
     private var mMapBuilder = hashMapOf<String, OkBuilder>()//构建的 OkBuilder
     private var mMapRetrofit = hashMapOf<String, Retrofit>() // 根据域名构建的 Retrofit
-
 
     /**
      * @date 创建时间: 2023/7/27
      * @auther gxx
      * @description 添加 OkBuilder
      **/
-    fun addOkBuilder(builder: OkBuilder): OkHttpRequestManager {
+    fun addOkBuilder(builder: OkBuilder): OkHttpManager {
         mMapBuilder[builder.getRequestUrl()] = builder
         return this
     }

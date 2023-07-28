@@ -7,6 +7,21 @@ import com.gxx.neworklibrary.inter.OnErrorHandler
 
 
 class ErrorHandlerFactory {
+    private var mOnErrorHandleFinishListener:OnErrorHandleFinishListener? = null
+
+    fun setOnErrorHandleFinishListener(listener: OnErrorHandleFinishListener){
+        this.mOnErrorHandleFinishListener = listener
+    }
+
+    /**
+      * @date 创建时间: 2023/7/28
+      * @auther gxx
+      * @description 错误处理完成回调
+      **/
+    public interface OnErrorHandleFinishListener{
+        fun onErrorHandleFinish()
+    }
+
     private val mErrorHandlers = mutableListOf<OnErrorHandler>()
 
     /**
@@ -40,6 +55,7 @@ class ErrorHandlerFactory {
 
         if (errorHandler == null || errorHandler.handleError(error)) {
              //错误已处理
+            mOnErrorHandleFinishListener?.onErrorHandleFinish()
         } else {
             propaGateError(errorHandler.next, error)
         }

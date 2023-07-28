@@ -1,7 +1,7 @@
 package com.gxx.neworklibrary.request.base
 
 import com.google.gson.Gson
-import com.gxx.neworklibrary.OkHttpRequestManager
+import com.gxx.neworklibrary.OkHttpManager
 import com.gxx.neworklibrary.constans.EmRequestType
 import com.gxx.neworklibrary.constans.EmSyncRequestType
 import com.gxx.neworklibrary.inter.*
@@ -121,7 +121,7 @@ abstract class AbsRequest(
         onRequestFailListener: OnRequestFailListener?
     ): Flow<OnIParserListener?> {
         val method = "${baseUrl}${funName}"
-        val aipService = OkHttpRequestManager
+        val aipService = OkHttpManager
             .getBaseApiService(baseUrl)
         var responseBody: ResponseBody? = null
         kotlin.runCatching {
@@ -221,7 +221,7 @@ abstract class AbsRequest(
         val method = "${baseUrl}${funName}"
         var onIParserListener: OnIParserListener? = null
         kotlin.runCatching {
-            val aipService = OkHttpRequestManager
+            val aipService = OkHttpManager
                 .getBaseApiService(baseUrl)
             val responseBody = when (emRequestType) {
                 EmSyncRequestType.GET_SYNC -> {

@@ -3,6 +3,7 @@ package com.gxx.neworklibrary.okbuild
 
 import com.gxx.neworklibrary.inter.OnFactoryListener
 import com.gxx.neworklibrary.inter.OnInterceptorListener
+import com.gxx.neworklibrary.launreq.AbsLaunchUrlReq
 
 /**
   * @date 创建时间: 2023/7/27
@@ -17,7 +18,11 @@ class OkBuilder {
     private var mIsDebug = false
     private var mOnFactoryListener: OnFactoryListener? = null //Factory
     private var mOnInterceptorListener: OnInterceptorListener? = null // 拦截器
+    private var mAbsLaunchUrlReq:AbsLaunchUrlReq? = null//配置 请求，域名，错误工厂 的抽象类
 
+    fun getAbsLaunchUrlReq():AbsLaunchUrlReq?{
+        return mAbsLaunchUrlReq
+    }
 
     fun getConnectTimeoutSecond(): Int {
         return mConnectTimeoutSecond
@@ -113,6 +118,16 @@ class OkBuilder {
      **/
     fun setIsDebug(isDebug: Boolean): OkBuilder {
         this.mIsDebug = isDebug
+        return this
+    }
+
+    /**
+      * @date 创建时间: 2023/7/28
+      * @auther gxx
+      * @description 配置 请求，域名，错误工厂 的抽象类
+      **/
+    fun setAbsLaunchUrlReq(absLaunchUrlReq: AbsLaunchUrlReq): OkBuilder {
+        this.mAbsLaunchUrlReq = absLaunchUrlReq
         return this
     }
 

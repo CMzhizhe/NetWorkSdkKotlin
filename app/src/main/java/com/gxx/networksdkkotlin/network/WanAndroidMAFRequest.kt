@@ -11,6 +11,7 @@ import com.gxx.networksdkkotlin.network.pase.DataParseSuFaCall
 import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform
 import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
+import com.gxx.neworklibrary.launreq.AbsLaunchUrlReq
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.okbuild.OkBuilder
 import com.gxx.neworklibrary.request.MobileRequest
@@ -23,9 +24,9 @@ import kotlinx.coroutines.flow.callbackFlow
   * @auther gxx
   * @description 用户自定义的 一个网络请求
   **/
-object WanAndroidMAFRequest {
+object WanAndroidMAFRequest : AbsLaunchUrlReq() {
     val TAG = "WanAndroidMAFRequest"
-    var mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
+    val mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
     //配置的第一个域名
     const val REQUEST_URL_FIRST = "https://www.wanandroid.com/"
     //自定义错误factory的构建
@@ -51,6 +52,7 @@ object WanAndroidMAFRequest {
             .setRequestUrl(REQUEST_URL_FIRST)
             .setIsDebug(BuildConfig.DEBUG)
             .setOnFactoryListener(FactoryImpl())
+            .setAbsLaunchUrlReq(this)
             .setOnInterceptorListener(InterceptImpl())
             .build()
     }
@@ -96,6 +98,18 @@ object WanAndroidMAFRequest {
               Log.d(TAG, "我被回调了");
             }
         }
+    }
+
+    override fun getBaseUrl(): String {
+       return REQUEST_URL_FIRST
+    }
+
+    override fun getMobileRequest(): MobileRequest {
+        return mMobileRequest
+    }
+
+    override fun getErrorHandlerFactory(): ErrorHandlerFactory {
+        return mErrorHandlerFactory
     }
 
 }
