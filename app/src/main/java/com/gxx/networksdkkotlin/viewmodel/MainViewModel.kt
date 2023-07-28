@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class MainViewModel: ViewModel() {
     private val TAG = "MainViewModel"
 
-   val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+    val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
         Log.e(TAG,"$throwable")
     }
 
@@ -26,8 +26,8 @@ class MainViewModel: ViewModel() {
       * @description 发起网络请求
       **/
     fun readBanner(){
-        viewModelScope.launch(exceptionHandler){
-          /*  WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
+        viewModelScope.launch{
+            WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
                 DataParseSuFaCall<MutableList<Banner>>() {
                 override fun onRequestDataSuccess(data: MutableList<Banner>?) {
                     super.onRequestDataSuccess(data)
@@ -36,14 +36,7 @@ class MainViewModel: ViewModel() {
                         Log.d(TAG, "是否主线程 = ${Looper.getMainLooper() == Looper.myLooper()}");
                     }
                 }
-            })*/
-
-            WanAndroidMAFRequest.createRequestFlow<MutableList<Banner>?>("banner/json").collect{
-                if(BuildConfig.DEBUG){
-                    Log.d(TAG, "json = ${Gson().toJson(it)}");
-                    Log.d(TAG, "是否主线程 = ${Looper.getMainLooper() == Looper.myLooper()}");
-                }
-            }
+            })
         }
     }
 }

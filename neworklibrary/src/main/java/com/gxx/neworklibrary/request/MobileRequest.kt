@@ -16,15 +16,12 @@ class MobileRequest(
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-        rqParamModel.let {
-            doRequest(
-                rqParamModel,
-                EmRequestType.GET,
-                onRequestSuccessListener,
-                onRequestFailListener
-            )
-        }
-
+        doRequest(
+            rqParamModel,
+            EmRequestType.GET,
+            onRequestSuccessListener,
+            onRequestFailListener
+        )
     }
 
     override fun getSync(
@@ -32,14 +29,12 @@ class MobileRequest(
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-        rqParamModel.let {
-            doSyncRequest(
-                rqParamModel,
-                EmSyncRequestType.GET_SYNC,
-                onRequestSuccessListener,
-                onRequestFailListener
-            )
-        }
+        doSyncRequest(
+            rqParamModel,
+            EmSyncRequestType.GET_SYNC,
+            onRequestSuccessListener,
+            onRequestFailListener
+        )
     }
 
     override suspend fun postBody(
@@ -47,14 +42,12 @@ class MobileRequest(
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-        rqParamModel.let {
-            doRequest(
-                rqParamModel,
-                EmRequestType.POST,
-                onRequestSuccessListener,
-                onRequestFailListener
-            )
-        }
+        doRequest(
+            rqParamModel,
+            EmRequestType.POST,
+            onRequestSuccessListener,
+            onRequestFailListener
+        )
     }
 
     override fun postSyncBody(
@@ -62,14 +55,12 @@ class MobileRequest(
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-        rqParamModel.let {
-            doSyncRequest(
-                rqParamModel,
-                EmSyncRequestType.POST_SYNC,
-                onRequestSuccessListener,
-                onRequestFailListener
-            )
-        }
+        doSyncRequest(
+            rqParamModel,
+            EmSyncRequestType.POST_SYNC,
+            onRequestSuccessListener,
+            onRequestFailListener
+        )
     }
 
     override suspend fun postForm(
@@ -77,14 +68,12 @@ class MobileRequest(
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-        rqParamModel.let {
-            doRequest(
-                rqParamModel,
-                EmRequestType.POST_FORM,
-                onRequestSuccessListener,
-                onRequestFailListener
-            )
-        }
+        doRequest(
+            rqParamModel,
+            EmRequestType.POST_FORM,
+            onRequestSuccessListener,
+            onRequestFailListener
+        )
     }
 
     override fun postSyncForm(
@@ -92,14 +81,12 @@ class MobileRequest(
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-        rqParamModel.let {
-            doSyncRequest(
-                rqParamModel,
-                EmSyncRequestType.POST_SYNC_FORM,
-                onRequestSuccessListener,
-                onRequestFailListener
-            )
-        }
+        doSyncRequest(
+            rqParamModel,
+            EmSyncRequestType.POST_SYNC_FORM,
+            onRequestSuccessListener,
+            onRequestFailListener
+        )
     }
 
     override suspend fun putBody(
@@ -107,14 +94,12 @@ class MobileRequest(
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-        rqParamModel.let {
-            doRequest(
-                rqParamModel,
-                EmRequestType.PUT,
-                onRequestSuccessListener,
-                onRequestFailListener
-            )
-        }
+        doRequest(
+            rqParamModel,
+            EmRequestType.PUT,
+            onRequestSuccessListener,
+            onRequestFailListener
+        )
     }
 
     override fun putSyncBody(
@@ -122,14 +107,12 @@ class MobileRequest(
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-        rqParamModel.let {
-            doSyncRequest(
-                rqParamModel,
-                EmSyncRequestType.PUT_SYNC,
-                onRequestSuccessListener,
-                onRequestFailListener
-            )
-        }
+        doSyncRequest(
+            rqParamModel,
+            EmSyncRequestType.PUT_SYNC,
+            onRequestSuccessListener,
+            onRequestFailListener
+        )
     }
 
     override suspend fun putForm(
@@ -137,14 +120,12 @@ class MobileRequest(
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-        rqParamModel.let {
-            doRequest(
-                rqParamModel,
-                EmRequestType.PUT_FORM,
-                onRequestSuccessListener,
-                onRequestFailListener
-            )
-        }
+        doRequest(
+            rqParamModel,
+            EmRequestType.PUT_FORM,
+            onRequestSuccessListener,
+            onRequestFailListener
+        )
     }
 
     override fun putSyncForm(
@@ -152,14 +133,12 @@ class MobileRequest(
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-        rqParamModel.let {
-            doSyncRequest(
-                rqParamModel,
-                EmSyncRequestType.PUT_SYNC_FORM,
-                onRequestSuccessListener,
-                onRequestFailListener
-            )
-        }
+        doSyncRequest(
+            rqParamModel,
+            EmSyncRequestType.PUT_SYNC_FORM,
+            onRequestSuccessListener,
+            onRequestFailListener
+        )
     }
 
 

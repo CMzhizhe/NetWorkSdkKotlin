@@ -1,5 +1,6 @@
 package com.gxx.networksdkkotlin.network
 
+import android.util.Log
 import com.gxx.networksdkkotlin.network.error.handler.LoginErrorHandler
 import com.gxx.networksdkkotlin.network.error.handler.PayErrorHandler
 import com.gxx.networksdkkotlin.network.error.handler.TokenErrorHandler
@@ -16,6 +17,7 @@ import com.gxx.neworklibrary.okbuild.OkBuilder
 import com.gxx.neworklibrary.request.MobileRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import java.util.concurrent.Flow
@@ -27,6 +29,7 @@ import kotlin.coroutines.Continuation
   * @description 用户自定义的 一个网络请求
   **/
 object WanAndroidMAFRequest {
+    val TAG = "WanAndroidMAFRequest"
     var mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
     //配置的第一个域名
     const val REQUEST_URL_FIRST = "https://www.wanandroid.com/"
@@ -84,6 +87,7 @@ object WanAndroidMAFRequest {
                 trySend(data!!)
             }
         }
+        delay(5* 1000)
         mMobileRequest.get(
             RqParamModel(
                 baseUrl = REQUEST_URL_FIRST,
@@ -92,7 +96,11 @@ object WanAndroidMAFRequest {
                 urlMap = mutableMapOf()
             ), dataParseSuFaCall, dataParseSuFaCall
         )
-        awaitClose()
+        awaitClose{
+            if(BuildConfig.DEBUG){
+              Log.d(TAG, "我被回调了");
+            }
+        }
     }
 
 }

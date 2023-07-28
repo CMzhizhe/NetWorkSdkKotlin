@@ -18,7 +18,7 @@ import java.lang.reflect.ParameterizedType
  * @description 服务器数据处理
  **/
 open class DataParseSuFaCall<T> : AbsRequestResultImpl() {
-    private val TAG = "ServiceDataParse"
+    private val TAG = "DataParseSuFaCall"
 
     /**
      * @date 创建时间: 2023/7/23
