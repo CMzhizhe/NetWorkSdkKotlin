@@ -27,24 +27,6 @@ object OkHttpRequestManager {
         return this
     }
 
-    /**
-      * @date 创建时间: 2023/7/27
-      * @auther gxx
-      * @description 自定义参数的配置。添加，自己定义的 Retrofit
-     * @param baseUrl 基本的baseUrl
-     * @param retrofit 用户自己创建的
-      **/
-    fun addRetrofit(baseUrl: String,retrofit: Retrofit): OkHttpRequestManager{
-        if (baseUrl.isEmpty()){
-            throw IllegalStateException("RequestUrl is empty")
-        }
-        //判断mRequestUrl 是否 /结尾
-        if (baseUrl.last().toString()!="/"){
-            throw IllegalStateException("RequestUrl is 需要以 '/' 结尾，形如www.xxx.com/")
-        }
-        mMapRetrofit[baseUrl] = retrofit
-        return this
-    }
 
     /**
      * @date 创建时间: 2023/7/27
@@ -78,7 +60,7 @@ object OkHttpRequestManager {
      * @auther gxx
      * @description 构建 retrofit
      **/
-    fun createRetrofit(builder: OkBuilder): Retrofit {
+   private fun createRetrofit(builder: OkBuilder): Retrofit {
         val mRequestUrl = builder.getRequestUrl()
         val mRetryOnConnectionFailure = builder.getRetryOnConnectionFailure()
         val mOnInterceptorListener = builder.getOnInterceptorListener()
@@ -99,11 +81,9 @@ object OkHttpRequestManager {
             }
         }
 
-
         val reBuilder: Retrofit.Builder = Retrofit.Builder()
             .baseUrl(mRequestUrl)
             .client(okBuilder.build())
-
 
         mOnFactoryListener?.let {
             for (callAdapterFactory in it.callAdapterFactorys()) {
