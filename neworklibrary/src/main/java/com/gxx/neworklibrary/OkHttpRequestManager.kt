@@ -117,7 +117,6 @@ object OkHttpRequestManager {
      * @description 构建 BaseApiService
      * @param baseUrl 请求的地址
      **/
-    @Override
     fun onGetBaseApiService(baseUrl: String): BaseApiService {
         if (mMapRetrofit[baseUrl] == null) {
             throw IllegalStateException("当前baseUrl的retrofit没有初始化，请先执行addOkBuilder")
