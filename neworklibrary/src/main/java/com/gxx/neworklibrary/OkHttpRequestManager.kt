@@ -27,7 +27,6 @@ object OkHttpRequestManager {
         return this
     }
 
-
     /**
      * @date 创建时间: 2023/7/27
      * @auther gxx
@@ -60,7 +59,7 @@ object OkHttpRequestManager {
      * @auther gxx
      * @description 构建 retrofit
      **/
-   private fun createRetrofit(builder: OkBuilder): Retrofit {
+    fun createRetrofit(builder: OkBuilder): Retrofit {
         val mRequestUrl = builder.getRequestUrl()
         val mRetryOnConnectionFailure = builder.getRetryOnConnectionFailure()
         val mOnInterceptorListener = builder.getOnInterceptorListener()
@@ -70,6 +69,7 @@ object OkHttpRequestManager {
             .connectTimeout(builder.getConnectTimeoutSecond().toLong(), TimeUnit.SECONDS)
             .readTimeout(builder.getReadTimeout().toLong(), TimeUnit.SECONDS)
             .retryOnConnectionFailure(mRetryOnConnectionFailure) //是否失败重新请求连接
+
 
         mOnInterceptorListener?.let {
             for (interceptor in it.interceptors()) {
@@ -106,7 +106,7 @@ object OkHttpRequestManager {
      **/
     fun <T> getApi(url: String, clazz: Class<T>): T {
         if (url.isEmpty() || mMapRetrofit[url] == null) {
-            throw IllegalStateException("请先执行addOkBuilder")
+            throw IllegalStateException("当前baseUrl的retrofit没有初始化，请先执行addOkBuilder")
         }
         return mMapRetrofit[url]!!.create(clazz)
     }
@@ -119,7 +119,7 @@ object OkHttpRequestManager {
      **/
     fun onGetBaseApiService(baseUrl: String): BaseApiService {
         if (mMapRetrofit[baseUrl] == null) {
-            throw IllegalStateException("请先执行addOkBuilder")
+            throw IllegalStateException("当前baseUrl的retrofit没有初始化，请先执行addOkBuilder")
         }
         return getApi(baseUrl, BaseApiService::class.java)
     }
