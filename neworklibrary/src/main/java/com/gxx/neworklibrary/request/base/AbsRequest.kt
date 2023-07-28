@@ -10,6 +10,7 @@ import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import com.gxx.neworklibrary.util.MultipartBodyUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 
 
@@ -174,13 +175,15 @@ abstract class AbsRequest(
             }
         }.onFailure {
             it.printStackTrace()
-            onRequestFailListener?.onRequestFail(
-                it,
-                null,
-                null,
-                null,
-                null
-            )
+            withContext(Dispatchers.Main){
+                onRequestFailListener?.onRequestFail(
+                    it,
+                    null,
+                    null,
+                    null,
+                    null
+                )
+            }
         }
         if (responseBody == null) {
             return flow {
@@ -193,13 +196,15 @@ abstract class AbsRequest(
                 emit(mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, it))
             }.catch {
                 it.printStackTrace()
-                onRequestFailListener?.onRequestFail(
-                    it,
-                    null,
-                    null,
-                    null,
-                    null
-                )
+                withContext(Dispatchers.Main){
+                    onRequestFailListener?.onRequestFail(
+                        it,
+                        null,
+                        null,
+                        null,
+                        null
+                    )
+                }
                 emit(null)
             }.flowOn(Dispatchers.IO)
         }

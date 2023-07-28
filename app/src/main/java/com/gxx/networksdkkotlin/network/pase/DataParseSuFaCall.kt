@@ -1,9 +1,12 @@
 package com.gxx.networksdkkotlin.network.pase
 
+import android.os.Looper
+import android.util.Log
 import com.google.gson.JsonElement
 import com.gxx.networksdkkotlin.util.MoshiUtil
 import com.gxx.networksdkkotlin.bean.BaseBean
 import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
+import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.ExceptionHandle
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
@@ -71,6 +74,9 @@ open class DataParseSuFaCall<T> : AbsRequestResultImpl() {
             if (resPoneThrowable.code == ExceptionHandle.ERROR.UNKNOWN.toString() && throwable is AbsApiException){
                 WanAndroidMAFRequest.mErrorHandlerFactory.propaGateError(WanAndroidMAFRequest.mErrorHandlerFactory.getErrorHandlers().first(),throwable)
             }
+        }
+        if(BuildConfig.DEBUG){
+          Log.d(TAG, "是否主线程=${Looper.getMainLooper() == Looper.myLooper()}");
         }
         onRequestDataFail(status?:"", failMsg?:"", onIParserListener as BaseBean?)
         onRequestBaseBeanFail(onIParserListener as BaseBean? )

@@ -84,7 +84,6 @@ object WanAndroidMAFRequest : AbsLaunchUrlReq() {
                 trySend(data!!)
             }
         }
-        delay(5* 1000)
         mMobileRequest.get(
             RqParamModel(
                 baseUrl = REQUEST_URL_FIRST,
