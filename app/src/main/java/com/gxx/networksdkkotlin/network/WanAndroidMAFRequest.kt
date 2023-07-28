@@ -10,18 +10,13 @@ import com.gxx.networksdkkotlin.network.intercept.InterceptImpl
 import com.gxx.networksdkkotlin.network.pase.DataParseSuFaCall
 import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform
 import com.gxx.neworklibrary.BuildConfig
-import com.gxx.neworklibrary.OkHttpRequestManager
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.okbuild.OkBuilder
 import com.gxx.neworklibrary.request.MobileRequest
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
-import java.util.concurrent.Flow
-import kotlin.coroutines.Continuation
 
 /**
   * @date 创建时间: 2023/7/27
