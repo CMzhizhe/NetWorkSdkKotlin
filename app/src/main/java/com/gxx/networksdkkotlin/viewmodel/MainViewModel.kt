@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class MainViewModel: ViewModel() {
     private val TAG = "MainViewModel"
 
-   val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+    val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
         Log.e(TAG,"$throwable")
     }
 
@@ -26,7 +26,7 @@ class MainViewModel: ViewModel() {
       * @description 发起网络请求
       **/
     fun readBanner(){
-        viewModelScope.launch(exceptionHandler){
+        viewModelScope.launch{
             WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
                 DataParseSuFaCall<MutableList<Banner>>() {
                 override fun onRequestDataSuccess(data: MutableList<Banner>?) {

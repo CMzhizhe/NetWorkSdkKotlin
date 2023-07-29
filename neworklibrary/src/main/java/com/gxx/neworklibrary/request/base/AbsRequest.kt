@@ -1,7 +1,7 @@
 package com.gxx.neworklibrary.request.base
 
 import com.google.gson.Gson
-import com.gxx.neworklibrary.OkHttpRequestManager
+import com.gxx.neworklibrary.OkHttpManager
 import com.gxx.neworklibrary.constans.EmRequestType
 import com.gxx.neworklibrary.constans.EmSyncRequestType
 import com.gxx.neworklibrary.inter.*
@@ -10,6 +10,7 @@ import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import com.gxx.neworklibrary.util.MultipartBodyUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 
 
@@ -121,8 +122,8 @@ abstract class AbsRequest(
         onRequestFailListener: OnRequestFailListener?
     ): Flow<OnIParserListener?> {
         val method = "${baseUrl}${funName}"
-        val aipService = OkHttpRequestManager
-            .onGetBaseApiService(baseUrl)
+        val aipService = OkHttpManager
+            .getBaseApiService(baseUrl)
         var responseBody: ResponseBody? = null
         kotlin.runCatching {
             responseBody = when (emRequestType) {
@@ -174,13 +175,15 @@ abstract class AbsRequest(
             }
         }.onFailure {
             it.printStackTrace()
-            onRequestFailListener?.onRequestFail(
-                it,
-                null,
-                null,
-                null,
-                null
-            )
+            withContext(Dispatchers.Main){
+                onRequestFailListener?.onRequestFail(
+                    it,
+                    null,
+                    null,
+                    null,
+                    null
+                )
+            }
         }
         if (responseBody == null) {
             return flow {
@@ -193,13 +196,15 @@ abstract class AbsRequest(
                 emit(mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, it))
             }.catch {
                 it.printStackTrace()
-                onRequestFailListener?.onRequestFail(
-                    it,
-                    null,
-                    null,
-                    null,
-                    null
-                )
+                withContext(Dispatchers.Main){
+                    onRequestFailListener?.onRequestFail(
+                        it,
+                        null,
+                        null,
+                        null,
+                        null
+                    )
+                }
                 emit(null)
             }.flowOn(Dispatchers.IO)
         }
@@ -221,8 +226,8 @@ abstract class AbsRequest(
         val method = "${baseUrl}${funName}"
         var onIParserListener: OnIParserListener? = null
         kotlin.runCatching {
-            val aipService = OkHttpRequestManager
-                .onGetBaseApiService(baseUrl)
+            val aipService = OkHttpManager
+                .getBaseApiService(baseUrl)
             val responseBody = when (emRequestType) {
                 EmSyncRequestType.GET_SYNC -> {
                     aipService

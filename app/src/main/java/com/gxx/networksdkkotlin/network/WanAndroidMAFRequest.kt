@@ -1,5 +1,6 @@
 package com.gxx.networksdkkotlin.network
 
+import android.util.Log
 import com.gxx.networksdkkotlin.network.error.handler.LoginErrorHandler
 import com.gxx.networksdkkotlin.network.error.handler.PayErrorHandler
 import com.gxx.networksdkkotlin.network.error.handler.TokenErrorHandler
@@ -9,21 +10,25 @@ import com.gxx.networksdkkotlin.network.intercept.InterceptImpl
 import com.gxx.networksdkkotlin.network.pase.DataParseSuFaCall
 import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform
 import com.gxx.neworklibrary.BuildConfig
-import com.gxx.neworklibrary.OkHttpRequestManager
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
+import com.gxx.neworklibrary.launreq.AbsLaunchUrlReq
 import com.gxx.neworklibrary.model.RqParamModel
-import com.gxx.neworklibrary.okbuild.OkBuilder
+import com.gxx.neworklibrary.okbuild.ParamOkBuilder
 import com.gxx.neworklibrary.request.MobileRequest
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import retrofit2.Retrofit
 
 /**
   * @date 创建时间: 2023/7/27
   * @auther gxx
   * @description 用户自定义的 一个网络请求
   **/
-object WanAndroidMAFRequest {
-    private var mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
+object WanAndroidMAFRequest : AbsLaunchUrlReq() {
+    val TAG = "WanAndroidMAFRequest"
+    val mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
     //配置的第一个域名
-    private const val REQUEST_URL_FIRST = "https://www.wanandroid.com/"
+    const val REQUEST_URL_FIRST = "https://www.wanandroid.com/"
     //自定义错误factory的构建
     val mErrorHandlerFactory = ErrorHandlerFactory()
 
@@ -38,18 +43,33 @@ object WanAndroidMAFRequest {
     }
 
     /**
-      * @date 创建时间: 2023/7/27
-      * @auther gxx
-      * @description 构建 OkBuilder
-      **/
-    fun createOkBuilder():OkBuilder{
-        return OkBuilder()
+     * @date 创建时间: 2023/7/27
+     * @auther gxx
+     * @description 构建 OkBuilder
+     **/
+    override fun createParamOkBuilder(): ParamOkBuilder? {
+        return ParamOkBuilder()
             .setRequestUrl(REQUEST_URL_FIRST)
             .setIsDebug(BuildConfig.DEBUG)
             .setOnFactoryListener(FactoryImpl())
+            .setAbsLaunchUrlReq(this)
             .setOnInterceptorListener(InterceptImpl())
             .build()
     }
+
+    /**
+      * @date 创建时间: 2023/7/28
+      * @auther gxx
+      * @description 创建 Retrofit
+      **/
+    override fun createRetrofit2(): Retrofit? {
+        return null
+    }
+
+    override fun baseUrl(): String {
+       return REQUEST_URL_FIRST
+    }
+
 
     /**
      * @date 创建时间: 2023/7/22
@@ -70,4 +90,29 @@ object WanAndroidMAFRequest {
             ), dataParseSuFaCall, dataParseSuFaCall
         )
     }
+
+    suspend inline fun <reified T> createRequestFlow(funName: String) = callbackFlow<T>{
+        val dataParseSuFaCall = object : DataParseSuFaCall<T>(){
+            override fun onRequestDataSuccess(data: T?) {
+                super.onRequestDataSuccess(data)
+                trySend(data!!)
+            }
+        }
+        mMobileRequest.get(
+            RqParamModel(
+                baseUrl = REQUEST_URL_FIRST,
+                funName = funName,
+                null,
+                urlMap = mutableMapOf()
+            ), dataParseSuFaCall, dataParseSuFaCall
+        )
+        awaitClose{
+            if(BuildConfig.DEBUG){
+              Log.d(TAG, "我被回调了");
+            }
+        }
+    }
+
+
+
 }

@@ -15,7 +15,7 @@ interface OnIParserListener {
      * @auther gaoxiaoxiong
      * @description 原始jsonString数据
      **/
-    fun sorceJsonString():String?
+    fun sourceJsonString():String?
 
     /**
      * @date 创建时间: 2023/7/22

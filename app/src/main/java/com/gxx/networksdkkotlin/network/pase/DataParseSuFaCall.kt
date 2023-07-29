@@ -1,12 +1,14 @@
 package com.gxx.networksdkkotlin.network.pase
 
+import android.os.Looper
+import android.util.Log
 import com.google.gson.JsonElement
 import com.gxx.networksdkkotlin.util.MoshiUtil
 import com.gxx.networksdkkotlin.bean.BaseBean
 import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
+import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.ExceptionHandle
-import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
 import com.gxx.neworklibrary.inter.OnIParserListener
 import com.gxx.neworklibrary.resultcall.AbsRequestResultImpl
 import com.squareup.moshi.JsonAdapter
@@ -18,7 +20,7 @@ import java.lang.reflect.ParameterizedType
  * @description 服务器数据处理
  **/
 open class DataParseSuFaCall<T> : AbsRequestResultImpl() {
-    private val TAG = "ServiceDataParse"
+    private val TAG = "DataParseSuFaCall"
 
     /**
      * @date 创建时间: 2023/7/23
@@ -69,8 +71,11 @@ open class DataParseSuFaCall<T> : AbsRequestResultImpl() {
             val resPoneThrowable = WanAndroidMAFRequest.mErrorHandlerFactory.netWorkException(throwable)
             //自定义解析错误处理
             if (resPoneThrowable.code == ExceptionHandle.ERROR.UNKNOWN.toString() && throwable is AbsApiException){
-                WanAndroidMAFRequest.mErrorHandlerFactory.propaGateError(WanAndroidMAFRequest.mErrorHandlerFactory.getErrorHandlers().first(),throwable)
+                WanAndroidMAFRequest.mErrorHandlerFactory.rollGateError(WanAndroidMAFRequest.mErrorHandlerFactory.getErrorHandlers().first(),throwable)
             }
+        }
+        if(BuildConfig.DEBUG){
+          Log.d(TAG, "是否主线程=${Looper.getMainLooper() == Looper.myLooper()}");
         }
         onRequestDataFail(status?:"", failMsg?:"", onIParserListener as BaseBean?)
         onRequestBaseBeanFail(onIParserListener as BaseBean? )

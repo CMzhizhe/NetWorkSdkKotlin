@@ -2,14 +2,14 @@ package com.gxx.networksdkkotlin
 
 import android.app.Application
 import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
-import com.gxx.neworklibrary.OkHttpRequestManager
+import com.gxx.neworklibrary.OkHttpManager
 
 class MyApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        OkHttpRequestManager
-            .addOkBuilder(WanAndroidMAFRequest.createOkBuilder())
+        OkHttpManager
+            .addAbsLaunchUrlReq(WanAndroidMAFRequest)
             .create()
     }
 }

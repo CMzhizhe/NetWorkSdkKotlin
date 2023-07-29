@@ -7,7 +7,26 @@ import com.gxx.neworklibrary.inter.OnErrorHandler
 
 
 class ErrorHandlerFactory {
+    private var mOnErrorHandleFinishListener:OnErrorHandleFinishListener? = null
     private val mErrorHandlers = mutableListOf<OnErrorHandler>()
+
+    /**
+      * @date 创建时间: 2023/7/28
+      * @auther gxx
+      * @description 设置完成处理的回调
+      **/
+    fun setOnErrorHandleFinishListener(listener: OnErrorHandleFinishListener){
+        this.mOnErrorHandleFinishListener = listener
+    }
+
+    /**
+      * @date 创建时间: 2023/7/28
+      * @auther gxx
+      * @description 错误处理完成回调
+      **/
+    public interface OnErrorHandleFinishListener{
+        fun onErrorHandleFinish()
+    }
 
     /**
       * @date 创建时间: 2023/7/25
@@ -33,15 +52,16 @@ class ErrorHandlerFactory {
       * @auther gxx
       * @description 错误Handler处理
       **/
-    fun propaGateError(
+    fun rollGateError(
         errorHandler: OnErrorHandler?,
         error: AbsApiException
     ){
 
         if (errorHandler == null || errorHandler.handleError(error)) {
              //错误已处理
+            mOnErrorHandleFinishListener?.onErrorHandleFinish()
         } else {
-            propaGateError(errorHandler.next, error)
+            rollGateError(errorHandler.next, error)
         }
     }
 

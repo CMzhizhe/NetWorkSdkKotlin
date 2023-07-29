@@ -35,7 +35,6 @@ class ServiceDataTransform : OnResponseBodyTransformJsonListener {
                     BaseBean(method, jsString, jsonObject.getAsJsonObject(DATA), errorCode)
                 }
             } else {//与服务器协商的异常逻辑
-
                 // 可以在这里抛异常
                 if (errorCode.toString() == ERROR_CODE_TYPE_101) {
                     throw LoginApiException(errorCode.toString(), jsString, "登陆的异常")
