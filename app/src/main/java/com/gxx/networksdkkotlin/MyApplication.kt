@@ -9,7 +9,7 @@ class MyApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         OkHttpManager
-            .addAbsLaunchUrlReq(WanAndroidMAFRequest.REQUEST_URL_FIRST,WanAndroidMAFRequest)
+            .addAbsLaunchUrlReq(WanAndroidMAFRequest)
             .create()
     }
 }

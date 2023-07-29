@@ -10,15 +10,16 @@ import com.gxx.neworklibrary.launreq.AbsLaunchUrlReq
   * @auther gxx
   * @description ok的Builder
   **/
-class ReqOkBuilder {
+class ParamOkBuilder {
     private var mConnectTimeoutSecond = 10//连接时间
-    private var mReadTimeout = 10//读写时间
+    private var mReadTimeoutSecond = 10//读时间
+    private var mWriteTimeOutSecond = 10//写10秒
     private var mRequestUrl: String = ""//连接地址
-    private var mRetryOnConnectionFailure = false
+    private var mRetryOnConnectionFailure = true //默认运行失败重连
     private var mIsDebug = false
     private var mOnFactoryListener: OnFactoryListener? = null //Factory
     private var mOnInterceptorListener: OnInterceptorListener? = null // 拦截器
-    private var mAbsLaunchUrlReq:AbsLaunchUrlReq? = null//配置 请求，域名，错误工厂 的抽象类
+    private var mAbsLaunchUrlReq:AbsLaunchUrlReq? = null//配置 请求，域名 的抽象类
 
     fun getAbsLaunchUrlReq():AbsLaunchUrlReq?{
         return mAbsLaunchUrlReq
@@ -29,7 +30,11 @@ class ReqOkBuilder {
     }
 
     fun getReadTimeout(): Int {
-        return mReadTimeout
+        return mReadTimeoutSecond
+    }
+
+    fun getWriteTimeOut():Int{
+        return mWriteTimeOutSecond
     }
 
     fun getRequestUrl(): String {
@@ -54,7 +59,7 @@ class ReqOkBuilder {
     }
 
 
-    fun setRequestUrl(url:String):ReqOkBuilder{
+    fun setRequestUrl(url:String):ParamOkBuilder{
         this.mRequestUrl = url
         return this
     }
@@ -64,7 +69,7 @@ class ReqOkBuilder {
      * @auther gaoxiaoxiong
      * @description 设置intercept
      **/
-    fun setOnInterceptorListener(listener: OnInterceptorListener): ReqOkBuilder {
+    fun setOnInterceptorListener(listener: OnInterceptorListener): ParamOkBuilder {
         this.mOnInterceptorListener = listener
         return this
     }
@@ -74,7 +79,7 @@ class ReqOkBuilder {
      * @auther gaoxiaoxiong
      * @description 设置工厂factory
      **/
-    fun setOnFactoryListener(listener: OnFactoryListener): ReqOkBuilder {
+    fun setOnFactoryListener(listener: OnFactoryListener): ParamOkBuilder {
         this.mOnFactoryListener = listener
         return this
     }
@@ -86,7 +91,7 @@ class ReqOkBuilder {
      * @auther gaoxiaoxiong
      * @description 设置连接的时间
      **/
-    fun setConnectTimeoutSecond(connectionTimeOut: Int): ReqOkBuilder {
+    fun setConnectTimeoutSecond(connectionTimeOut: Int): ParamOkBuilder {
         this.mConnectTimeoutSecond = connectionTimeOut
         return this
     }
@@ -96,8 +101,18 @@ class ReqOkBuilder {
      * @auther gaoxiaoxiong
      * @description 设置读写时间
      **/
-    fun setReadTimeout(readTimeout: Int): ReqOkBuilder {
-        this.mReadTimeout = readTimeout
+    fun setReadTimeout(readTimeout: Int): ParamOkBuilder {
+        this.mReadTimeoutSecond = readTimeout
+        return this
+    }
+
+    /**
+     * @author gaoxiaoxiong
+     * @date 创建时间: 2023/7/29/029
+     * @description  写的时间
+     **/
+    fun setWriteTimeout(writeTimeOut:Int):ParamOkBuilder{
+        this.mWriteTimeOutSecond = writeTimeOut
         return this
     }
 
@@ -106,7 +121,7 @@ class ReqOkBuilder {
      * @auther gaoxiaoxiong
      * @description 设置是否尝试重连
      **/
-    fun setRetryOnConnectionFailure(retryOnConnectionFailure: Boolean): ReqOkBuilder {
+    fun setRetryOnConnectionFailure(retryOnConnectionFailure: Boolean): ParamOkBuilder {
         this.mRetryOnConnectionFailure = retryOnConnectionFailure
         return this
     }
@@ -116,7 +131,7 @@ class ReqOkBuilder {
      * @auther gaoxiaoxiong
      * @description 是否开发者模式
      **/
-    fun setIsDebug(isDebug: Boolean): ReqOkBuilder {
+    fun setIsDebug(isDebug: Boolean): ParamOkBuilder {
         this.mIsDebug = isDebug
         return this
     }
@@ -126,7 +141,7 @@ class ReqOkBuilder {
       * @auther gxx
       * @description 配置 请求，域名，错误工厂 的抽象类
       **/
-    fun setAbsLaunchUrlReq(absLaunchUrlReq: AbsLaunchUrlReq): ReqOkBuilder {
+    fun setAbsLaunchUrlReq(absLaunchUrlReq: AbsLaunchUrlReq): ParamOkBuilder {
         this.mAbsLaunchUrlReq = absLaunchUrlReq
         return this
     }
@@ -136,7 +151,7 @@ class ReqOkBuilder {
       * @auther gxx
       * @description 构建
       **/
-    fun build():ReqOkBuilder{
+    fun build():ParamOkBuilder{
         if (mRequestUrl.isEmpty()){
             throw IllegalStateException("RequestUrl is empty")
         }

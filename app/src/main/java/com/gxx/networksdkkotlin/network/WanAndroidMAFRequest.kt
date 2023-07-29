@@ -13,7 +13,7 @@ import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
 import com.gxx.neworklibrary.launreq.AbsLaunchUrlReq
 import com.gxx.neworklibrary.model.RqParamModel
-import com.gxx.neworklibrary.okbuild.ReqOkBuilder
+import com.gxx.neworklibrary.okbuild.ParamOkBuilder
 import com.gxx.neworklibrary.request.MobileRequest
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -47,8 +47,8 @@ object WanAndroidMAFRequest : AbsLaunchUrlReq() {
      * @auther gxx
      * @description 构建 OkBuilder
      **/
-    override fun createReqOkBuilder(): ReqOkBuilder? {
-        return ReqOkBuilder()
+    override fun createParamOkBuilder(): ParamOkBuilder? {
+        return ParamOkBuilder()
             .setRequestUrl(REQUEST_URL_FIRST)
             .setIsDebug(BuildConfig.DEBUG)
             .setOnFactoryListener(FactoryImpl())
@@ -64,6 +64,10 @@ object WanAndroidMAFRequest : AbsLaunchUrlReq() {
       **/
     override fun createRetrofit2(): Retrofit? {
         return null
+    }
+
+    override fun baseUrl(): String {
+       return REQUEST_URL_FIRST
     }
 
 

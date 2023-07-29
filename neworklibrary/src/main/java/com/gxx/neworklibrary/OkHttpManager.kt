@@ -2,7 +2,7 @@ package com.gxx.neworklibrary
 
 import com.gxx.neworklibrary.apiservice.BaseApiService
 import com.gxx.neworklibrary.launreq.AbsLaunchUrlReq
-import com.gxx.neworklibrary.okbuild.ReqOkBuilder
+import com.gxx.neworklibrary.okbuild.ParamOkBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
@@ -14,29 +14,28 @@ import java.util.concurrent.TimeUnit
  **/
 object OkHttpManager {
     private val TAG = "OkHttpRequestManager"
-    private var mMapReqOkBuilder = hashMapOf<String, ReqOkBuilder>()//构建的 OkBuilder
+    private var mMapParamOkBuilder = hashMapOf<String, ParamOkBuilder>()//构建的 OkBuilder
     private var mMapRetrofit = hashMapOf<String, Retrofit>() // 根据域名构建的 Retrofit
 
     /**
      * @date 创建时间: 2023/7/28
      * @auther gxx
      * @description 添加 AbsLaunchUrlReq
-     * @param baseUrl 域名
      **/
-    fun addAbsLaunchUrlReq(baseUrl: String, absLaunchUrlReq: AbsLaunchUrlReq):OkHttpManager {
-        if (baseUrl.isEmpty()){
+    fun addAbsLaunchUrlReq(absLaunchUrlReq: AbsLaunchUrlReq):OkHttpManager {
+        if (absLaunchUrlReq.baseUrl().isEmpty()){
             throw IllegalStateException("baseUrl 是空的")
         }
-        if (absLaunchUrlReq.createRetrofit2() == null && absLaunchUrlReq.createReqOkBuilder() == null) {
+        if (absLaunchUrlReq.createRetrofit2() == null && absLaunchUrlReq.createParamOkBuilder() == null) {
             throw IllegalStateException("不能2个同时为空")
         }
 
         if (absLaunchUrlReq.createRetrofit2() != null) {
-            mMapRetrofit[baseUrl] = absLaunchUrlReq.createRetrofit2()!!
-        }else if (absLaunchUrlReq.createReqOkBuilder()!=null){
-            mMapReqOkBuilder[baseUrl] = absLaunchUrlReq.createReqOkBuilder()!!
+            mMapRetrofit[absLaunchUrlReq.baseUrl()] = absLaunchUrlReq.createRetrofit2()!!
+        }else if (absLaunchUrlReq.createParamOkBuilder()!=null){
+            mMapParamOkBuilder[absLaunchUrlReq.baseUrl()] = absLaunchUrlReq.createParamOkBuilder()!!
         }else{//2个都不是空的，以createPamOkBuilder为准
-            mMapReqOkBuilder[baseUrl] = absLaunchUrlReq.createReqOkBuilder()!!
+            mMapParamOkBuilder[absLaunchUrlReq.baseUrl()] = absLaunchUrlReq.createParamOkBuilder()!!
         }
         return this
     }
@@ -47,14 +46,14 @@ object OkHttpManager {
      * @description 通过okBuilders 创建 Retrofits
      **/
     fun create() {
-        for (baseUrl in mMapReqOkBuilder.keys) {
-            if (mMapReqOkBuilder[baseUrl] == null) {
+        for (baseUrl in mMapParamOkBuilder.keys) {
+            if (mMapParamOkBuilder[baseUrl] == null) {
                 continue
             }
             if (mMapRetrofit[baseUrl] != null) {
                 continue
             }
-            mMapRetrofit[baseUrl] = createRetrofit(mMapReqOkBuilder[baseUrl]!!)
+            mMapRetrofit[baseUrl] = createRetrofit(mMapParamOkBuilder[baseUrl]!!)
         }
     }
 
@@ -72,7 +71,7 @@ object OkHttpManager {
      * @auther gxx
      * @description 构建 retrofit
      **/
-    private fun createRetrofit(builder: ReqOkBuilder): Retrofit {
+    private fun createRetrofit(builder: ParamOkBuilder): Retrofit {
         val mRequestUrl = builder.getRequestUrl()
         val mRetryOnConnectionFailure = builder.getRetryOnConnectionFailure()
         val mOnInterceptorListener = builder.getOnInterceptorListener()
@@ -81,6 +80,7 @@ object OkHttpManager {
         val okBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
             .connectTimeout(builder.getConnectTimeoutSecond().toLong(), TimeUnit.SECONDS)
             .readTimeout(builder.getReadTimeout().toLong(), TimeUnit.SECONDS)
+            .writeTimeout(builder.getWriteTimeOut().toLong(),TimeUnit.SECONDS)
             .retryOnConnectionFailure(mRetryOnConnectionFailure) //是否失败重新请求连接
 
 
