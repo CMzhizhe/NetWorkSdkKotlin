@@ -1,7 +1,6 @@
 package com.gxx.neworklibrary.request.base
 
 import com.google.gson.Gson
-import com.gxx.neworklibrary.OkHttpManager
 import com.gxx.neworklibrary.constans.EmRequestType
 import com.gxx.neworklibrary.constans.EmSyncRequestType
 import com.gxx.neworklibrary.inter.*
@@ -21,6 +20,7 @@ import okhttp3.ResponseBody
  * @param mOnResponseBodyTransformJsonListener 处理服务器提供的数据，转换成，自己需要的baseBean
  **/
 abstract class AbsRequest(
+    private val mOnBaseApiServiceListener:OnBaseApiServiceListener,
     private val mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener
 ) : OnRequestListener {
     private val TAG = "MobileRequest"
@@ -123,7 +123,7 @@ abstract class AbsRequest(
         onRequestFailListener: OnRequestFailListener?
     ): Flow<OnIParserListener?> {
         val method = "${baseUrl}${funName}"
-        val aipService = OkHttpManager.getBaseApiService(baseUrl)
+        val aipService = mOnBaseApiServiceListener.onGetBaseApiService()
         var responseBody: ResponseBody? = null
         kotlin.runCatching {
             responseBody = when (emRequestType) {
@@ -226,8 +226,7 @@ abstract class AbsRequest(
         val method = "${baseUrl}${funName}"
         var onIParserListener: OnIParserListener? = null
         kotlin.runCatching {
-            val aipService = OkHttpManager
-                .getBaseApiService(baseUrl)
+            val aipService = mOnBaseApiServiceListener.onGetBaseApiService()
             val responseBody = when (emRequestType) {
                 EmSyncRequestType.GET_SYNC -> {
                     aipService

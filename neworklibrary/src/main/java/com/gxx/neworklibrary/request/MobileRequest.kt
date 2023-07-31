@@ -6,9 +6,17 @@ import com.gxx.neworklibrary.inter.*
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.base.AbsRequest
 
+/**
+ * @date 创建时间: 2023/7/31
+ * @auther gaoxiaoxiong
+ * @description 网络请求封装
+ * @param mOnResponseBodyTransformJsonListener 服务器给的参数，回传给调用者
+ * @param mOnBaseApiServiceListener 获取BaseApiService
+ **/
 class MobileRequest(
+    mOnBaseApiServiceListener:OnBaseApiServiceListener,
     mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener
-) : AbsRequest(mOnResponseBodyTransformJsonListener),
+) : AbsRequest(mOnBaseApiServiceListener,mOnResponseBodyTransformJsonListener),
     OnMobileRequestListener {
 
     override suspend fun get(
