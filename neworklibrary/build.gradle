@@ -4,6 +4,14 @@ plugins {
     id 'maven-publish'
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}
+
+
 
 android {
     namespace 'com.gxx.neworklibrary'
@@ -64,13 +72,44 @@ dependencies {
     implementation 'com.google.android.gms:play-services-basement:18.0.1'
 }
 
+afterEvaluate{ project ->
+    task androidJavadocs(type: Javadoc) {
+        source = android.sourceSets.main.java.source
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        excludes = ['**/*.kt']
+    }
+
+    task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+        archiveClassifier.set("javadoc")
+        archiveClassifier.convention("javadoc")
+        from androidJavadocs.destinationDir
+    }
+
+    task androidSourcesJar(type: Jar) {
+        archiveClassifier.set("sources")
+        archiveClassifier.convention("sources")
+        from android.sourceSets.main.java.srcDirs
+    }
+
+    android.libraryVariants.all { variant ->
+        tasks.androidJavadocs.doFirst {
+            classpath += files(variant.javaCompileProvider.get().classpath.files.join(File.pathSeparator))
+        }
+    }
+
+    artifacts {
+        archives androidSourcesJar
+        archives androidJavadocsJar
+    }
+
+}
+
 publishing {
     publications {
         release(MavenPublication) {
             groupId = "com.github.CMzhizhe"
             artifactId = "NetWorkSdkKotlin"
             version = "v1.0.1"
-
             afterEvaluate {
                 from components.release
             }
