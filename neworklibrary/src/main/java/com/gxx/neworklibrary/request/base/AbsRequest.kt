@@ -18,6 +18,7 @@ import okhttp3.ResponseBody
  * @date 创建时间: 2023/7/21
  * @auther gxx
  * @description 请求的封装
+ * @param mOnResponseBodyTransformJsonListener 处理服务器提供的数据，转换成，自己需要的baseBean
  **/
 abstract class AbsRequest(
     private val mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener
@@ -122,8 +123,7 @@ abstract class AbsRequest(
         onRequestFailListener: OnRequestFailListener?
     ): Flow<OnIParserListener?> {
         val method = "${baseUrl}${funName}"
-        val aipService = OkHttpManager
-            .getBaseApiService(baseUrl)
+        val aipService = OkHttpManager.getBaseApiService(baseUrl)
         var responseBody: ResponseBody? = null
         kotlin.runCatching {
             responseBody = when (emRequestType) {
