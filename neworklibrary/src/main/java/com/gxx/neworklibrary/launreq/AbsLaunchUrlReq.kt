@@ -13,7 +13,8 @@ abstract class AbsLaunchUrlReq {
     /**
       * @date 创建时间: 2023/7/28
       * @auther gxx
-      * @description 构建 PamOkBuilder
+      * @description
+     *  构建 PamOkBuilder 可为null
       **/
     abstract fun createParamOkBuilder(): ParamOkBuilder?
 
@@ -22,6 +23,7 @@ abstract class AbsLaunchUrlReq {
       * @date 创建时间: 2023/7/28
       * @auther gxx
       * @description 构建retrofit2
+      *  构建retrofit2 可为null
       **/
     abstract fun createRetrofit2():Retrofit?
 

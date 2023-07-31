@@ -52,7 +52,6 @@ object WanAndroidMAFRequest : AbsLaunchUrlReq() {
             .setRequestUrl(REQUEST_URL_FIRST)
             .setIsDebug(BuildConfig.DEBUG)
             .setOnFactoryListener(FactoryImpl())
-            .setAbsLaunchUrlReq(this)
             .setOnInterceptorListener(InterceptImpl())
             .build()
     }

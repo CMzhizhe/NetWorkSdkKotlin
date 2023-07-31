@@ -1,20 +1,18 @@
 plugins {
-    id 'com.android.application'
+    id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
 }
 
 android {
-    namespace 'com.gxx.networksdkkotlin'
+    namespace 'com.gxx.testalibrary'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.gxx.networksdkkotlin"
-        minSdk 24
+        minSdk 22
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
@@ -31,8 +29,6 @@ android {
         jvmTarget = '1.8'
     }
 }
-
-
 
 dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
@@ -65,7 +61,4 @@ dependencies {
     implementation 'com.squareup.moshi:moshi-kotlin:1.14.0'
 
     implementation project(":neworklibrary")
-    implementation project(":TestAlibrary")
-    implementation project(":TestBlibrary")
-    //implementation 'com.github.CMzhizhe:NetWorkSdkKotlin:v1.0.2'
 }
