@@ -23,12 +23,11 @@ object OkHttpManager {
      * @auther gxx
      * @description 添加 AbsLaunchUrlReq
      **/
-    @Synchronized
     fun addAbsLaunchUrlReq(absLaunchUrlReq: AbsLaunchUrlReq): OkHttpManager {
         if (absLaunchUrlReq.baseUrl().isEmpty()) {
             throw IllegalStateException("baseUrl 是空的")
         }
-        if (absLaunchUrlReq.createRetrofit2() == null && absLaunchUrlReq.createParamOkBuilder() == null) {
+        if (absLaunchUrlReq.createParamOkBuilder() == null) {
             throw IllegalStateException("不能2个同时为空")
         }
 
@@ -47,13 +46,7 @@ object OkHttpManager {
             return this
         }
 
-        if (absLaunchUrlReq.createRetrofit2() != null) {
-            mMapRetrofit[absLaunchUrlReq.baseUrl()] = absLaunchUrlReq.createRetrofit2()!!
-        } else if (absLaunchUrlReq.createParamOkBuilder() != null) {
-            mMapParamOkBuilder[absLaunchUrlReq.baseUrl()] = absLaunchUrlReq.createParamOkBuilder()!!
-        } else {//2个都不是空的，以createPamOkBuilder为准
-            mMapParamOkBuilder[absLaunchUrlReq.baseUrl()] = absLaunchUrlReq.createParamOkBuilder()!!
-        }
+        mMapParamOkBuilder[absLaunchUrlReq.baseUrl()] = absLaunchUrlReq.createParamOkBuilder()!!
         return this
     }
 
@@ -62,7 +55,6 @@ object OkHttpManager {
      * @auther gxx
      * @description 通过okBuilders 创建 Retrofits
      **/
-    @Synchronized
     fun create() {
         //构建retrofit2
         for (baseUrl in mMapParamOkBuilder.keys) {

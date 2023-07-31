@@ -56,14 +56,6 @@ object WanAndroidMAFRequest : AbsLaunchUrlReq() {
             .build()
     }
 
-    /**
-      * @date 创建时间: 2023/7/28
-      * @auther gxx
-      * @description 创建 Retrofit
-      **/
-    override fun createRetrofit2(): Retrofit? {
-        return null
-    }
 
     override fun baseUrl(): String {
        return REQUEST_URL_FIRST
