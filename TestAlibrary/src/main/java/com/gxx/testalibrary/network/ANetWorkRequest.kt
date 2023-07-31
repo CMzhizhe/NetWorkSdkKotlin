@@ -1,5 +1,6 @@
 package com.gxx.testalibrary.network
 
+import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.launreq.AbsLaunchUrlReq
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.okbuild.ParamOkBuilder
@@ -18,24 +19,12 @@ object ANetWorkRequest : AbsLaunchUrlReq() {
     //配置的第一个域名
     val REQUEST_URL_FIRST = "https://www.wanandroid.com/"
     private val mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
-    private var mRetrofit:Retrofit? = null
-
-    /**
-      * @date 创建时间: 2023/7/31
-      * @auther gxx
-      * @description  设置mRetrofit
-      **/
-    fun setRetrofit(retrofit: Retrofit):ANetWorkRequest{
-        this.mRetrofit = retrofit
-        return this
-    }
 
     override fun createParamOkBuilder(): ParamOkBuilder? {
-        return null
-    }
-
-    override fun createRetrofit2(): Retrofit? {
-        return mRetrofit
+        return ParamOkBuilder()
+            .setRequestUrl(REQUEST_URL_FIRST)
+            .setIsDebug(BuildConfig.DEBUG)
+            .build()
     }
 
     override fun baseUrl(): String {

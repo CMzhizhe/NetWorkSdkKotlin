@@ -23,9 +23,6 @@ object BNetWorkRequest : AbsLaunchUrlReq() {
             .build()
     }
 
-    override fun createRetrofit2(): Retrofit? {
-        return null
-    }
 
     override fun baseUrl(): String {
         return REQUEST_URL_FIRST

@@ -20,12 +20,12 @@ import retrofit2.Retrofit
  * @auther gxx
  * @description A 包管理工具类
  **/
-class TestANetWorkManager(private val retrofit: Retrofit) {
+class TestANetWorkManager() {
     private val mCoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val TAG = "TestANetWorkManager"
 
     init {
-        OkHttpManager.addAbsLaunchUrlReq(ANetWorkRequest.setRetrofit(retrofit))
+        OkHttpManager.addAbsLaunchUrlReq(ANetWorkRequest)
     }
 
 

@@ -16,6 +16,6 @@ class MyApplication: Application() {
         //构建相同的B域名
         TestBNetWorkManager()
         //拿到构建好的 Retrofit传递进去
-        TestANetWorkManager(OkHttpManager.getRetrofit(WanAndroidMAFRequest.REQUEST_URL_FIRST)!!).init()
+        TestANetWorkManager().init()
     }
 }
