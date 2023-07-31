@@ -12,7 +12,6 @@ interface OnBaseApiServiceListener {
       * @date 创建时间: 2023/7/27
       * @auther gxx
       * @description
-     * @param baseUrl 基础的url
       **/
-    fun onGetBaseApiService(baseUrl:String): BaseApiService
+    fun onGetBaseApiService(): BaseApiService
 }
