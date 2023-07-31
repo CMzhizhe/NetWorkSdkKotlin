@@ -19,5 +19,3 @@ dependencyResolutionManagement {
 rootProject.name = "NetWorkSdkKotlin"
 include ':app'
 include ':neworklibrary'
-include ':TestAlibrary'
-include ':TestBlibrary'

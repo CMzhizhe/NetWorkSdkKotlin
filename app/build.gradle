@@ -13,8 +13,6 @@ android {
         targetSdk 33
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -61,11 +59,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime:2.4.1"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
 
-
     implementation 'com.squareup.moshi:moshi-kotlin:1.14.0'
 
     implementation project(":neworklibrary")
-    implementation project(":TestAlibrary")
-    implementation project(":TestBlibrary")
     //implementation 'com.github.CMzhizhe:NetWorkSdkKotlin:v1.0.2'
 }
