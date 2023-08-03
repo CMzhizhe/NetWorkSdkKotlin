@@ -3,12 +3,21 @@ package com.gxx.neworklibrary.request.base
 import com.google.gson.Gson
 import com.gxx.neworklibrary.constans.EmRequestType
 import com.gxx.neworklibrary.constans.EmSyncRequestType
-import com.gxx.neworklibrary.inter.*
+import com.gxx.neworklibrary.inter.OnBaseApiServiceListener
+import com.gxx.neworklibrary.inter.OnIParserListener
+import com.gxx.neworklibrary.inter.OnRequestFailListener
+import com.gxx.neworklibrary.inter.OnRequestListener
+import com.gxx.neworklibrary.inter.OnRequestSuccessListener
+import com.gxx.neworklibrary.inter.OnResponseBodyTransformJsonListener
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import com.gxx.neworklibrary.util.MultipartBodyUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 
@@ -128,48 +137,46 @@ abstract class AbsRequest(
         kotlin.runCatching {
             responseBody = when (emRequestType) {
                 EmRequestType.GET -> {
-                    aipService.getJson(method, urlMap ?: mutableMapOf())
+                    aipService?.getJson(method, urlMap ?: mutableMapOf())
                 }
 
                 EmRequestType.POST -> {
                     if (bodyMap.isNotEmpty()) {
-                        aipService.postJson(
+                        aipService?.postJson(
                             method,
                             urlMap,
                             mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
                         )
                     } else {
-                        aipService.postJson(method, urlMap ?: mutableMapOf())
+                        aipService?.postJson(method, urlMap ?: mutableMapOf())
                     }
                 }
 
                 EmRequestType.POST_FORM -> {
                     if (bodyMap.isNotEmpty()) {
-                        aipService.postForm(method, urlMap, bodyMap)
+                        aipService?.postForm(method, urlMap, bodyMap)
                     } else {
-                        aipService.postForm(method, urlMap)
+                        aipService?.postForm(method, urlMap)
                     }
                 }
 
                 EmRequestType.PUT -> {
                     if (bodyMap.isNotEmpty()) {
-                        aipService.putJson(
+                        aipService?.putJson(
                             method,
                             urlMap,
                             mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
                         )
                     } else {
-                        aipService.putJson(method, urlMap)
+                        aipService?.putJson(method, urlMap)
                     }
                 }
 
                 EmRequestType.PUT_FORM -> {
                     if (bodyMap.isNotEmpty()) {
-                        aipService
-                            .putForm(method, urlMap, bodyMap)
+                        aipService?.putForm(method, urlMap, bodyMap)
                     } else {
-                        aipService
-                            .putForm(method, urlMap)
+                        aipService?.putForm(method, urlMap)
                     }
                 }
             }
@@ -229,55 +236,53 @@ abstract class AbsRequest(
             val aipService = mOnBaseApiServiceListener.onGetBaseApiService()
             val responseBody = when (emRequestType) {
                 EmSyncRequestType.GET_SYNC -> {
-                    aipService
-                        .getSyncJson(method, urlMap)
+                    aipService?.getSyncJson(method, urlMap)
                 }
 
                 EmSyncRequestType.POST_SYNC -> {
                     if (bodyMap.isNotEmpty()) {
-                        aipService
-                            .postSyncJson(
+                        aipService?.postSyncJson(
                                 method,
                                 urlMap,
                                 mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
                             )
                     } else {
-                        aipService
-                            .postSyncJson(method, urlMap)
+                        aipService?.postSyncJson(method, urlMap)
                     }
                 }
 
                 EmSyncRequestType.POST_SYNC_FORM -> {
                     if (bodyMap.isNotEmpty()) {
-                        aipService.postSyncForm(method, urlMap, bodyMap)
+                        aipService?.postSyncForm(method, urlMap, bodyMap)
                     } else {
-                        aipService.postSyncForm(method, urlMap)
+                        aipService?.postSyncForm(method, urlMap)
                     }
                 }
 
                 EmSyncRequestType.PUT_SYNC -> {
                     if (bodyMap.isNotEmpty()) {
-                        aipService.putSyncJson(
+                        aipService?.putSyncJson(
                             method,
                             urlMap,
                             mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
                         )
                     } else {
-                        aipService.putSyncJson(method, urlMap)
+                        aipService?.putSyncJson(method, urlMap)
                     }
                 }
 
                 EmSyncRequestType.PUT_SYNC_FORM -> {
                     if (bodyMap.isNotEmpty()) {
-                        aipService.postSyncForm(method, urlMap, bodyMap)
+                        aipService?.postSyncForm(method, urlMap, bodyMap)
                     } else {
-                        aipService.postSyncForm(method, urlMap)
+                        aipService?.postSyncForm(method, urlMap)
                     }
                 }
             }
-            val jsString = responseBody.string()
-            onIParserListener =
-                mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, jsString)
+            val jsString = responseBody?.string()
+            if (jsString!=null){
+                onIParserListener = mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, jsString)
+            }
         }.onFailure {
             it.printStackTrace()
             onRequestFailListener?.onRequestFail(

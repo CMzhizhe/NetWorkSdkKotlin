@@ -88,8 +88,8 @@ object WanAndroidMAFRequest : OnBaseApiServiceListener {
         }
     }
 
-    override fun onGetBaseApiService(): BaseApiService {
-        return mOkHttpManager.getApi(BaseApiService::class.java)
+    override fun onGetBaseApiService(): BaseApiService? {
+        return mOkHttpManager.getApi(REQUEST_URL_FIRST,BaseApiService::class.java)
     }
 
 

@@ -13,5 +13,5 @@ interface OnBaseApiServiceListener {
       * @auther gxx
       * @description
       **/
-    fun onGetBaseApiService(): BaseApiService
+    fun onGetBaseApiService(): BaseApiService?
 }

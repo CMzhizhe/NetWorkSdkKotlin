@@ -1,5 +1,7 @@
 package com.gxx.neworklibrary
 
+import android.net.Uri
+import com.gxx.neworklibrary.constans.Constant
 import com.gxx.neworklibrary.inter.OnFactoryListener
 import com.gxx.neworklibrary.inter.OnInterceptorListener
 import okhttp3.OkHttpClient
@@ -12,28 +14,16 @@ import java.util.concurrent.TimeUnit
  * @description 管理所有的 Retrofit
  **/
 class OkHttpManager {
-    private val TAG = "OkHttpRequestManager"
-    private var mConnectTimeoutSecond = 10//连接时间
-    private var mReadTimeoutSecond = 30//读时间
-    private var mWriteTimeOutSecond = 30//写10秒
-    private var mRequestUrl: String = ""//连接地址
-    private var mRetryOnConnectionFailure = true //默认运行失败重连
-    private var mIsDebug = false
-    private var mOnFactoryListener: OnFactoryListener? = null //Factory
-    private var mOnInterceptorListener: OnInterceptorListener? = null // 拦截器
-    private var mRetrofit:Retrofit
-
+    private val TAG = "OkHttpManager"
+    private val mCatchMapRetrofit = mutableMapOf<String, Retrofit>()//存储OkHttpManager，key为baseUrl
+    private val mObj = Any()
 
     private constructor(builder: Builder) {
-        this.mConnectTimeoutSecond = builder.getConnectTimeoutSecond()
-        this.mReadTimeoutSecond = builder.getReadTimeout()
-        this.mWriteTimeOutSecond = builder.getWriteTimeOut()
-        this.mRequestUrl = builder.getRequestUrl()
-        this.mRetryOnConnectionFailure = builder.getRetryOnConnectionFailure()
-        this.mIsDebug = builder.getIsDebug()
-        this.mOnFactoryListener = builder.getOnFactoryListener()
-        this.mOnInterceptorListener = builder.getOnInterceptorListener()
-        mRetrofit = init()
+        synchronized(mObj){
+            mCatchMapRetrofit.getOrPut(builder.getRequestUrl()){
+                createRetrofit(builder)
+            }
+        }
     }
 
     class Builder {
@@ -172,6 +162,12 @@ class OkHttpManager {
                 throw IllegalStateException("RequestUrl is 需要以 '/' 结尾，形如www.xxx.com/")
             }
 
+
+            val uri = Uri.parse(mRequestUrl)
+            if (uri.port == Constant.DEFAULT_PORT_80 || uri.port == Constant.DEFAULT_PORT_443) {
+                throw IllegalStateException("默认端口号，不用去加上")
+            }
+
             return OkHttpManager(this)
         }
     }
@@ -181,14 +177,14 @@ class OkHttpManager {
      * @auther gaoxiaoxiong
      * @description 初始化
      **/
-    private fun init():Retrofit {
+    private fun createRetrofit(builder: Builder):Retrofit {
         val okBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
-            .connectTimeout(this.mConnectTimeoutSecond.toLong(), TimeUnit.SECONDS)
-            .readTimeout(this.mReadTimeoutSecond.toLong(), TimeUnit.SECONDS)
-            .writeTimeout(this.mWriteTimeOutSecond.toLong(), TimeUnit.SECONDS)
-            .retryOnConnectionFailure(this.mRetryOnConnectionFailure) //是否失败重新请求连接
+            .connectTimeout(builder.getConnectTimeoutSecond().toLong(), TimeUnit.SECONDS)
+            .readTimeout(builder.getReadTimeout().toLong(), TimeUnit.SECONDS)
+            .writeTimeout(builder.getWriteTimeOut().toLong(), TimeUnit.SECONDS)
+            .retryOnConnectionFailure(builder.getRetryOnConnectionFailure()) //是否失败重新请求连接
 
-        this.mOnInterceptorListener?.let {
+        builder.getOnInterceptorListener()?.let {
             for (interceptor in it.interceptors()) {
                 okBuilder.addInterceptor(interceptor)
             }
@@ -199,10 +195,10 @@ class OkHttpManager {
         }
 
         val reBuilder: Retrofit.Builder = Retrofit.Builder()
-            .baseUrl(mRequestUrl)
+            .baseUrl(builder.getRequestUrl())
             .client(okBuilder.build())
 
-        this.mOnFactoryListener?.let {
+        builder.getOnFactoryListener()?.let {
             for (callAdapterFactory in it.callAdapterFactorys()) {
                 reBuilder.addCallAdapterFactory(callAdapterFactory)
             }
@@ -219,9 +215,13 @@ class OkHttpManager {
      * @date 创建时间: 2023/7/27
      * @auther gxx
      * @description 返回retrofit
+     * @param baseUrl
      **/
-    fun getRetrofit(): Retrofit {
-        return mRetrofit
+    fun getRetrofit(baseUrl: String): Retrofit {
+        if (mCatchMapRetrofit[baseUrl] == null) {
+            throw IllegalStateException("retrofit == null 请先builder")
+        }
+        return mCatchMapRetrofit[baseUrl]!!
     }
 
     /**
@@ -229,11 +229,12 @@ class OkHttpManager {
      * @auther gxx
      * @description 获取公共API
      **/
-    fun <T> getApi(clazz: Class<T>): T {
-        return getRetrofit().create(clazz)
+    fun <T> getApi(baseUrl: String, clazz: Class<T>): T? {
+        if (mCatchMapRetrofit[baseUrl] == null) {
+            throw IllegalStateException("请先builder")
+        }
+        return getRetrofit(baseUrl).create(clazz)
     }
-
-
 
 
 }
