@@ -15,8 +15,16 @@ import java.util.concurrent.TimeUnit
  **/
 class OkHttpManager {
     private val TAG = "OkHttpManager"
-    private val mCatchMapRetrofit = mutableMapOf<String, Retrofit>()//存储OkHttpManager，key为baseUrl
-    private val mObj = Any()
+
+    companion object{
+        private val mCatchMapRetrofit = mutableMapOf<String, Retrofit>()//存储OkHttpManager，key为baseUrl
+        private val mObj = Any()
+
+        //用户可以自己配置这样的ConfigBean，在各个地方可以通过baseUrl获取此bean
+        //val mUserConfigBean = mutableMapOf<String,UserConfigBean>()// key是baseUrl
+    }
+
+
 
     private constructor(builder: Builder) {
         synchronized(mObj){
