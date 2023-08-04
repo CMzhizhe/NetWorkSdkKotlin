@@ -47,7 +47,7 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.9.0'
 
-    implementation 'tech.thdev:flow-call-adapter-factory:1.0.0'
+    implementation 'com.github.CMzhizhe:Retrofit-FlowCallAdapterFactory:v1.0.0'
 
     // Kotlin
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
