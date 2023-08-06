@@ -9,7 +9,7 @@
   - 自定义BaseBean
   - 解析data里面的数据，统一错误处理，回传业务层成功与失败
   - 提供的请求方法（针对PHP不安规定返回错误的对象处理，比如我要对象，PHP给数组）
-  - flow方式的拿到结果、接口方式拿到结果
+  - flow方式的拿到结果
 * 站在巨人的肩膀上
 
 以下介绍，只能讲个大概，建议跑Demo，我更多的希望各位开发者，可以自定义修改此库来。因为加密，解密，以及配置Content-Type各自需求不同。
@@ -361,7 +361,7 @@ class LoginErrorHandler(override var next: OnErrorHandler? = null) : OnErrorHand
         )
     }
 ```
-##### flow方式的拿到结果、接口方式拿到结果
+##### flow方式的拿到结果
 flow方式，其实原理也是通过接口方式拿到结果，然后通过callbackFlow拿到数据
 ```
 /**
@@ -385,26 +385,6 @@ flow方式，其实原理也是通过接口方式拿到结果，然后通过call
             ), dataParseSuFaCall, dataParseSuFaCall
         )
         awaitClose { }
-    }
-
- /**
-     * @date 创建时间: 2023/7/22
-     * @auther gaoxiaoxiong
-     * @description get 请求
-     **/
-    suspend fun <T> getRequest(
-        funName: String,
-        urlMap: Map<String, Any> = mutableMapOf(),
-        dataParseSuFaCall: DataParseSuFaCall<T>
-    ) {
-        mMobileRequest.get(
-            RqParamModel(
-                baseUrl = REQUEST_URL_FIRST,
-                funName = funName,
-                null,
-                urlMap = urlMap
-            ), dataParseSuFaCall, dataParseSuFaCall
-        )
     }
 
 /**
