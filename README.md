@@ -11,7 +11,7 @@
   - 提供的请求方法（针对PHP不安规定返回错误的对象处理，比如我要对象，PHP给数组）
 * 站在巨人的肩膀上
 
-以下介绍，只能讲个大概，建议跑Demo
+以下介绍，只能讲个大概，建议跑Demo，我更多的希望各位开发者，可以自定义修改此库来。因为加密，解密，以及配置Content-Type各自需求不同。
 
 #### demo案例
 ```
@@ -94,11 +94,12 @@ class OkHttpManager {
     companion object{
         private val mCatchMapRetrofit = mutableMapOf<String, Retrofit>()//存储OkHttpManager，key为baseUrl
         private val mObj = Any()
-        val mSecreKey = mutableMapOf<String, String>()//key为baseUrl，value为密匙
+        val mSecreKey = mutableMapOf<String, String>()//key为baseUrl，value为密匙 key类似=http://www.baidu.com/
     }
 }
 ```
 ```
+//加密
 class EncryptionInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = builder.build()
