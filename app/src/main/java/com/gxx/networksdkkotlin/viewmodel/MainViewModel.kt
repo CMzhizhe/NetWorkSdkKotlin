@@ -27,7 +27,9 @@ class MainViewModel: ViewModel() {
       **/
     fun readBanner(){
         viewModelScope.launch{
-            WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
+            val map = mutableMapOf<String,Any>()
+            map["userId"] = "1"
+            WanAndroidMAFRequest.getRequest("banner/json",map,object :
                 DataParseSuFaCall<MutableList<Banner>>() {
                 override fun onRequestDataSuccess(data: MutableList<Banner>?) {
                     super.onRequestDataSuccess(data)
