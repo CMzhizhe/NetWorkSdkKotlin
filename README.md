@@ -114,7 +114,7 @@ class EncryptionInterceptor : Interceptor {
         val port = HttpUrl.defaultPort(httpUrl.scheme)
         var url = ""
         if (port == 80 || port == 443) {
-            url = "${httpUrl.scheme}://${httpUrl.host}"
+            url = "${httpUrl.scheme}://${httpUrl.host}/"
         } else {
             url = "${httpUrl.scheme}://${httpUrl.host}:${httpUrl.port}/"
         }
