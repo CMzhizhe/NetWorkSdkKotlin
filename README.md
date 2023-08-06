@@ -22,12 +22,15 @@
       **/
     fun readBanner(){
         viewModelScope.launch{
-            WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
+           val map = mutableMapOf<String,Any>()
+            map["userId"] = "1"
+            WanAndroidMAFRequest.getRequest("banner/json",map,object :
                 DataParseSuFaCall<MutableList<Banner>>() {
                 override fun onRequestDataSuccess(data: MutableList<Banner>?) {
                     super.onRequestDataSuccess(data)
                     if(BuildConfig.DEBUG){
                         Log.d(TAG, "json = ${Gson().toJson(data)}");
+                        Log.d(TAG, "是否主线程 = ${Looper.getMainLooper() == Looper.myLooper()}");
                     }
                 }
             })
@@ -111,7 +114,7 @@ class EncryptionInterceptor : Interceptor {
         val port = HttpUrl.defaultPort(httpUrl.scheme)
         var url = ""
         if (port == 80 || port == 443) {
-            url = "${httpUrl.scheme}://${httpUrl.host}"
+            url = "${httpUrl.scheme}://${httpUrl.host}/"
         } else {
             url = "${httpUrl.scheme}://${httpUrl.host}:${httpUrl.port}/"
         }
@@ -197,16 +200,19 @@ class BaseBean( var resourceJsonString: String? = null,
 ##### 解析data里面的数据，统一错误处理，回传业务层成功与失败
 我们在发起网络请求的时候是这样的，new DataParseSuFaCall 传递需要的具体格式
 ```
-WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
+viewModelScope.launch{
+            val map = mutableMapOf<String,Any>()
+            map["userId"] = "1"
+            WanAndroidMAFRequest.getRequest("banner/json",map,object :
                 DataParseSuFaCall<MutableList<Banner>>() {
-                override fun onRequestDataSuccess(data: MutableList<Banner>?) {
+                override fun onRequestDataSuccess(data: MutableList<Banner>?) {//成功回调
                     super.onRequestDataSuccess(data)
-                    if(BuildConfig.DEBUG){
-                        Log.d(TAG, "json = ${Gson().toJson(data)}");
-                        Log.d(TAG, "是否主线程 = ${Looper.getMainLooper() == Looper.myLooper()}");
-                    }
+                }
+                override fun onRequestBaseBeanFail(baseBean: BaseBean?) {//失败回调
+                    super.onRequestBaseBeanFail(baseBean)
                 }
             })
+        }
 
 /**
  * @date 创建时间: 2023/7/22
