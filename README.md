@@ -275,33 +275,33 @@ WanAndroidMAFRequest.mErrorHandlerFactory.rollGateError(WanAndroidMAFRequest.mEr
         onRequestBaseBeanFail(onIParserListener as BaseBean? )
     }
 
-    /**
-     * @date 2022/5/7
-     * @auther qinzhichang
-     * @Descriptiion 请求失败
+      /**
+     * @author gaoxiaoxiong
+     * @date 创建时间: 2023/8/6/006
+     * @description  请求失败
      **/
     open fun onRequestDataFail(code: String, msg: String, baseBean: BaseBean?=null) {}
 
-    /**
-     * @date 2022/6/23
-     * @author qinzhichang
-     * @Description 请求失败
-     **/
+      /**
+       * @author gaoxiaoxiong
+       * @date 创建时间: 2023/8/6/006
+       * @description  请求失败
+       **/
     open fun onRequestBaseBeanFail(baseBean: BaseBean?=null) {}
+
     /**
-     * @date 2022/5/7
-     * @auther qinzhichang
-     * @Descriptiion 请求成功
-     * 返回最终的结果T
+     * @author gaoxiaoxiong
+     * @date 创建时间: 2023/8/6/006
+     * @description  请求成功
      **/
     open fun onRequestDataSuccess(data: T?) {}
 
-    /**
-     * @date 2022/5/7
-     * @auther qinzhichang
-     * @Descriptiion 请求成功
-     * 返回含有 BaseBean 的
-     **/
+   /**
+    * @author gaoxiaoxiong
+    * @date 创建时间: 2023/8/6/006
+    * @description  请求成功
+    * 返回含有 BaseBean 的
+    **/
     open fun onRequestBaseBeanSuccess(data: T?, baseBean: BaseBean) {}
 }
 ```
