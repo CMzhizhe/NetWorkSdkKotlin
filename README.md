@@ -63,6 +63,8 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
 
     implementation 'com.github.CMzhizhe:Retrofit-FlowCallAdapterFactory:v1.0.0'
+    //如果自己不设计到加密，解密，可以加上下面这个
+    implementation 'com.github.CMzhizhe:NetWorkSdkKotlin:v1.0.5'
 }
 ```
 ##### 域名，intercept，factory配置
