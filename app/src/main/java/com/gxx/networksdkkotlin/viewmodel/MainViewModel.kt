@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.gxx.networksdkkotlin.bean.BaseBean
 import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
 import com.gxx.networksdkkotlin.network.pase.DataParseSuFaCall
 import com.gxx.neworklibrary.BuildConfig
@@ -37,6 +38,9 @@ class MainViewModel: ViewModel() {
                         Log.d(TAG, "json = ${Gson().toJson(data)}");
                         Log.d(TAG, "是否主线程 = ${Looper.getMainLooper() == Looper.myLooper()}");
                     }
+                }
+                override fun onRequestBaseBeanFail(baseBean: BaseBean?) {
+                    super.onRequestBaseBeanFail(baseBean)
                 }
             })
         }
