@@ -6,6 +6,8 @@ import com.gxx.neworklibrary.inter.OnFactoryListener
 import com.gxx.neworklibrary.inter.OnInterceptorListener
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import tech.thdev.network.flowcalladapterfactory.FlowCallAdapterFactory
 import java.util.concurrent.TimeUnit
 
 /**
@@ -20,11 +22,7 @@ class OkHttpManager {
         private val mCatchMapRetrofit = mutableMapOf<String, Retrofit>()//存储OkHttpManager，key为baseUrl
         private val mObj = Any()
 
-        //用户可以自己配置这样的ConfigBean，在各个地方可以通过baseUrl获取此bean
-        //val mUserConfigBean = mutableMapOf<String,UserConfigBean>()// key是baseUrl
     }
-
-
 
     private constructor(builder: Builder) {
         synchronized(mObj){
@@ -170,7 +168,6 @@ class OkHttpManager {
                 throw IllegalStateException("RequestUrl is 需要以 '/' 结尾，形如www.xxx.com/")
             }
 
-
             val uri = Uri.parse(mRequestUrl)
             if (uri.port == Constant.DEFAULT_PORT_80 || uri.port == Constant.DEFAULT_PORT_443) {
                 throw IllegalStateException("默认端口号，不用去加上")
@@ -206,6 +203,10 @@ class OkHttpManager {
             .baseUrl(builder.getRequestUrl())
             .client(okBuilder.build())
 
+        reBuilder.addConverterFactory(GsonConverterFactory.create())
+        reBuilder.addCallAdapterFactory(FlowCallAdapterFactory())
+
+        //可以添加其他的CallAdapterFactory、ConverterFactory
         builder.getOnFactoryListener()?.let {
             for (callAdapterFactory in it.callAdapterFactorys()) {
                 reBuilder.addCallAdapterFactory(callAdapterFactory)
