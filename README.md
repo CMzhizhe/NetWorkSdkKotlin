@@ -22,12 +22,15 @@
       **/
     fun readBanner(){
         viewModelScope.launch{
-            WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
+           val map = mutableMapOf<String,Any>()
+            map["userId"] = "1"
+            WanAndroidMAFRequest.getRequest("banner/json",map,object :
                 DataParseSuFaCall<MutableList<Banner>>() {
                 override fun onRequestDataSuccess(data: MutableList<Banner>?) {
                     super.onRequestDataSuccess(data)
                     if(BuildConfig.DEBUG){
                         Log.d(TAG, "json = ${Gson().toJson(data)}");
+                        Log.d(TAG, "是否主线程 = ${Looper.getMainLooper() == Looper.myLooper()}");
                     }
                 }
             })
