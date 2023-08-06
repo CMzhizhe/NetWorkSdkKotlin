@@ -9,6 +9,7 @@
   - 自定义BaseBean
   - 解析data里面的数据，统一错误处理，回传业务层成功与失败
   - 提供的请求方法（针对PHP不安规定返回错误的对象处理，比如我要对象，PHP给数组）
+  - flow方式的拿到结果、接口方式拿到结果
 * 站在巨人的肩膀上
 
 以下介绍，只能讲个大概，建议跑Demo，我更多的希望各位开发者，可以自定义修改此库来。因为加密，解密，以及配置Content-Type各自需求不同。
@@ -360,6 +361,67 @@ class LoginErrorHandler(override var next: OnErrorHandler? = null) : OnErrorHand
         )
     }
 ```
+##### flow方式的拿到结果、接口方式拿到结果
+flow方式，其实原理也是通过接口方式拿到结果，然后通过callbackFlow拿到数据
+```
+/**
+     * @author gaoxiaoxiong
+     * @date 创建时间: 2023/8/6/006
+     * @description  flow方式的调用
+     **/
+    suspend inline fun <reified T> createRequestFlow(funName: String) = callbackFlow<T> {
+        val dataParseSuFaCall = object : DataParseSuFaCall<T>() {
+            override fun onRequestDataSuccess(data: T?) {
+                super.onRequestDataSuccess(data)
+                trySend(data!!)
+            }
+        }
+        mMobileRequest.get(
+            RqParamModel(
+                baseUrl = REQUEST_URL_FIRST,
+                funName = funName,
+                null,
+                urlMap = mutableMapOf()
+            ), dataParseSuFaCall, dataParseSuFaCall
+        )
+        awaitClose { }
+    }
+
+ /**
+     * @date 创建时间: 2023/7/22
+     * @auther gaoxiaoxiong
+     * @description get 请求
+     **/
+    suspend fun <T> getRequest(
+        funName: String,
+        urlMap: Map<String, Any> = mutableMapOf(),
+        dataParseSuFaCall: DataParseSuFaCall<T>
+    ) {
+        mMobileRequest.get(
+            RqParamModel(
+                baseUrl = REQUEST_URL_FIRST,
+                funName = funName,
+                null,
+                urlMap = urlMap
+            ), dataParseSuFaCall, dataParseSuFaCall
+        )
+    }
+
+/**
+     * @date 创建时间: 2023/7/25
+     * @auther gxx
+     * @description 发起网络请求
+     **/
+    fun readBanner(){
+        viewModelScope.launch{
+            WanAndroidMAFRequest.createRequestFlow<MutableList<Banner>>("banner/json").collect{//flow方式
+                mBannerFlow.emit(Gson().toJson(it))
+            }
+        }
+    }
+```
+
+
 ##### 站在巨人的肩膀上
 [开发搭建网络请求框架 3](https://juejin.cn/post/7220339259161526333)这里借用了他的链式处理的思想，点赞点赞
 
