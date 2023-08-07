@@ -65,7 +65,7 @@ dependencies {
 
     implementation 'com.github.CMzhizhe:Retrofit-FlowCallAdapterFactory:v1.0.0'
     //如果自己不设计到加密，解密，可以加上下面这个
-    implementation 'com.github.CMzhizhe:NetWorkSdkKotlin:v1.0.5'
+    implementation 'com.github.CMzhizhe:NetWorkSdkKotlin:v1.0.6'
 }
 ```
 ##### 域名，intercept，factory配置
