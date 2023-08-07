@@ -10,6 +10,7 @@
   - 解析data里面的数据，统一错误处理，回传业务层成功与失败
   - 提供的请求方法（针对PHP不安规定返回错误的对象处理，比如我要对象，PHP给数组）
   - flow方式的拿到结果
+  - 自定义Api
 * 站在巨人的肩膀上
 
 以下介绍，只能讲个大概，建议跑Demo，我更多的希望各位开发者，可以自定义修改此库来。因为加密，解密，以及配置Content-Type各自需求不同。喜欢再点个start
@@ -404,6 +405,40 @@ flow方式，其实原理也是通过接口方式拿到结果，然后通过call
             }
         }
     }
+```
+
+#### 自定义Api
+```
+    interface CustomApiService {
+        //自定义接口名称
+        @JvmSuppressWildcards
+        @GET
+        suspend fun readBook(
+            @Url url: String,
+            @QueryMap urlMap: Map<String, Any>
+        ): ResponseBody
+    }
+
+   private val mJsonParseResult = JsonParseResult()
+   //自定义api请求的Demo
+    suspend fun <T> readBannerJson(dataParseSuFaCall: DataParseSuFaCall<T>) {
+        val api = mOkHttpManager.getApi(REQUEST_URL_FIRST, CustomApiService::class.java)
+        val url = "${REQUEST_URL_FIRST}banner/json"
+        val responseBody = api?.readBook(url, mutableMapOf())
+        mMobileRequest.responseBodyTransformJson(REQUEST_URL_FIRST,"banner/json",responseBody,dataParseSuFaCall).collect{
+            if (it == null) {
+                return@collect
+            }
+            mJsonParseResult.doIParseResult(
+                "${REQUEST_URL_FIRST}banner/json",
+                EmResultType.REQUEST_RESULT_OWN,
+                listener = it,
+                dataParseSuFaCall,
+                dataParseSuFaCall
+            )
+        }
+    }
+   
 ```
 
 
