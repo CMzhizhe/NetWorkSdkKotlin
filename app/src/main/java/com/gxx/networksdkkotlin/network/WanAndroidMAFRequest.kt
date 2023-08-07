@@ -1,6 +1,7 @@
 package com.gxx.networksdkkotlin.network
 
 import android.util.Log
+import com.gxx.networksdkkotlin.network.api.CustomApiService
 import com.gxx.networksdkkotlin.network.error.handler.LoginErrorHandler
 import com.gxx.networksdkkotlin.network.error.handler.PayErrorHandler
 import com.gxx.networksdkkotlin.network.error.handler.TokenErrorHandler
@@ -12,10 +13,12 @@ import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform
 import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.OkHttpManager
 import com.gxx.neworklibrary.apiservice.BaseApiService
+import com.gxx.neworklibrary.constans.EmResultType
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
 import com.gxx.neworklibrary.inter.OnBaseApiServiceListener
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.MobileRequest
+import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 
@@ -89,8 +92,31 @@ object WanAndroidMAFRequest : OnBaseApiServiceListener {
     }
 
     override fun onGetBaseApiService(): BaseApiService? {
-        return mOkHttpManager.getApi(REQUEST_URL_FIRST,BaseApiService::class.java)
+        return mOkHttpManager.getApi(REQUEST_URL_FIRST, BaseApiService::class.java)
     }
 
 
+    private val mJsonParseResult = JsonParseResult()
+    /**
+     * @date 创建时间: 2023/8/7
+     * @auther gxx
+     * 自定义api请求的Demo
+     **/
+    suspend fun <T> readBannerJson(dataParseSuFaCall: DataParseSuFaCall<T>) {
+        val api = mOkHttpManager.getApi(REQUEST_URL_FIRST, CustomApiService::class.java)
+        val url = "${REQUEST_URL_FIRST}banner/json"
+        val responseBody = api?.readBook(url, mutableMapOf())
+        mMobileRequest.responseBodyTransformJson(REQUEST_URL_FIRST,"banner/json",responseBody,dataParseSuFaCall).collect{
+            if (it == null) {
+                return@collect
+            }
+            mJsonParseResult.doIParseResult(
+                "${REQUEST_URL_FIRST}banner/json",
+                EmResultType.REQUEST_RESULT_OWN,
+                listener = it,
+                dataParseSuFaCall,
+                dataParseSuFaCall
+            )
+        }
+    }
 }

@@ -13,7 +13,7 @@ import com.gxx.neworklibrary.request.base.AbsRequest
  * @param mOnResponseBodyTransformJsonListener 服务器给的参数，回传给调用者
  * @param mOnBaseApiServiceListener 获取BaseApiService
  **/
-class MobileRequest(
+open class MobileRequest(
     mOnBaseApiServiceListener:OnBaseApiServiceListener,
     mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener
 ) : AbsRequest(mOnBaseApiServiceListener,mOnResponseBodyTransformJsonListener),

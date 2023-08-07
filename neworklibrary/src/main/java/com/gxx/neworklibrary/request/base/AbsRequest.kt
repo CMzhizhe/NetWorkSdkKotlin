@@ -29,7 +29,7 @@ import okhttp3.ResponseBody
  * @param mOnResponseBodyTransformJsonListener 处理服务器提供的数据，转换成，自己需要的baseBean
  **/
 abstract class AbsRequest(
-    private val mOnBaseApiServiceListener:OnBaseApiServiceListener,
+    private val mOnBaseApiServiceListener: OnBaseApiServiceListener,
     private val mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener
 ) : OnRequestListener {
     private val TAG = "MobileRequest"
@@ -182,7 +182,7 @@ abstract class AbsRequest(
             }
         }.onFailure {
             it.printStackTrace()
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 onRequestFailListener?.onRequestFail(
                     it,
                     null,
@@ -192,18 +192,38 @@ abstract class AbsRequest(
                 )
             }
         }
+
+       return responseBodyTransformJson(baseUrl,funName, responseBody, onRequestFailListener)
+    }
+
+    /**
+     * @date 创建时间: 2023/8/7
+     * @auther gaoxiaoxiong
+     * 将 responseBody 转 Flow<OnIParserListener?>
+     * @param baseUrl 请求的baseUrl
+     * @param funName 接口名称
+     * @param responseBody 服务器提供的数据
+     * @param onRequestFailListener 失败的回调
+     **/
+   suspend fun responseBodyTransformJson(
+        baseUrl: String,
+        funName: String,
+        responseBody: ResponseBody?=null,
+        onRequestFailListener: OnRequestFailListener?=null
+    ): Flow<OnIParserListener?> {
+        val method = "${baseUrl}${funName}"
         if (responseBody == null) {
             return flow {
                 emit(null)
             }
         } else {
             return flow<String> {
-                emit(responseBody!!.string())
+                emit(responseBody.string())
             }.transform<String, OnIParserListener?> {
                 emit(mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, it))
             }.catch {
                 it.printStackTrace()
-                withContext(Dispatchers.Main){
+                withContext(Dispatchers.Main) {
                     onRequestFailListener?.onRequestFail(
                         it,
                         null,
@@ -242,10 +262,10 @@ abstract class AbsRequest(
                 EmSyncRequestType.POST_SYNC -> {
                     if (bodyMap.isNotEmpty()) {
                         aipService?.postSyncJson(
-                                method,
-                                urlMap,
-                                mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
-                            )
+                            method,
+                            urlMap,
+                            mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
+                        )
                     } else {
                         aipService?.postSyncJson(method, urlMap)
                     }
@@ -280,8 +300,12 @@ abstract class AbsRequest(
                 }
             }
             val jsString = responseBody?.string()
-            if (jsString!=null){
-                onIParserListener = mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, jsString)
+            if (jsString != null) {
+                onIParserListener =
+                    mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(
+                        method,
+                        jsString
+                    )
             }
         }.onFailure {
             it.printStackTrace()
