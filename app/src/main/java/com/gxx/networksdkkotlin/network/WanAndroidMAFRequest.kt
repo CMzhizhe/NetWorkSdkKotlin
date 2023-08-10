@@ -42,12 +42,13 @@ object WanAndroidMAFRequest : OnBaseApiServiceListener {
         .build()
 
     //自定义错误factory的构建
-    val mErrorHandlerFactory = ErrorHandlerFactory()
+    val mErrorHandlerFactory = ErrorHandlerFactory.Builder()
+        .setBaseUrl(REQUEST_URL_FIRST)
         .addErrorHandler(LoginErrorHandler())
         .addErrorHandler(PayErrorHandler())
         .addErrorHandler(TokenErrorHandler())
         .addErrorHandler(UnErrorHandler())
-        .init()
+        .build()
 
     /**
      * @date 创建时间: 2023/7/22

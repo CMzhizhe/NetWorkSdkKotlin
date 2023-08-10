@@ -4,7 +4,9 @@ import android.net.Uri
 import com.gxx.neworklibrary.constans.Constant
 import com.gxx.neworklibrary.inter.OnFactoryListener
 import com.gxx.neworklibrary.inter.OnInterceptorListener
+import com.gxx.neworklibrary.interceptor.JsonUtf8Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import tech.thdev.network.flowcalladapterfactory.FlowCallAdapterFactory
@@ -33,15 +35,24 @@ class OkHttpManager {
     }
 
     class Builder {
-        private var mConnectTimeoutSecond = 10//连接时间
+        private var mConnectTimeoutSecond = 15//连接时间
         private var mReadTimeoutSecond = 30//读时间
         private var mWriteTimeOutSecond = 30//写10秒
         private var mRequestUrl: String = ""//连接地址
         private var mRetryOnConnectionFailure = true //默认运行失败重连
         private var mIsDebug = false
+        private var mIsShowNetHttpLog = false//是否打印网络日志
+        private var mIsContentTypeApplicationUtf8 = true//是否默认   application/json; charset=UTF-8
         private var mOnFactoryListener: OnFactoryListener? = null //Factory
         private var mOnInterceptorListener: OnInterceptorListener? = null // 拦截器
 
+        fun getIsShowNetHttpLog():Boolean{
+            return mIsShowNetHttpLog
+        }
+
+        fun getIsContentTypeApplicationUtf8():Boolean{
+            return mIsContentTypeApplicationUtf8
+        }
 
         fun getConnectTimeoutSecond(): Int {
             return mConnectTimeoutSecond
@@ -81,6 +92,17 @@ class OkHttpManager {
             this.mRequestUrl = url
             return this
         }
+
+        fun setIsShowNetHttpLog(boolean: Boolean): Builder {
+            this.mIsShowNetHttpLog = boolean
+            return this
+        }
+
+        fun setIsContentTypeApplicationUtf8(boolean: Boolean): Builder{
+            this.mIsContentTypeApplicationUtf8 = boolean
+            return this
+        }
+
 
         /**
          * @date 创建时间: 2023/7/20
@@ -188,6 +210,14 @@ class OkHttpManager {
             .readTimeout(builder.getReadTimeout().toLong(), TimeUnit.SECONDS)
             .writeTimeout(builder.getWriteTimeOut().toLong(), TimeUnit.SECONDS)
             .retryOnConnectionFailure(builder.getRetryOnConnectionFailure()) //是否失败重新请求连接
+
+        if (builder.getIsShowNetHttpLog() && builder.getIsDebug()){
+            okBuilder.addNetworkInterceptor(HttpLoggingInterceptor())
+        }
+
+        if (builder.getIsContentTypeApplicationUtf8()){
+            okBuilder.addInterceptor(JsonUtf8Interceptor())
+        }
 
         builder.getOnInterceptorListener()?.let {
             for (interceptor in it.interceptors()) {
