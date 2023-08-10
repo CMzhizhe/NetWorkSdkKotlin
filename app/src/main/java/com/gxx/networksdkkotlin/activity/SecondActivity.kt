@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.gson.Gson
 import com.gxx.networksdkkotlin.BuildConfig
 import com.gxx.networksdkkotlin.R
 import com.gxx.networksdkkotlin.viewmodel.SecondViewModel
@@ -19,7 +20,12 @@ class SecondActivity: AppCompatActivity()  {
         setContentView(R.layout.activity_second)
 
         subscribeBanner();
-        mSecondViewModel.readBanner()
+        lifecycleScope.launch{
+           val result = mSecondViewModel.readBanner()
+            if(BuildConfig.DEBUG) {
+               Log.d(TAG, "result.first=${Gson().toJson(result.first())}");
+            }
+        }
     }
 
     private fun subscribeBanner(){

@@ -1,5 +1,6 @@
 package com.gxx.neworklibrary
 
+import android.app.Application
 import android.net.Uri
 import com.gxx.neworklibrary.constans.Constant
 import com.gxx.neworklibrary.inter.OnFactoryListener
@@ -21,13 +22,18 @@ class OkHttpManager {
     private val TAG = "OkHttpManager"
 
     companion object{
+        private lateinit var mApplication: Application
         private val mCatchMapRetrofit = mutableMapOf<String, Retrofit>()//存储OkHttpManager，key为baseUrl
         private val mObj = Any()
 
+        fun getApplication():Application{
+            return mApplication
+        }
     }
 
     private constructor(builder: Builder) {
         synchronized(mObj){
+            mApplication = builder.getApplication()!!
             mCatchMapRetrofit.getOrPut(builder.getRequestUrl()){
                 createRetrofit(builder)
             }
@@ -35,6 +41,7 @@ class OkHttpManager {
     }
 
     class Builder {
+        private var mApplication:Application?=null
         private var mConnectTimeoutSecond = 15//连接时间
         private var mReadTimeoutSecond = 30//读时间
         private var mWriteTimeOutSecond = 30//写10秒
@@ -45,6 +52,10 @@ class OkHttpManager {
         private var mIsContentTypeApplicationUtf8 = true//是否默认   application/json; charset=UTF-8
         private var mOnFactoryListener: OnFactoryListener? = null //Factory
         private var mOnInterceptorListener: OnInterceptorListener? = null // 拦截器
+
+        fun getApplication():Application?{
+            return mApplication
+        }
 
         fun getIsShowNetHttpLog():Boolean{
             return mIsShowNetHttpLog
@@ -87,6 +98,10 @@ class OkHttpManager {
             return mOnInterceptorListener
         }
 
+        fun setApplication(application: Application): Builder {
+            this.mApplication = application
+            return this
+        }
 
         fun setRequestUrl(url: String): Builder {
             this.mRequestUrl = url
@@ -190,6 +205,10 @@ class OkHttpManager {
                 throw IllegalStateException("RequestUrl is 需要以 '/' 结尾，形如www.xxx.com/")
             }
 
+            if (mApplication == null){
+                throw IllegalStateException("mApplication 为空")
+            }
+
             val uri = Uri.parse(mRequestUrl)
             if (uri.port == Constant.DEFAULT_PORT_80 || uri.port == Constant.DEFAULT_PORT_443) {
                 throw IllegalStateException("默认端口号，不用去加上")
@@ -211,8 +230,9 @@ class OkHttpManager {
             .writeTimeout(builder.getWriteTimeOut().toLong(), TimeUnit.SECONDS)
             .retryOnConnectionFailure(builder.getRetryOnConnectionFailure()) //是否失败重新请求连接
 
+
         if (builder.getIsShowNetHttpLog() && builder.getIsDebug()){
-            okBuilder.addNetworkInterceptor(HttpLoggingInterceptor())
+            okBuilder.addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
         }
 
         if (builder.getIsContentTypeApplicationUtf8()){

@@ -12,6 +12,7 @@ import com.gxx.neworklibrary.inter.OnResponseBodyTransformJsonListener
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import com.gxx.neworklibrary.util.MultipartBodyUtils
+import com.gxx.neworklibrary.util.NetWorkUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -57,6 +58,11 @@ abstract class AbsRequest(
 
         if (rqParamModel.funName.isEmpty()) {
             throw IllegalStateException("funName 是空的")
+        }
+
+        if (!NetWorkUtil.isNetConnected()){
+
+            return
         }
 
         doComposeMapRequest(
