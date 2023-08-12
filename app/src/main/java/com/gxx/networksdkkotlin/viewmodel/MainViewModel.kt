@@ -10,6 +10,8 @@ import com.gxx.neworklibrary.doservice.parse.BaseServiceDataParseSuFaCall
 import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.bean.Banner
 import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class MainViewModel: ViewModel() {
     private val TAG = "MainViewModel"
@@ -35,4 +37,42 @@ class MainViewModel: ViewModel() {
             })
         }
     }
+
+    /**
+     * @author gaoxiaoxiong
+     * @date 创建时间: 2023/8/12/012
+     * @description  flow方式请求
+     **/
+    fun readBannerFlow(){
+        viewModelScope.launch {
+            WanAndroidMAFRequest.createRequestFlow<MutableList<Banner>>("banner/json").collect{
+                if(BuildConfig.DEBUG){
+                 Log.d(TAG, "flow拿到的结果->${Gson().toJson(it)}");
+                }
+            }
+        }
+    }
+
+    /**
+     * @author gaoxiaoxiong
+     * @date 创建时间: 2023/8/12/012
+     * @description  method方法返回
+     **/
+   suspend fun methodReturn():MutableList<Banner>{
+        return suspendCoroutine {coroutine->
+            viewModelScope.launch{
+                WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
+                    BaseServiceDataParseSuFaCall<MutableList<Banner>>() {
+                    override fun onRequestDataSuccess(data: MutableList<Banner>?) {
+                        super.onRequestDataSuccess(data)
+                        if (data!=null){
+                            coroutine.resume(data)
+                        }
+                    }
+                })
+            }
+        }
+    }
+
+
 }
