@@ -7,6 +7,6 @@ import com.gxx.neworklibrary.error.exception.AbsApiException
  * @auther gaoxiaoxiong
  * @description 支付异常
  **/
-class PayApiException (code: String, jsString: String, errorMessage: String = "") :
+class PayApiException (code: String, jsString: String="", errorMessage: String = "") :
     AbsApiException(code, jsString, errorMessage) {
 }

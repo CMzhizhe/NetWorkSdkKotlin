@@ -2,6 +2,7 @@ package com.gxx.neworklibrary.request
 
 import com.gxx.neworklibrary.constans.EmRequestType
 import com.gxx.neworklibrary.constans.EmSyncRequestType
+import com.gxx.neworklibrary.doservice.transform.BaseServiceDataTransform
 import com.gxx.neworklibrary.inter.*
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.base.AbsRequest
@@ -11,12 +12,10 @@ import com.gxx.neworklibrary.request.base.AbsRequest
  * @auther gaoxiaoxiong
  * @description 网络请求封装
  * @param mOnResponseBodyTransformJsonListener 服务器给的参数，回传给调用者
- * @param mOnBaseApiServiceListener 获取BaseApiService
  **/
 open class MobileRequest(
-    mOnBaseApiServiceListener:OnBaseApiServiceListener,
-    mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener
-) : AbsRequest(mOnBaseApiServiceListener,mOnResponseBodyTransformJsonListener),
+    mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener?=null
+) : AbsRequest(mOnResponseBodyTransformJsonListener ?: BaseServiceDataTransform()),
     OnMobileRequestListener {
 
     override suspend fun get(

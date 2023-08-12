@@ -1,4 +1,4 @@
-package com.gxx.networksdkkotlin.util
+package com.gxx.neworklibrary.util
 
 import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory

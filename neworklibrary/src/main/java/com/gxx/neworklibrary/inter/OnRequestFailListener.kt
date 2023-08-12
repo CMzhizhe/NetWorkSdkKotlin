@@ -7,10 +7,11 @@ package com.gxx.neworklibrary.inter
  **/
 interface OnRequestFailListener {
     fun onRequestFail(
-        throwable: Throwable?,
-        status: String?,
-        failMsg: String?,
-        errorJsonString: String?,
-        onIParserListener: OnIParserListener?
+        method:String,
+        throwable: Throwable?=null,
+        status: String?=null,
+        failMsg: String?=null,
+        errorJsonString: String?=null,
+        onIParserListener: OnIParserListener?=null
     )
 }

@@ -53,4 +53,5 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
 
     implementation 'com.github.CMzhizhe:Retrofit-FlowCallAdapterFactory:v1.0.0'
+    implementation 'com.squareup.moshi:moshi-kotlin:1.14.0'
 }

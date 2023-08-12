@@ -29,9 +29,12 @@ class JsonParseResult() {
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-
         if (emResultType == EmResultType.REQUEST_RESULT_OWN) {//自己处理
-            onRequestSuccessListener?.onRequestSuccess(method, listener.resultDataJsonElement(), listener)
+            if (listener.isSuccess()){
+                onRequestSuccessListener?.onRequestSuccess(method, listener.resultDataJsonElement(), listener)
+            }else{
+                onRequestFailListener?.onRequestFail(method,null, null, null, null, listener)
+            }
         } else {
             if (listener.isSuccess()) {
                 if (listener.resultDataJsonElement() == null) {
@@ -41,19 +44,19 @@ class JsonParseResult() {
                         if (listener.resultDataJsonElement() is JsonObject) {
                             onRequestSuccessListener?.onRequestSuccess(method, listener.resultDataJsonElement(), listener)
                         } else {
-                            onRequestFailListener?.onRequestFail(null, null, null, null, listener)
+                            onRequestFailListener?.onRequestFail(method,null, null, null, null, listener)
                         }
                     } else if (emResultType == EmResultType.REQUEST_RESULT_ARRAY) {//希望拿到数组
                         if (listener.resultDataJsonElement() is JsonArray) {
                             onRequestSuccessListener?.onRequestSuccess(method, listener.resultDataJsonElement(), listener)
                         } else {
-                            onRequestFailListener?.onRequestFail(null, null, null, null, listener
+                            onRequestFailListener?.onRequestFail(method,null, null, null, null, listener
                             )
                         }
                     }
                 }
             } else {//失败处理
-                onRequestFailListener?.onRequestFail(null, null, null, null, listener)
+                onRequestFailListener?.onRequestFail(method,null, null, null, null, listener)
             }
         }
     }

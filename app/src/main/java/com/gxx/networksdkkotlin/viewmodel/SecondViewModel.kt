@@ -1,13 +1,10 @@
 package com.gxx.networksdkkotlin.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
-import com.gxx.networksdkkotlin.bean.BaseBean
+import com.gxx.neworklibrary.model.BaseBean
 import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
-import com.gxx.networksdkkotlin.network.pase.DataParseSuFaCall
-import com.gxx.neworklibrary.BuildConfig
+import com.gxx.neworklibrary.doservice.parse.BaseServiceDataParseSuFaCall
 import com.gxx.neworklibrary.bean.Banner
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,7 +24,7 @@ class SecondViewModel: ViewModel()  {
        return suspendCoroutine<MutableList<Banner>> {continuation ->
            viewModelScope.launch {
                WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
-                   DataParseSuFaCall<MutableList<Banner>>() {
+                   BaseServiceDataParseSuFaCall<MutableList<Banner>>() {
                    override fun onRequestDataSuccess(data: MutableList<Banner>?) {
                        super.onRequestDataSuccess(data)
                        continuation.resume(data!!)

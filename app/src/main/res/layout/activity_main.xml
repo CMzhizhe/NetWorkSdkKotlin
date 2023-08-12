@@ -17,6 +17,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/bt_net_work_start"
+        android:text="网络请求开始"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
         android:id="@+id/bt_start_second"
         android:text="启动第二个activity"
         android:layout_width="wrap_content"

@@ -15,6 +15,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         mMainViewModel.readBanner()
 
+        this.findViewById<Button>(R.id.bt_net_work_start).setOnClickListener {
+            mMainViewModel.readBanner()
+        }
+
         this.findViewById<Button>(R.id.bt_start_second).setOnClickListener {
             startActivity(Intent(this,SecondActivity::class.java))
         }

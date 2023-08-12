@@ -2,7 +2,9 @@ package com.gxx.neworklibrary
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import com.gxx.neworklibrary.constans.Constant
+import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
 import com.gxx.neworklibrary.inter.OnFactoryListener
 import com.gxx.neworklibrary.inter.OnInterceptorListener
 import com.gxx.neworklibrary.interceptor.JsonUtf8Interceptor
@@ -24,19 +26,38 @@ class OkHttpManager {
     companion object{
         private lateinit var mApplication: Application
         private val mCatchMapRetrofit = mutableMapOf<String, Retrofit>()//存储OkHttpManager，key为baseUrl
+        private val mCacheErrorHandler = mutableMapOf<String, ErrorHandlerFactory>()
         private val mObj = Any()
 
         fun getApplication():Application{
             return mApplication
         }
+
+        fun getRetrofit(baseUrl: String):Retrofit?{
+            return mCatchMapRetrofit[baseUrl]
+        }
+
+        fun getErrorHandlerFactory(baseUrl: String):ErrorHandlerFactory?{
+            return mCacheErrorHandler[baseUrl]
+        }
     }
 
     private constructor(builder: Builder) {
         synchronized(mObj){
+            val startTime = System.currentTimeMillis()
             mApplication = builder.getApplication()!!
+
             mCatchMapRetrofit.getOrPut(builder.getRequestUrl()){
                 createRetrofit(builder)
             }
+
+            if (builder.getErrorHandlerFactory()!=null){
+                mCacheErrorHandler.getOrPut(builder.getRequestUrl()){
+                    builder.getErrorHandlerFactory()!!
+                }
+            }
+
+           Log.d(TAG,"创建耗时-->${System.currentTimeMillis() - startTime}")
         }
     }
 
@@ -47,11 +68,16 @@ class OkHttpManager {
         private var mWriteTimeOutSecond = 30//写10秒
         private var mRequestUrl: String = ""//连接地址
         private var mRetryOnConnectionFailure = true //默认运行失败重连
+        private var mErrorHandlerFactory:ErrorHandlerFactory?=null//错误Handler
         private var mIsDebug = false
         private var mIsShowNetHttpLog = false//是否打印网络日志
         private var mIsContentTypeApplicationUtf8 = true//是否默认   application/json; charset=UTF-8
         private var mOnFactoryListener: OnFactoryListener? = null //Factory
         private var mOnInterceptorListener: OnInterceptorListener? = null // 拦截器
+
+        fun getErrorHandlerFactory():ErrorHandlerFactory?{
+            return mErrorHandlerFactory
+        }
 
         fun getApplication():Application?{
             return mApplication
@@ -100,6 +126,11 @@ class OkHttpManager {
 
         fun setApplication(application: Application): Builder {
             this.mApplication = application
+            return this
+        }
+
+        fun setErrorHandlerFactory(factory: ErrorHandlerFactory):Builder{
+            this.mErrorHandlerFactory = factory
             return this
         }
 

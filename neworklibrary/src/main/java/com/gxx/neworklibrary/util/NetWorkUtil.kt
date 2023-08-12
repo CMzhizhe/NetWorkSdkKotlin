@@ -3,6 +3,7 @@ package com.gxx.neworklibrary.util
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.NetworkInfo
 import android.os.Build
 import com.gxx.neworklibrary.OkHttpManager
 
@@ -32,7 +33,7 @@ class NetWorkUtil {
                 } else {
                     try {
                         val activeNetworkInfo = connectivityManager.activeNetworkInfo
-                        if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
+                        if (activeNetworkInfo != null && activeNetworkInfo.isConnected && activeNetworkInfo.getState() == NetworkInfo.State.CONNECTED) {
                             return true
                         }
                     } catch (e: Exception) {

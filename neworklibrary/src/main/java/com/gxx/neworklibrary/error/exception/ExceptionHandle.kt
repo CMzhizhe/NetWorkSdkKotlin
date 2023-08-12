@@ -19,10 +19,14 @@ class ExceptionHandle {
             ex = if (httpException.code() == INTERNAL_SERVER_ERROR) { //服务器异常
                 ResponeThrowable(e, ERROR.HTTP_ERROR_500.toString())
             } else {
-                ResponeThrowable(e, ERROR.HTTP_ERROR.toString())
+                if (httpException.code() == BAD_REQUEST){//badRequest
+                    ResponeThrowable(e,BAD_REQUEST.toString())
+                }else{
+                    ResponeThrowable(e, ERROR.HTTP_ERROR.toString())
+                }
             }
             when (httpException.code()) {
-                UNAUTHORIZED, FORBIDDEN, NOT_FOUND, REQUEST_TIMEOUT, GATEWAY_TIMEOUT, INTERNAL_SERVER_ERROR, BAD_GATEWAY, SERVICE_UNAVAILABLE -> if (httpException.message != null) {
+                UNAUTHORIZED, FORBIDDEN, NOT_FOUND, REQUEST_TIMEOUT, GATEWAY_TIMEOUT, INTERNAL_SERVER_ERROR, BAD_GATEWAY, SERVICE_UNAVAILABLE,BAD_REQUEST -> if (httpException.message != null) {
                     ex.message = httpException.message
                 } else if (httpException.message() != null) {
                     ex.message = httpException.message()
@@ -123,6 +127,7 @@ class ExceptionHandle {
     }
 
     companion object {
+        private const val BAD_REQUEST = 400//服务器错误
         private const val UNAUTHORIZED = 401
         private const val FORBIDDEN = 403
         private const val NOT_FOUND = 404

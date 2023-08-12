@@ -1,24 +1,18 @@
 package com.gxx.neworklibrary.request.base
 
 import com.google.gson.Gson
+import com.gxx.neworklibrary.OkHttpManager
+import com.gxx.neworklibrary.apiservice.BaseApiService
 import com.gxx.neworklibrary.constans.EmRequestType
 import com.gxx.neworklibrary.constans.EmSyncRequestType
-import com.gxx.neworklibrary.inter.OnBaseApiServiceListener
-import com.gxx.neworklibrary.inter.OnIParserListener
-import com.gxx.neworklibrary.inter.OnRequestFailListener
-import com.gxx.neworklibrary.inter.OnRequestListener
-import com.gxx.neworklibrary.inter.OnRequestSuccessListener
-import com.gxx.neworklibrary.inter.OnResponseBodyTransformJsonListener
+import com.gxx.neworklibrary.error.impl.NoNetWorkApiException
+import com.gxx.neworklibrary.inter.*
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import com.gxx.neworklibrary.util.MultipartBodyUtils
 import com.gxx.neworklibrary.util.NetWorkUtil
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 
@@ -30,7 +24,6 @@ import okhttp3.ResponseBody
  * @param mOnResponseBodyTransformJsonListener 处理服务器提供的数据，转换成，自己需要的baseBean
  **/
 abstract class AbsRequest(
-    private val mOnBaseApiServiceListener: OnBaseApiServiceListener,
     private val mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener
 ) : OnRequestListener {
     private val TAG = "MobileRequest"
@@ -60,8 +53,8 @@ abstract class AbsRequest(
             throw IllegalStateException("funName 是空的")
         }
 
-        if (!NetWorkUtil.isNetConnected()){
-
+        if (!NetWorkUtil.isNetConnected()) {
+            onRequestFailListener?.onRequestFail("${rqParamModel.baseUrl}${rqParamModel.funName}",NoNetWorkApiException())
             return
         }
 
@@ -101,6 +94,11 @@ abstract class AbsRequest(
             throw IllegalStateException("funName 是空的")
         }
 
+        if (!NetWorkUtil.isNetConnected()) {
+            onRequestFailListener?.onRequestFail("${rqParamModel.baseUrl}${rqParamModel.funName}",NoNetWorkApiException())
+            return
+        }
+
         val listener = doSyncComposeMapRequest(
             rqParamModel.baseUrl,
             rqParamModel.funName,
@@ -138,7 +136,7 @@ abstract class AbsRequest(
         onRequestFailListener: OnRequestFailListener?
     ): Flow<OnIParserListener?> {
         val method = "${baseUrl}${funName}"
-        val aipService = mOnBaseApiServiceListener.onGetBaseApiService()
+        val aipService = OkHttpManager.getRetrofit(baseUrl)?.create(BaseApiService::class.java)
         var responseBody: ResponseBody? = null
         kotlin.runCatching {
             responseBody = when (emRequestType) {
@@ -190,6 +188,7 @@ abstract class AbsRequest(
             it.printStackTrace()
             withContext(Dispatchers.Main) {
                 onRequestFailListener?.onRequestFail(
+                    method,
                     it,
                     null,
                     null,
@@ -199,7 +198,7 @@ abstract class AbsRequest(
             }
         }
 
-       return responseBodyTransformJson(baseUrl,funName, responseBody, onRequestFailListener)
+        return responseBodyTransformJson(baseUrl, funName, responseBody, onRequestFailListener)
     }
 
     /**
@@ -211,11 +210,11 @@ abstract class AbsRequest(
      * @param responseBody 服务器提供的数据
      * @param onRequestFailListener 失败的回调
      **/
-   suspend fun responseBodyTransformJson(
+    suspend fun responseBodyTransformJson(
         baseUrl: String,
         funName: String,
-        responseBody: ResponseBody?=null,
-        onRequestFailListener: OnRequestFailListener?=null
+        responseBody: ResponseBody? = null,
+        onRequestFailListener: OnRequestFailListener? = null
     ): Flow<OnIParserListener?> {
         val method = "${baseUrl}${funName}"
         if (responseBody == null) {
@@ -231,6 +230,7 @@ abstract class AbsRequest(
                 it.printStackTrace()
                 withContext(Dispatchers.Main) {
                     onRequestFailListener?.onRequestFail(
+                        method,
                         it,
                         null,
                         null,
@@ -259,7 +259,7 @@ abstract class AbsRequest(
         val method = "${baseUrl}${funName}"
         var onIParserListener: OnIParserListener? = null
         kotlin.runCatching {
-            val aipService = mOnBaseApiServiceListener.onGetBaseApiService()
+            val aipService = OkHttpManager.getRetrofit(baseUrl)?.create(BaseApiService::class.java)
             val responseBody = when (emRequestType) {
                 EmSyncRequestType.GET_SYNC -> {
                     aipService?.getSyncJson(method, urlMap)
@@ -316,6 +316,7 @@ abstract class AbsRequest(
         }.onFailure {
             it.printStackTrace()
             onRequestFailListener?.onRequestFail(
+                method,
                 it,
                 null,
                 null,

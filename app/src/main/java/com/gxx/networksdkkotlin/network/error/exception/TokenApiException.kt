@@ -7,6 +7,6 @@ import com.gxx.neworklibrary.error.exception.AbsApiException
  * @auther gaoxiaoxiong
  * @description token 异常
  **/
-class TokenApiException(code: String, jsString: String, errorMessage: String = "") :
+class TokenApiException(code: String, jsString: String="", errorMessage: String = "") :
     AbsApiException(code, jsString, errorMessage) {
 }

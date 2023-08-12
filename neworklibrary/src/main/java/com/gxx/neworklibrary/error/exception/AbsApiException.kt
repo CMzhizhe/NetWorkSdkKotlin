@@ -8,4 +8,4 @@ package com.gxx.neworklibrary.error.exception
  * @param jsString 错误json
  * @param errorMessage 错误message
  **/
-abstract class AbsApiException(val code: String, val jsString: String, val errorMessage:String=""):Exception(errorMessage) {}
+abstract class AbsApiException(val code: String, var jsString: String, var errorMessage:String=""):Exception(errorMessage) {}
