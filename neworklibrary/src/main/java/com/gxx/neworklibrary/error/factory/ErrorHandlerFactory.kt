@@ -88,18 +88,18 @@ class ErrorHandlerFactory {
         this.mOnServiceCodeErrorHandleFinishListener = builder.getOnServiceCodeErrorHandleFinishListener()
         this.mOnNetWorkErrorListener = builder.getOnNetWorkErrorListener()
 
+        //添加用户额外补充的错误
+        for (serviceErrorModel in builder.getServiceErrorModel()) {
+            mServiceErrorHandlers.add(serviceErrorModel.onErrorHandler)
+            mServiceErrorApiExceptions.add(serviceErrorModel.absApiException)
+        }
+
         //添加默认handler
         if (builder.getIsAddDefaultServiceErrorHandle()){
             for (defaultErrorHandlerAndApiException in defaultErrorHandlerAndApiExceptions()) {
                 mServiceErrorHandlers.add(defaultErrorHandlerAndApiException.onErrorHandler)
                 mServiceErrorApiExceptions.add(defaultErrorHandlerAndApiException.absApiException)
             }
-        }
-
-        //添加用户额外补充的错误
-        for (serviceErrorModel in builder.getServiceErrorModel()) {
-            mServiceErrorHandlers.add(serviceErrorModel.onErrorHandler)
-            mServiceErrorApiExceptions.add(serviceErrorModel.absApiException)
         }
 
         //添加无网络 + 未定义异常
