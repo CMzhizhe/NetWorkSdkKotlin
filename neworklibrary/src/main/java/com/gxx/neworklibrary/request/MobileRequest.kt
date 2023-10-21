@@ -1,9 +1,11 @@
 package com.gxx.neworklibrary.request
 
 import com.gxx.neworklibrary.constans.EmRequestType
-import com.gxx.neworklibrary.constans.EmSyncRequestType
 import com.gxx.neworklibrary.doservice.transform.BaseServiceDataTransform
-import com.gxx.neworklibrary.inter.*
+import com.gxx.neworklibrary.inter.OnMobileRequestListener
+import com.gxx.neworklibrary.inter.OnRequestFailListener
+import com.gxx.neworklibrary.inter.OnRequestSuccessListener
+import com.gxx.neworklibrary.inter.OnResponseBodyTransformJsonListener
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.base.AbsRequest
 
@@ -31,18 +33,6 @@ open class MobileRequest(
         )
     }
 
-    override fun getSync(
-        rqParamModel: RqParamModel,
-        onRequestSuccessListener: OnRequestSuccessListener?,
-        onRequestFailListener: OnRequestFailListener?
-    ) {
-        doSyncRequest(
-            rqParamModel,
-            EmSyncRequestType.GET_SYNC,
-            onRequestSuccessListener,
-            onRequestFailListener
-        )
-    }
 
     override suspend fun postBody(
         rqParamModel: RqParamModel,
@@ -52,19 +42,6 @@ open class MobileRequest(
         doRequest(
             rqParamModel,
             EmRequestType.POST,
-            onRequestSuccessListener,
-            onRequestFailListener
-        )
-    }
-
-    override fun postSyncBody(
-        rqParamModel: RqParamModel,
-        onRequestSuccessListener: OnRequestSuccessListener?,
-        onRequestFailListener: OnRequestFailListener?
-    ) {
-        doSyncRequest(
-            rqParamModel,
-            EmSyncRequestType.POST_SYNC,
             onRequestSuccessListener,
             onRequestFailListener
         )
@@ -83,19 +60,6 @@ open class MobileRequest(
         )
     }
 
-    override fun postSyncForm(
-        rqParamModel: RqParamModel,
-        onRequestSuccessListener: OnRequestSuccessListener?,
-        onRequestFailListener: OnRequestFailListener?
-    ) {
-        doSyncRequest(
-            rqParamModel,
-            EmSyncRequestType.POST_SYNC_FORM,
-            onRequestSuccessListener,
-            onRequestFailListener
-        )
-    }
-
     override suspend fun putBody(
         rqParamModel: RqParamModel,
         onRequestSuccessListener: OnRequestSuccessListener?,
@@ -104,19 +68,6 @@ open class MobileRequest(
         doRequest(
             rqParamModel,
             EmRequestType.PUT,
-            onRequestSuccessListener,
-            onRequestFailListener
-        )
-    }
-
-    override fun putSyncBody(
-        rqParamModel: RqParamModel,
-        onRequestSuccessListener: OnRequestSuccessListener?,
-        onRequestFailListener: OnRequestFailListener?
-    ) {
-        doSyncRequest(
-            rqParamModel,
-            EmSyncRequestType.PUT_SYNC,
             onRequestSuccessListener,
             onRequestFailListener
         )
@@ -134,19 +85,5 @@ open class MobileRequest(
             onRequestFailListener
         )
     }
-
-    override fun putSyncForm(
-        rqParamModel: RqParamModel,
-        onRequestSuccessListener: OnRequestSuccessListener?,
-        onRequestFailListener: OnRequestFailListener?
-    ) {
-        doSyncRequest(
-            rqParamModel,
-            EmSyncRequestType.PUT_SYNC_FORM,
-            onRequestSuccessListener,
-            onRequestFailListener
-        )
-    }
-
 
 }

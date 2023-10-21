@@ -15,6 +15,8 @@ object MoshiUtil {
         .add(MoshiArrayListJsonAdapter.FACTORY)
         .addLast(KotlinJsonAdapterFactory()).build()
 
+
+
     inline fun <reified T> toJson(src: T, indent: String = ""): String {
         try {
             val jsonAdapter = moshi.adapter<T>(getGenericType<T>())

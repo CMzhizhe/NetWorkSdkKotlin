@@ -8,10 +8,9 @@ import com.gxx.neworklibrary.inter.OnErrorHandler
 import com.gxx.neworklibrary.model.ErrorHandlerApiModel
 
 
-class ErrorHandlerFactory {
+ class ErrorHandlerFactory {
     private var mOnServiceCodeErrorHandleFinishListener: OnServiceCodeErrorHandleFinishListener? = null//服务器错误回调
-    private var mOnNetWorkErrorListener:OnNetWorkErrorListener? = null//网络错误调用
-
+    private var mOnNetWorkErrorListener: OnNetWorkErrorListener? = null//网络错误调用
     private val mServiceErrorHandlers = mutableListOf<OnErrorHandler>()//服务器的serviceHandler
     private var mServiceErrorApiExceptions = mutableListOf<AbsApiException>()//服务器的errorApi
     private var mBaseUrl = ""
@@ -21,11 +20,11 @@ class ErrorHandlerFactory {
      * @date 创建时间: 2023/8/12/012
      * @description  网络错误回调
      **/
-    interface OnNetWorkErrorListener{
-        fun onNetWorkError(throwable:ExceptionHandle.ResponeThrowable )
+    interface OnNetWorkErrorListener {
+        fun onNetWorkError(throwable: ExceptionHandle.ResponeThrowable)
     }
 
-   /**
+    /**
      * @date 创建时间: 2023/8/10
      * @auther gxx
      * 错误处理完成回调
@@ -33,8 +32,6 @@ class ErrorHandlerFactory {
     public interface OnServiceCodeErrorHandleFinishListener {
         fun onServiceCodeErrorHandleFinish(error: AbsApiException)
     }
-
-
 
     /**
      * @date 创建时间: 2023/7/25
@@ -50,7 +47,7 @@ class ErrorHandlerFactory {
      * @date 创建时间: 2023/8/12/012
      * @description  拿到异常
      **/
-    fun getServiceErrorApiExceptions():MutableList<AbsApiException>{
+    fun getServiceErrorApiExceptions(): MutableList<AbsApiException> {
         return mServiceErrorApiExceptions
     }
 
@@ -84,6 +81,10 @@ class ErrorHandlerFactory {
 
 
     constructor(builder: Builder) {
+        if (builder.getBaseUrl().isEmpty()) {
+            throw IllegalStateException("请先设置 BaseUrl")
+        }
+
         this.mBaseUrl = builder.getBaseUrl()
         this.mOnServiceCodeErrorHandleFinishListener = builder.getOnServiceCodeErrorHandleFinishListener()
         this.mOnNetWorkErrorListener = builder.getOnNetWorkErrorListener()
@@ -94,17 +95,17 @@ class ErrorHandlerFactory {
             mServiceErrorApiExceptions.add(serviceErrorModel.absApiException)
         }
 
-        //添加默认handler
-        if (builder.getIsAddDefaultServiceErrorHandle()){
-            for (defaultErrorHandlerAndApiException in defaultErrorHandlerAndApiExceptions()) {
-                mServiceErrorHandlers.add(defaultErrorHandlerAndApiException.onErrorHandler)
-                mServiceErrorApiExceptions.add(defaultErrorHandlerAndApiException.absApiException)
-            }
-        }
+        //添加rootJson解析错误
+        mServiceErrorHandlers.add(RootJsonEmptyErrorHandler())
+        mServiceErrorApiExceptions.add(RootJsonEmptyApiException())
 
-        //添加无网络 + 未定义异常
+        //添加无网络异常
         mServiceErrorHandlers.add(NoNetErrorHandler())
+        mServiceErrorApiExceptions.add(NoNetWorkApiException())
+
+        //添加未定义异常
         mServiceErrorHandlers.add(UnErrorHandler())
+        mServiceErrorApiExceptions.add(UnApiException())
 
         mServiceErrorHandlers.reduceRight { left, right ->
             left.apply {
@@ -114,23 +115,28 @@ class ErrorHandlerFactory {
     }
 
     class Builder {
-        private val mErrorHandlerApiModels = mutableListOf<ErrorHandlerApiModel>()
         private var mBaseUrl = ""//baseUrl
-        private var mIsAddDefaultServiceErrorHandle = true//是否service提供的默认的错误
+        private val mErrorHandlerApiModels = mutableListOf<ErrorHandlerApiModel>() //添加用户额外补充的错误
         private var mOnServiceCodeErrorHandleFinishListener: OnServiceCodeErrorHandleFinishListener? = null//异常完成处理回调
-        private var mOnNetWorkErrorListener:OnNetWorkErrorListener? = null
+        private var mOnNetWorkErrorListener: OnNetWorkErrorListener? = null
 
-        fun getOnNetWorkErrorListener():OnNetWorkErrorListener?{
-            return mOnNetWorkErrorListener
-        }
-
-        fun getIsAddDefaultServiceErrorHandle():Boolean{
-            return mIsAddDefaultServiceErrorHandle
-        }
-        
-        fun setIsAddDefaultServiceErrorHandle(boolean: Boolean):Builder{
-            this.mIsAddDefaultServiceErrorHandle = boolean
+        fun setOnNetWorkErrorListener(listener: OnNetWorkErrorListener): Builder {
+            this.mOnNetWorkErrorListener = listener
             return this
+        }
+
+        fun setOnServiceCodeErrorHandleFinishListener(listener: OnServiceCodeErrorHandleFinishListener): Builder {
+            this.mOnServiceCodeErrorHandleFinishListener = listener
+            return this
+        }
+
+        fun setBaseUrl(baseUrl: String): Builder {
+            this.mBaseUrl = baseUrl
+            return this
+        }
+
+        fun getOnNetWorkErrorListener(): OnNetWorkErrorListener? {
+            return mOnNetWorkErrorListener
         }
 
         fun getOnServiceCodeErrorHandleFinishListener(): OnServiceCodeErrorHandleFinishListener? {
@@ -145,51 +151,24 @@ class ErrorHandlerFactory {
             return mBaseUrl
         }
 
-        fun setOnNetWorkErrorListener(listener:OnNetWorkErrorListener):Builder{
-            this.mOnNetWorkErrorListener = listener
-            return this
-        }
-
-        fun setOnServiceCodeErrorHandleFinishListener(listener: OnServiceCodeErrorHandleFinishListener): Builder {
-            this.mOnServiceCodeErrorHandleFinishListener = listener
-            return this
-        }
-        
         /**
          * @date 创建时间: 2023/8/8
          * @auther gxx
          * 添加错误处理的OnErrorHandler
          **/
-        fun addErrorHandler(onErrorHandler: OnErrorHandler,absApiException: AbsApiException): Builder {
+        fun addErrorHandler(
+            onErrorHandler: OnErrorHandler,
+            absApiException: AbsApiException
+        ): Builder {
             mErrorHandlerApiModels.add(ErrorHandlerApiModel(onErrorHandler, absApiException))
             return this
         }
 
-        fun setBaseUrl(baseUrl:String):Builder{
-            this.mBaseUrl = baseUrl
-            return this
-        }
 
-        fun build(): ErrorHandlerFactory {
-            if (this.mBaseUrl.isEmpty()) {
-                throw IllegalStateException("请先设置 BaseUrl")
-            }
-            return ErrorHandlerFactory(this)
-        }
+
     }
 
-    /**
-     * @author gaoxiaoxiong
-     * @date 创建时间: 2023/8/12/012
-     * @description  默认的错误
-     **/
-    fun defaultErrorHandlerAndApiExceptions():MutableList<ErrorHandlerApiModel>{
-        val list = mutableListOf<ErrorHandlerApiModel>()
-        list.apply {
-            add(ErrorHandlerApiModel(RootJsonEmptyErrorHandler(),RootJsonEmptyApiException()))
-        }
-        return list
-    }
+
 
 
 }

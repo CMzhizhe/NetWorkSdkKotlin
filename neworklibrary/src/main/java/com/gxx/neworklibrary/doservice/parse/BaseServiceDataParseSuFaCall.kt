@@ -5,7 +5,7 @@ import com.gxx.neworklibrary.OkHttpManager
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.inter.OnIParserListener
 import com.gxx.neworklibrary.model.BaseBean
-import com.gxx.neworklibrary.resultcall.AbsRequestResultImpl
+import com.gxx.neworklibrary.doservice.resultcall.AbsRequestResultImpl
 import com.gxx.neworklibrary.util.MoshiUtil
 import com.gxx.neworklibrary.util.Utils
 import com.squareup.moshi.JsonAdapter
@@ -68,7 +68,7 @@ open class BaseServiceDataParseSuFaCall<T> : AbsRequestResultImpl() {
     ) {
         if (throwable!=null){
             val baseUrl = Utils.getBaseUrlByMethod(method)
-            val cacheHandler = OkHttpManager.getErrorHandlerFactory(baseUrl)
+            val cacheHandler = OkHttpManager.getInstance().getErrorHandlerFactory(baseUrl)
             if (cacheHandler!=null){
                 if (throwable is AbsApiException){//处理服务器的异常
                     cacheHandler.rollServiceCodeGateError(cacheHandler.getServiceErrorHandlers().first(),throwable)

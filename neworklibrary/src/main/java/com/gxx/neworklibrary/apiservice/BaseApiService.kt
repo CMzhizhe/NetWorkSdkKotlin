@@ -17,12 +17,6 @@ interface BaseApiService {
         @QueryMap urlMap: Map<String, Any>
     ): ResponseBody
 
-    @JvmSuppressWildcards
-    @GET
-    fun getSyncJson(
-        @Url url: String,
-        @QueryMap urlMap: Map<String, Any>
-    ): ResponseBody
 
     //get ============== finish
 
@@ -42,23 +36,6 @@ interface BaseApiService {
         @Body body: RequestBody
     ): ResponseBody
 
-
-    @JvmSuppressWildcards
-    @POST
-     fun postSyncJson(
-        @Url url: String,
-        @QueryMap urlMap: Map<String, Any>
-    ): ResponseBody
-
-
-    @JvmSuppressWildcards
-    @POST
-     fun postSyncJson(
-        @Url url: String,
-        @QueryMap urlMap: Map<String, Any>,
-        @Body body: RequestBody
-    ): ResponseBody
-
     @JvmSuppressWildcards
     @FormUrlEncoded
     @POST
@@ -71,24 +48,6 @@ interface BaseApiService {
     @FormUrlEncoded
     @POST
     suspend fun postForm(
-        @Url url: String,
-        @QueryMap urlMap: Map<String, Any>,
-        @FieldMap fieldMap :Map<String, Any>
-    ): ResponseBody
-
-
-    @JvmSuppressWildcards
-    @FormUrlEncoded
-    @POST
-     fun postSyncForm(
-        @Url url: String,
-        @QueryMap urlMap: Map<String, Any>
-    ): ResponseBody
-
-    @JvmSuppressWildcards
-    @FormUrlEncoded
-    @POST
-     fun postSyncForm(
         @Url url: String,
         @QueryMap urlMap: Map<String, Any>,
         @FieldMap fieldMap :Map<String, Any>
@@ -114,22 +73,6 @@ interface BaseApiService {
 
 
     @JvmSuppressWildcards
-    @PUT
-    fun putSyncJson(
-        @Url url: String,
-        @QueryMap urlMap: Map<String, Any>
-    ): ResponseBody
-
-
-    @JvmSuppressWildcards
-    @PUT
-    fun putSyncJson(
-        @Url url: String,
-        @QueryMap urlMap: Map<String, Any>,
-        @Body body: RequestBody
-    ): ResponseBody
-
-    @JvmSuppressWildcards
     @FormUrlEncoded
     @PUT
     suspend fun putForm(
@@ -141,24 +84,6 @@ interface BaseApiService {
     @FormUrlEncoded
     @PUT
     suspend fun putForm(
-        @Url url: String,
-        @QueryMap urlMap: Map<String, Any>,
-        @FieldMap fieldMap :Map<String, Any>
-    ): ResponseBody
-
-
-    @JvmSuppressWildcards
-    @FormUrlEncoded
-    @PUT
-    fun putSyncForm(
-        @Url url: String,
-        @QueryMap urlMap: Map<String, Any>
-    ): ResponseBody
-
-    @JvmSuppressWildcards
-    @FormUrlEncoded
-    @PUT
-    fun putSyncForm(
         @Url url: String,
         @QueryMap urlMap: Map<String, Any>,
         @FieldMap fieldMap :Map<String, Any>

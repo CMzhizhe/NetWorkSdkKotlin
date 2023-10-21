@@ -21,7 +21,7 @@ import com.gxx.neworklibrary.util.Utils
  **/
 open class BaseServiceDataTransform : OnResponseBodyTransformJsonListener {
     companion object {
-        const val MSG = "msg"
+
         const val ERROR_CODE = "errorCode"
         const val DATA = "data"
         const val ERROR_CODE_TYPE_0 = "0"//与服务器协商的正常状态
@@ -60,12 +60,12 @@ open class BaseServiceDataTransform : OnResponseBodyTransformJsonListener {
                 //与服务器协商的异常逻辑
                 // 可以在这里抛异常，比如服务器有提供code = 201，那么可以抛出属于201的异常错误
                val baseUrl = Utils.getBaseUrlByMethod(method)
-               val errorHandlerFactory = OkHttpManager.getErrorHandlerFactory(baseUrl)
+               val errorHandlerFactory = OkHttpManager.getInstance().getErrorHandlerFactory(baseUrl)
                 if (errorHandlerFactory!=null){
                     for (serviceErrorApiException in errorHandlerFactory.getServiceErrorApiExceptions()) {
                         if (serviceErrorApiException.code == errorCode.toString()){
                             serviceErrorApiException.jsString = jsString
-                            serviceErrorApiException.errorMessage = "msg"
+                            serviceErrorApiException.errorMessage = "这里可以写错误的信息"
                             throw serviceErrorApiException
                         }
                     }

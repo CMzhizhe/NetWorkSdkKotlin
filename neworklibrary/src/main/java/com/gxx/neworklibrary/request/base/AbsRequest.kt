@@ -12,7 +12,9 @@ import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import com.gxx.neworklibrary.util.MultipartBodyUtils
 import com.gxx.neworklibrary.util.NetWorkUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 
@@ -30,7 +32,6 @@ abstract class AbsRequest(
     private val mGson = Gson()
     private val mJsonParseResult = JsonParseResult()
     private val mMultipartBodyUtils = MultipartBodyUtils()
-
 
     /**
      * @author gaoxiaoxiong
@@ -54,7 +55,11 @@ abstract class AbsRequest(
         }
 
         if (!NetWorkUtil.isNetConnected()) {
-            onRequestFailListener?.onRequestFail("${rqParamModel.baseUrl}${rqParamModel.funName}",NoNetWorkApiException())
+            if (currentCoroutineContext().isActive){
+                withContext(Dispatchers.Main){
+                    onRequestFailListener?.onRequestFail("${rqParamModel.baseUrl}${rqParamModel.funName}",NoNetWorkApiException())
+                }
+            }
             return
         }
 
@@ -65,7 +70,7 @@ abstract class AbsRequest(
             rqParamModel.bodyMap ?: mutableMapOf(),
             emRequestType,
             onRequestFailListener
-        ).collect {
+        )?.collect {
             if (it == null) {
                 return@collect
             }
@@ -78,44 +83,6 @@ abstract class AbsRequest(
             )
         }
     }
-
-
-    override fun doSyncRequest(
-        rqParamModel: RqParamModel,
-        emRequestType: EmSyncRequestType,
-        onRequestSuccessListener: OnRequestSuccessListener?,
-        onRequestFailListener: OnRequestFailListener?
-    ) {
-        if (rqParamModel.baseUrl.isEmpty()) {
-            throw IllegalStateException("baseUrl 是空的")
-        }
-
-        if (rqParamModel.funName.isEmpty()) {
-            throw IllegalStateException("funName 是空的")
-        }
-
-        if (!NetWorkUtil.isNetConnected()) {
-            onRequestFailListener?.onRequestFail("${rqParamModel.baseUrl}${rqParamModel.funName}",NoNetWorkApiException())
-            return
-        }
-
-        val listener = doSyncComposeMapRequest(
-            rqParamModel.baseUrl,
-            rqParamModel.funName,
-            rqParamModel.urlMap ?: mutableMapOf(),
-            rqParamModel.bodyMap ?: mutableMapOf(),
-            emRequestType,
-            onRequestFailListener
-        ) ?: return
-        mJsonParseResult.doIParseResult(
-            "${rqParamModel.baseUrl}${rqParamModel.funName}",
-            rqParamModel.emResultType,
-            listener,
-            onRequestSuccessListener,
-            onRequestFailListener
-        )
-    }
-
 
     /**
      * @date 创建时间: 2023/7/21
@@ -134,69 +101,75 @@ abstract class AbsRequest(
         bodyMap: Map<String, Any> = mutableMapOf(),
         emRequestType: EmRequestType,
         onRequestFailListener: OnRequestFailListener?
-    ): Flow<OnIParserListener?> {
+    ): Flow<OnIParserListener?>? {
         val method = "${baseUrl}${funName}"
-        val aipService = OkHttpManager.getRetrofit(baseUrl)?.create(BaseApiService::class.java)
+        val aipService = OkHttpManager.getInstance().getRetrofit(baseUrl)?.create(BaseApiService::class.java)?:return null
         var responseBody: ResponseBody? = null
         kotlin.runCatching {
             responseBody = when (emRequestType) {
                 EmRequestType.GET -> {
-                    aipService?.getJson(method, urlMap ?: mutableMapOf())
+                    aipService.getJson(method, urlMap ?: mutableMapOf())
                 }
 
                 EmRequestType.POST -> {
                     if (bodyMap.isNotEmpty()) {
-                        aipService?.postJson(
+                        aipService.postJson(
                             method,
                             urlMap,
                             mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
                         )
                     } else {
-                        aipService?.postJson(method, urlMap ?: mutableMapOf())
+                        aipService.postJson(method, urlMap ?: mutableMapOf())
                     }
                 }
 
                 EmRequestType.POST_FORM -> {
                     if (bodyMap.isNotEmpty()) {
-                        aipService?.postForm(method, urlMap, bodyMap)
+                        aipService.postForm(method, urlMap, bodyMap)
                     } else {
-                        aipService?.postForm(method, urlMap)
+                        aipService.postForm(method, urlMap)
                     }
                 }
 
                 EmRequestType.PUT -> {
                     if (bodyMap.isNotEmpty()) {
-                        aipService?.putJson(
+                        aipService.putJson(
                             method,
                             urlMap,
                             mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
                         )
                     } else {
-                        aipService?.putJson(method, urlMap)
+                        aipService.putJson(method, urlMap)
                     }
                 }
 
                 EmRequestType.PUT_FORM -> {
                     if (bodyMap.isNotEmpty()) {
-                        aipService?.putForm(method, urlMap, bodyMap)
+                        aipService.putForm(method, urlMap, bodyMap)
                     } else {
-                        aipService?.putForm(method, urlMap)
+                        aipService.putForm(method, urlMap)
                     }
                 }
             }
         }.onFailure {
             it.printStackTrace()
-            withContext(Dispatchers.Main) {
-                onRequestFailListener?.onRequestFail(
-                    method,
-                    it,
-                    null,
-                    null,
-                    null,
-                    null
-                )
+            if (currentCoroutineContext().isActive){
+                withContext(Dispatchers.Main){
+                    onRequestFailListener?.onRequestFail(
+                        method,
+                        it,
+                        null,
+                        null,
+                        null,
+                        null
+                    )
+                }
             }
         }
+
+       if (!currentCoroutineContext().isActive){
+           return null
+       }
 
         return responseBodyTransformJson(baseUrl, funName, responseBody, onRequestFailListener)
     }
@@ -228,103 +201,20 @@ abstract class AbsRequest(
                 emit(mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, it))
             }.catch {
                 it.printStackTrace()
-                withContext(Dispatchers.Main) {
-                    onRequestFailListener?.onRequestFail(
-                        method,
-                        it,
-                        null,
-                        null,
-                        null,
-                        null
-                    )
-                }
-                emit(null)
-            }.flowOn(Dispatchers.IO)
-        }
-    }
-
-    /**
-     * @date 创建时间: 2023/7/23
-     * @auther gaoxiaoxiong
-     * @description 同步请求
-     **/
-    private fun doSyncComposeMapRequest(
-        baseUrl: String,
-        funName: String,
-        urlMap: Map<String, Any> = mutableMapOf(),
-        bodyMap: Map<String, Any> = mutableMapOf(),
-        emRequestType: EmSyncRequestType,
-        onRequestFailListener: OnRequestFailListener?
-    ): OnIParserListener? {
-        val method = "${baseUrl}${funName}"
-        var onIParserListener: OnIParserListener? = null
-        kotlin.runCatching {
-            val aipService = OkHttpManager.getRetrofit(baseUrl)?.create(BaseApiService::class.java)
-            val responseBody = when (emRequestType) {
-                EmSyncRequestType.GET_SYNC -> {
-                    aipService?.getSyncJson(method, urlMap)
-                }
-
-                EmSyncRequestType.POST_SYNC -> {
-                    if (bodyMap.isNotEmpty()) {
-                        aipService?.postSyncJson(
+                if (currentCoroutineContext().isActive){
+                    withContext(Dispatchers.Main){
+                        onRequestFailListener?.onRequestFail(
                             method,
-                            urlMap,
-                            mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
+                            it,
+                            null,
+                            null,
+                            null,
+                            null
                         )
-                    } else {
-                        aipService?.postSyncJson(method, urlMap)
                     }
                 }
-
-                EmSyncRequestType.POST_SYNC_FORM -> {
-                    if (bodyMap.isNotEmpty()) {
-                        aipService?.postSyncForm(method, urlMap, bodyMap)
-                    } else {
-                        aipService?.postSyncForm(method, urlMap)
-                    }
-                }
-
-                EmSyncRequestType.PUT_SYNC -> {
-                    if (bodyMap.isNotEmpty()) {
-                        aipService?.putSyncJson(
-                            method,
-                            urlMap,
-                            mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
-                        )
-                    } else {
-                        aipService?.putSyncJson(method, urlMap)
-                    }
-                }
-
-                EmSyncRequestType.PUT_SYNC_FORM -> {
-                    if (bodyMap.isNotEmpty()) {
-                        aipService?.postSyncForm(method, urlMap, bodyMap)
-                    } else {
-                        aipService?.postSyncForm(method, urlMap)
-                    }
-                }
-            }
-            val jsString = responseBody?.string()
-            if (jsString != null) {
-                onIParserListener =
-                    mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(
-                        method,
-                        jsString
-                    )
-            }
-        }.onFailure {
-            it.printStackTrace()
-            onRequestFailListener?.onRequestFail(
-                method,
-                it,
-                null,
-                null,
-                null,
-                null
-            )
+            }.flowOn(Dispatchers.Default)
         }
-        return onIParserListener
     }
 
 }

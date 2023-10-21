@@ -1,0 +1,16 @@
+{
+  "httpBusiness": {
+    "hostUrl": "https://www.wanandroid.com/",
+    "connectTime": 30,
+    "readTime": 30,
+    "retryOnConnection": true,
+    "writeTime": 30
+  },
+  "videoBusiness": {
+    "hostUrl": "https://www.video.com/",
+    "connectTime": 30,
+    "readTime": 30,
+    "retryOnConnection": true,
+    "writeTime": 30
+  }
+}

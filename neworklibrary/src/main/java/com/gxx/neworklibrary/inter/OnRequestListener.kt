@@ -1,8 +1,6 @@
 package com.gxx.neworklibrary.inter
 
 import com.gxx.neworklibrary.constans.EmRequestType
-import com.gxx.neworklibrary.constans.EmResultType
-import com.gxx.neworklibrary.constans.EmSyncRequestType
 import com.gxx.neworklibrary.model.RqParamModel
 
 
@@ -23,10 +21,5 @@ interface OnRequestListener {
         onRequestFailListener: OnRequestFailListener?
     )
 
-    fun doSyncRequest(
-        rqParamModel: RqParamModel,
-        emRequestType: EmSyncRequestType,
-        onRequestSuccessListener: OnRequestSuccessListener?,
-        onRequestFailListener: OnRequestFailListener?
-    )
+
 }

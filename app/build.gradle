@@ -28,6 +28,32 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    task copyAgconnecToRelease(type: Copy) {
+        from "httpConfig/release/"
+        include "http_config.json"
+        into "./src/main/assets"
+    }
+
+    task copyAgconnecToDebug(type: Copy) {
+        from "httpConfig/debug/"
+        include "http_config.json"
+        into "./src/main/assets"
+    }
+
+    afterEvaluate {
+        tasks.matching {
+             it.name == "assembleDebug" || it.name == "assembleRelease" || it.name == "bundleRelease"
+        }.each {task->
+            if(task.getName() == "assembleDebug" || task.getName() == "assembleRelease" || it.getName() == "bundleRelease"){
+                if(task.getName() == "assembleDebug"){
+                    task.dependsOn(copyAgconnecToDebug)
+                }else{
+                    task.dependsOn(copyAgconnecToRelease)
+                }
+            }
+        }
+    }
 }
 
 

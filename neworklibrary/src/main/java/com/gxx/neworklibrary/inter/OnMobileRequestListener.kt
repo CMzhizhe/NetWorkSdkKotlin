@@ -14,11 +14,7 @@ interface OnMobileRequestListener {
         onRequestFailListener: OnRequestFailListener? = null
     )
 
-    fun getSync(
-        rqParamModel: RqParamModel,
-        onRequestSuccessListener: OnRequestSuccessListener? = null,
-        onRequestFailListener: OnRequestFailListener? = null
-    )
+
 
     suspend fun postBody(
         rqParamModel: RqParamModel,
@@ -26,11 +22,6 @@ interface OnMobileRequestListener {
         onRequestFailListener: OnRequestFailListener? = null
     )
 
-    fun postSyncBody(
-        rqParamModel: RqParamModel,
-        onRequestSuccessListener: OnRequestSuccessListener? = null,
-        onRequestFailListener: OnRequestFailListener? = null
-    )
 
     suspend fun postForm(
         rqParamModel: RqParamModel,
@@ -38,11 +29,7 @@ interface OnMobileRequestListener {
         onRequestFailListener: OnRequestFailListener? = null
     )
 
-    fun postSyncForm(
-        rqParamModel: RqParamModel,
-        onRequestSuccessListener: OnRequestSuccessListener? = null,
-        onRequestFailListener: OnRequestFailListener? = null
-    )
+
 
     suspend fun putBody(
         rqParamModel: RqParamModel,
@@ -50,11 +37,7 @@ interface OnMobileRequestListener {
         onRequestFailListener: OnRequestFailListener? = null
     )
 
-    fun putSyncBody(
-        rqParamModel: RqParamModel,
-        onRequestSuccessListener: OnRequestSuccessListener? = null,
-        onRequestFailListener: OnRequestFailListener? = null
-    )
+
 
     suspend fun putForm(
         rqParamModel: RqParamModel,
@@ -62,9 +45,4 @@ interface OnMobileRequestListener {
         onRequestFailListener: OnRequestFailListener? = null
     )
 
-    fun putSyncForm(
-        rqParamModel: RqParamModel,
-        onRequestSuccessListener: OnRequestSuccessListener? = null,
-        onRequestFailListener: OnRequestFailListener? = null
-    )
 }
