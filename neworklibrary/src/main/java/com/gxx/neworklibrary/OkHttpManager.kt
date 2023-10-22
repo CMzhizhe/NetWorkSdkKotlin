@@ -65,10 +65,19 @@ class OkHttpManager {
     /**
      * @author gaoxiaoxiong
      * 放置配置的clss
-     * @param hostUrl
+     * @param keyName 字段名称
      */
-    fun putConfig(hostUrl: String, httpConfigModel: HttpConfigModel) {
-        mCatchHttpConfigMap[hostUrl] = httpConfigModel
+    fun putConfig(keyName: String, httpConfigModel: HttpConfigModel) {
+        mCatchHttpConfigMap[keyName] = httpConfigModel
+    }
+
+    /**
+     * @author gaoxiaoxiong
+     * 获取 HttpConfigModel
+     * @param keyName 字段名称
+     */
+    fun getConfig(keyName: String):HttpConfigModel?{
+      return mCatchHttpConfigMap[keyName]
     }
 
     fun getContext(): Context {
@@ -91,10 +100,10 @@ class OkHttpManager {
      **/
     fun createRetrofit(httpConfigModel: HttpConfigModel,builder: Builder): Retrofit {
         val okBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
-            .connectTimeout(httpConfigModel.model.connectTime.toLong(), TimeUnit.SECONDS)
-            .readTimeout(httpConfigModel.model.readTime.toLong(), TimeUnit.SECONDS)
-            .writeTimeout(httpConfigModel.model.writeTime.toLong(), TimeUnit.SECONDS)
-            .retryOnConnectionFailure(httpConfigModel.model.retryOnConnection)
+            .connectTimeout(httpConfigModel.connectTime.toLong(), TimeUnit.SECONDS)
+            .readTimeout(httpConfigModel.readTime.toLong(), TimeUnit.SECONDS)
+            .writeTimeout(httpConfigModel.writeTime.toLong(), TimeUnit.SECONDS)
+            .retryOnConnectionFailure(httpConfigModel.retryOnConnection)
 
         okBuilder.apply {
             //添加 application/json; charset=UTF-8
@@ -116,7 +125,7 @@ class OkHttpManager {
         }
 
         val reBuilder: Retrofit.Builder = Retrofit.Builder()
-            .baseUrl(httpConfigModel.model.hostUrl)
+            .baseUrl(httpConfigModel.hostUrl)
             .client(okBuilder.build())
 
         reBuilder.addConverterFactory(GsonConverterFactory.create())
@@ -132,7 +141,20 @@ class OkHttpManager {
                 reBuilder.addConverterFactory(converterFactory)
             }
         }
+
+        builder.mErrorHandlerFactory?.let {
+            putErrorHandlerFactory(httpConfigModel.hostUrl,it)
+        }
+
         return reBuilder.build()
+    }
+
+    /**
+     * @author gaoxiaoxiong
+     * 存放 ErrorHandlerFactory
+     */
+    fun putErrorHandlerFactory(baseUrl: String,errorHandlerFactory: ErrorHandlerFactory){
+        mCacheErrorHandler[baseUrl] = errorHandlerFactory
     }
 
     fun getErrorHandlerFactory(baseUrl: String): ErrorHandlerFactory? {
@@ -143,10 +165,19 @@ class OkHttpManager {
      * @date 创建时间: 2023/7/27
      * @auther gxx
      * @description 返回retrofit
-     * @param baseUrl
+     * @param hostUrl
      **/
-    fun getRetrofit(baseUrl: String): Retrofit? {
-        return mCatchMapRetrofit[baseUrl]
+    fun getRetrofit(hostUrl: String): Retrofit? {
+        return mCatchMapRetrofit[hostUrl]
+    }
+
+    /**
+     * @author gaoxiaoxiong
+     * put Retrofit
+     * @param hostUrl 域名
+     */
+    fun putRetrofit(hostUrl:String,retrofit:Retrofit){
+        mCatchMapRetrofit[hostUrl] = retrofit
     }
 
     /**
@@ -154,8 +185,8 @@ class OkHttpManager {
      * @auther gxx
      * @description 获取公共API
      **/
-    fun <T> getApi(baseUrl: String, clazz: Class<T>): T? {
-        return getRetrofit(baseUrl)?.create(clazz)
+    fun <T> getApi(hostUrl: String, clazz: Class<T>): T? {
+        return getRetrofit(hostUrl)?.create(clazz)
     }
 
 

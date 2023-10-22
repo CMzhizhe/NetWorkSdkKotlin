@@ -1,11 +1,11 @@
-package com.gxx.neworklibrary.doservice.parse
+package com.gxx.neworklibrary.base.doservicedata.parse
 
 import com.google.gson.JsonElement
 import com.gxx.neworklibrary.OkHttpManager
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.inter.OnIParserListener
 import com.gxx.neworklibrary.model.BaseBean
-import com.gxx.neworklibrary.doservice.resultcall.AbsRequestResultImpl
+import com.gxx.neworklibrary.base.doservicedata.resultcall.AbsRequestResultImpl
 import com.gxx.neworklibrary.util.MoshiUtil
 import com.gxx.neworklibrary.util.Utils
 import com.squareup.moshi.JsonAdapter
@@ -16,7 +16,7 @@ import java.lang.reflect.ParameterizedType
  * @auther gaoxiaoxiong
  * @description 服务器数据处理
  **/
-open class BaseServiceDataParseSuFaCall<T> : AbsRequestResultImpl() {
+open class BaseServiceDataParseCall<T> : AbsRequestResultImpl() {
     private val TAG = "DataParseSuFaCall"
 
     /**

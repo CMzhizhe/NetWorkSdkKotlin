@@ -2,14 +2,15 @@ package com.gxx.neworklibrary.error.factory
 
 
 import com.gxx.neworklibrary.error.exception.AbsApiException
-import com.gxx.neworklibrary.error.exception.ExceptionHandle
+import com.gxx.neworklibrary.error.exception.NetWorkExceptionHandle
 import com.gxx.neworklibrary.error.impl.*
 import com.gxx.neworklibrary.inter.OnErrorHandler
 import com.gxx.neworklibrary.model.ErrorHandlerApiModel
 
 
- class ErrorHandlerFactory {
-    private var mOnServiceCodeErrorHandleFinishListener: OnServiceCodeErrorHandleFinishListener? = null//服务器错误回调
+class ErrorHandlerFactory {
+    private var mOnServiceCodeErrorHandleFinishListener: OnServiceCodeErrorHandleFinishListener? =
+        null//服务器错误回调
     private var mOnNetWorkErrorListener: OnNetWorkErrorListener? = null//网络错误调用
     private val mServiceErrorHandlers = mutableListOf<OnErrorHandler>()//服务器的serviceHandler
     private var mServiceErrorApiExceptions = mutableListOf<AbsApiException>()//服务器的errorApi
@@ -21,7 +22,7 @@ import com.gxx.neworklibrary.model.ErrorHandlerApiModel
      * @description  网络错误回调
      **/
     interface OnNetWorkErrorListener {
-        fun onNetWorkError(throwable: ExceptionHandle.ResponeThrowable)
+        fun onNetWorkError(throwable: NetWorkExceptionHandle.ResponeThrowable)
     }
 
     /**
@@ -58,7 +59,7 @@ import com.gxx.neworklibrary.model.ErrorHandlerApiModel
      * @param e 错误异常
      **/
     fun netWorkException(e: Throwable) {
-        val responeThrowable = ExceptionHandle().handleException(e = e)
+        val responeThrowable = NetWorkExceptionHandle().handleException(e = e)
         mOnNetWorkErrorListener?.onNetWorkError(responeThrowable)
     }
 
@@ -79,14 +80,11 @@ import com.gxx.neworklibrary.model.ErrorHandlerApiModel
         }
     }
 
-
-    constructor(builder: Builder) {
-        if (builder.getBaseUrl().isEmpty()) {
-            throw IllegalStateException("请先设置 BaseUrl")
-        }
-
-        this.mBaseUrl = builder.getBaseUrl()
-        this.mOnServiceCodeErrorHandleFinishListener = builder.getOnServiceCodeErrorHandleFinishListener()
+    private constructor()
+    private constructor(builder: Builder) {
+        this.mBaseUrl = builder.getHostUrl()
+        this.mOnServiceCodeErrorHandleFinishListener =
+            builder.getOnServiceCodeErrorHandleFinishListener()
         this.mOnNetWorkErrorListener = builder.getOnNetWorkErrorListener()
 
         //添加用户额外补充的错误
@@ -115,9 +113,10 @@ import com.gxx.neworklibrary.model.ErrorHandlerApiModel
     }
 
     class Builder {
-        private var mBaseUrl = ""//baseUrl
+        private var hostUrl = ""//hostUrl
         private val mErrorHandlerApiModels = mutableListOf<ErrorHandlerApiModel>() //添加用户额外补充的错误
-        private var mOnServiceCodeErrorHandleFinishListener: OnServiceCodeErrorHandleFinishListener? = null//异常完成处理回调
+        private var mOnServiceCodeErrorHandleFinishListener: OnServiceCodeErrorHandleFinishListener? =
+            null//异常完成处理回调
         private var mOnNetWorkErrorListener: OnNetWorkErrorListener? = null
 
         fun setOnNetWorkErrorListener(listener: OnNetWorkErrorListener): Builder {
@@ -130,8 +129,8 @@ import com.gxx.neworklibrary.model.ErrorHandlerApiModel
             return this
         }
 
-        fun setBaseUrl(baseUrl: String): Builder {
-            this.mBaseUrl = baseUrl
+        fun setHostUrl(hostUrl: String): Builder {
+            this.hostUrl = hostUrl
             return this
         }
 
@@ -147,8 +146,15 @@ import com.gxx.neworklibrary.model.ErrorHandlerApiModel
             return mErrorHandlerApiModels
         }
 
-        fun getBaseUrl(): String {
-            return mBaseUrl
+        fun getHostUrl(): String {
+            return hostUrl
+        }
+
+        fun build(): ErrorHandlerFactory {
+            if (hostUrl.isEmpty()) {
+                throw IllegalStateException("请先设置 hostUrl")
+            }
+            return ErrorHandlerFactory(this)
         }
 
         /**
@@ -163,12 +169,7 @@ import com.gxx.neworklibrary.model.ErrorHandlerApiModel
             mErrorHandlerApiModels.add(ErrorHandlerApiModel(onErrorHandler, absApiException))
             return this
         }
-
-
-
     }
-
-
 
 
 }

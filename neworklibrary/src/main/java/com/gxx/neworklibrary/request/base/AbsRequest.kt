@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import com.gxx.neworklibrary.OkHttpManager
 import com.gxx.neworklibrary.apiservice.BaseApiService
 import com.gxx.neworklibrary.constans.EmRequestType
-import com.gxx.neworklibrary.constans.EmSyncRequestType
 import com.gxx.neworklibrary.error.impl.NoNetWorkApiException
 import com.gxx.neworklibrary.inter.*
 import com.gxx.neworklibrary.model.RqParamModel
@@ -46,7 +45,7 @@ abstract class AbsRequest(
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
-        if (rqParamModel.baseUrl.isEmpty()) {
+        if (rqParamModel.hostUrl.isEmpty()) {
             throw IllegalStateException("baseUrl 是空的")
         }
 
@@ -57,14 +56,14 @@ abstract class AbsRequest(
         if (!NetWorkUtil.isNetConnected()) {
             if (currentCoroutineContext().isActive){
                 withContext(Dispatchers.Main){
-                    onRequestFailListener?.onRequestFail("${rqParamModel.baseUrl}${rqParamModel.funName}",NoNetWorkApiException())
+                    onRequestFailListener?.onRequestFail("${rqParamModel.hostUrl}${rqParamModel.funName}",NoNetWorkApiException())
                 }
             }
             return
         }
 
         doComposeMapRequest(
-            rqParamModel.baseUrl,
+            rqParamModel.hostUrl,
             rqParamModel.funName,
             rqParamModel.urlMap ?: mutableMapOf(),
             rqParamModel.bodyMap ?: mutableMapOf(),
@@ -75,7 +74,7 @@ abstract class AbsRequest(
                 return@collect
             }
             mJsonParseResult.doIParseResult(
-                "${rqParamModel.baseUrl}${rqParamModel.funName}",
+                "${rqParamModel.hostUrl}${rqParamModel.funName}",
                 rqParamModel.emResultType,
                 listener = it,
                 onRequestSuccessListener,

@@ -1,4 +1,4 @@
-package com.gxx.neworklibrary.doservice.resultcall
+package com.gxx.neworklibrary.base.doservicedata.resultcall
 
 import com.gxx.neworklibrary.inter.OnRequestFailListener
 import com.gxx.neworklibrary.inter.OnRequestSuccessListener

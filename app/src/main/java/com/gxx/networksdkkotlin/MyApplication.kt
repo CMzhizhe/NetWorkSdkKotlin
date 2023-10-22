@@ -7,6 +7,5 @@ class MyApplication: Application() {
     private val TAG = "MyApplication"
     override fun onCreate() {
         super.onCreate()
-        WanAndroidMAFRequest.init(this)
     }
 }

@@ -1,4 +1,4 @@
-package com.gxx.neworklibrary.doservice.transform
+package com.gxx.neworklibrary.base.doservicedata.transform
 
 import com.google.gson.JsonParser
 import com.gxx.neworklibrary.OkHttpManager

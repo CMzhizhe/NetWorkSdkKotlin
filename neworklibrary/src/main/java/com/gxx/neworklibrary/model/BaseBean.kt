@@ -1,7 +1,7 @@
 package com.gxx.neworklibrary.model
 
 import com.google.gson.JsonElement
-import com.gxx.neworklibrary.doservice.transform.BaseServiceDataTransform
+import com.gxx.neworklibrary.base.doservicedata.transform.BaseServiceDataTransform
 import com.gxx.neworklibrary.inter.OnIParserListener
 
 class BaseBean(var method: String? = null,

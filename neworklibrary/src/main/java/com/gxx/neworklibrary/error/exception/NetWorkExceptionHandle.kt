@@ -11,7 +11,7 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.net.ssl.SSLHandshakeException
 
-class ExceptionHandle {
+class NetWorkExceptionHandle {
     fun handleException(e: Throwable): ResponeThrowable {
         val ex: ResponeThrowable
         return if (e is HttpException) {

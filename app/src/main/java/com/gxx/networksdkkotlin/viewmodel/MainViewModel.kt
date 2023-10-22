@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.gxx.neworklibrary.model.BaseBean
 import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
-import com.gxx.neworklibrary.doservice.parse.BaseServiceDataParseSuFaCall
+import com.gxx.neworklibrary.base.doservicedata.parse.BaseServiceDataParseCall
 import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.bean.Banner
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ class MainViewModel: ViewModel() {
     fun readBanner(){
         viewModelScope.launch{
             WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
-                BaseServiceDataParseSuFaCall<MutableList<Banner>>() {
+                BaseServiceDataParseCall<MutableList<Banner>>() {
                 override fun onRequestDataSuccess(data: MutableList<Banner>?) {
                     super.onRequestDataSuccess(data)
                     if(BuildConfig.DEBUG){
@@ -62,7 +62,7 @@ class MainViewModel: ViewModel() {
         return suspendCoroutine {coroutine->
             viewModelScope.launch{
                 WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
-                    BaseServiceDataParseSuFaCall<MutableList<Banner>>() {
+                    BaseServiceDataParseCall<MutableList<Banner>>() {
                     override fun onRequestDataSuccess(data: MutableList<Banner>?) {
                         super.onRequestDataSuccess(data)
                         if (data!=null){

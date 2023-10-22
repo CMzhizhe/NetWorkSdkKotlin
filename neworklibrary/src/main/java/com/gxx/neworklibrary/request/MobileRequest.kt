@@ -1,7 +1,7 @@
 package com.gxx.neworklibrary.request
 
 import com.gxx.neworklibrary.constans.EmRequestType
-import com.gxx.neworklibrary.doservice.transform.BaseServiceDataTransform
+import com.gxx.neworklibrary.base.doservicedata.transform.BaseServiceDataTransform
 import com.gxx.neworklibrary.inter.OnMobileRequestListener
 import com.gxx.neworklibrary.inter.OnRequestFailListener
 import com.gxx.neworklibrary.inter.OnRequestSuccessListener
