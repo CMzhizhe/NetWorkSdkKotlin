@@ -29,26 +29,34 @@ android {
         jvmTarget = '1.8'
     }
 
-    task copyAgconnecToRelease(type: Copy) {
-        from "httpConfig/release/"
-        include "http_config.json"
-        into "./src/main/assets"
+    
+    tasks.register("copyAgconnecToRelease"){
+        doFirst{
+            copy {
+                from "httpConfig/release/http_config.json"
+                into "./src/main/assets"
+            }
+        }
     }
 
-    task copyAgconnecToDebug(type: Copy) {
-        from "httpConfig/debug/"
-        include "http_config.json"
-        into "./src/main/assets"
+    tasks.register("copyAgconnecToDebug"){
+        doFirst{
+            copy {
+                from "httpConfig/debug/http_config.json"
+                into "./src/main/assets"
+            }
+        }
     }
+
 
     afterEvaluate {
         tasks.matching {
-             it.name == "assembleDebug" || it.name == "assembleRelease" || it.name == "bundleRelease"
+            it.name == "mergeReleaseAssets" || it.name == "mergeDebugAssets"
         }.each {task->
-            if(task.getName() == "assembleDebug" || task.getName() == "assembleRelease" || it.getName() == "bundleRelease"){
-                if(task.getName() == "assembleDebug"){
+            if(task.getName() == "mergeReleaseAssets" || task.getName() == "mergeDebugAssets"){
+                if(task.getName() == "mergeDebugAssets" &&  isDeBugBuildType()){
                     task.dependsOn(copyAgconnecToDebug)
-                }else{
+                }else if (task.getName() == "mergeReleaseAssets"){
                     task.dependsOn(copyAgconnecToRelease)
                 }
             }
@@ -56,6 +64,17 @@ android {
     }
 }
 
+
+def isDeBugBuildType(){
+    boolean isDebugTypes = false;
+    for(String s : gradle.startParameter.taskNames) {
+        if (s == "assembleDebug" || s == "bundleDebug" || s == ":app:assembleDebug" || s == ":app:bundleDebug") {
+            isDebugTypes = true;
+            break;
+        }
+    }
+    return isDebugTypes;
+}
 
 
 dependencies {
