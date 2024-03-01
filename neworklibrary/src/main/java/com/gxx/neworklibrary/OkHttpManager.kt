@@ -2,10 +2,8 @@ package com.gxx.neworklibrary
 
 import android.app.Application
 import android.content.Context
-import android.net.Uri
-import android.util.Log
-import com.gxx.neworklibrary.constans.Constant
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
+import com.gxx.neworklibrary.inter.OnCommonParamsListener
 import com.gxx.neworklibrary.inter.OnFactoryListener
 import com.gxx.neworklibrary.inter.OnInterceptorListener
 import com.gxx.neworklibrary.interceptor.JsonUtf8Interceptor
@@ -29,6 +27,7 @@ class OkHttpManager {
     private val mCatchHttpConfigMap = mutableMapOf<String, HttpConfigModel>()//存储配置信息，key为hostUrl
     private val mCatchMapRetrofit = mutableMapOf<String, Retrofit>()//存储OkHttpManager，key为hostUrl
     private val mCacheErrorHandler = mutableMapOf<String, ErrorHandlerFactory>()
+    private var mCacheOnCommonParams = mutableMapOf<String, OnCommonParamsListener>()//公共参数
 
     companion object {
         private var INSTANCE: OkHttpManager? = null
@@ -43,6 +42,8 @@ class OkHttpManager {
             return INSTANCE!!
         }
     }
+
+
 
     /**
      * @author gaoxiaoxiong
@@ -89,6 +90,7 @@ class OkHttpManager {
         var mOnFactoryListener: OnFactoryListener? = null //Factory
         var mOnInterceptorListener: OnInterceptorListener? = null // 拦截器
         var mErrorHandlerFactory: ErrorHandlerFactory? = null//错误Handler
+        var mOnCommonParamsListener:OnCommonParamsListener? = null;//公共参数
     }
 
     /**
@@ -146,7 +148,18 @@ class OkHttpManager {
             putErrorHandlerFactory(httpConfigModel.hostUrl,it)
         }
 
+        builder.mOnCommonParamsListener?.let {
+            putCommonParamsListener(httpConfigModel.hostUrl,it);
+        }
+
         return reBuilder.build()
+    }
+
+    /**
+      * 设置公共参数的接口
+      */
+    fun putCommonParamsListener(baseUrl: String,commonParamsListener: OnCommonParamsListener){
+        mCacheOnCommonParams[baseUrl] = commonParamsListener;
     }
 
     /**
@@ -178,6 +191,13 @@ class OkHttpManager {
      */
     fun putRetrofit(hostUrl:String,retrofit:Retrofit){
         mCatchMapRetrofit[hostUrl] = retrofit
+    }
+
+    /**
+      * @param hostUrl 域名
+      */
+    fun getOnCommonParamsListener(hostUrl:String):OnCommonParamsListener?{
+       return mCacheOnCommonParams[hostUrl]
     }
 
     /**

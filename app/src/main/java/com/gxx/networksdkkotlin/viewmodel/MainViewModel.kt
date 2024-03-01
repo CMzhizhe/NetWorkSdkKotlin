@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.gxx.networksdkkotlin.bean.BannerRequestModel
 import com.gxx.neworklibrary.model.BaseBean
 import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
 import com.gxx.neworklibrary.base.doservicedata.parse.BaseServiceDataParseCall
@@ -22,7 +23,30 @@ class MainViewModel: ViewModel() {
       * @description 发起网络请求
       **/
     fun readBanner(){
-        viewModelScope.launch{
+        viewModelScope.launch {
+            WanAndroidMAFRequest.postRequest(
+                BannerRequestModel(
+                    "123", mutableListOf("11","18")
+                ),"banner/json",null,object :
+                    BaseServiceDataParseCall<MutableList<Banner>>() {
+                    override fun onRequestDataSuccess(data: MutableList<Banner>?) {
+                        super.onRequestDataSuccess(data)
+
+                    }
+                }
+            )
+
+           /* WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
+                BaseServiceDataParseCall<MutableList<Banner>>() {
+                override fun onRequestDataSuccess(data: MutableList<Banner>?) {
+                    super.onRequestDataSuccess(data)
+
+                }
+            })*/
+        }
+
+
+        /*viewModelScope.launch{
             WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
                 BaseServiceDataParseCall<MutableList<Banner>>() {
                 override fun onRequestDataSuccess(data: MutableList<Banner>?) {
@@ -35,7 +59,7 @@ class MainViewModel: ViewModel() {
                     super.onRequestBaseBeanFail(baseBean)
                 }
             })
-        }
+        }*/
     }
 
     /**

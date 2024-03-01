@@ -64,7 +64,13 @@ abstract class AbsRequest(
         }
 
         val toMapModel = ToMapModel();
-        toMapModel.addParam(rqParamModel);
+        if (rqParamModel.bodyModel!=null){
+            toMapModel.addParam(rqParamModel.bodyModel!!);
+        }
+
+        OkHttpManager.getInstance().getOnCommonParamsListener(hostUrl = rqParamModel.hostUrl)?.let {
+            toMapModel.addParam(it.onCommonParams())
+        }
 
         doComposeMapRequest(
             rqParamModel.hostUrl,
