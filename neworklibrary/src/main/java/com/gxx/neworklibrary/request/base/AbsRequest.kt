@@ -7,6 +7,7 @@ import com.gxx.neworklibrary.constans.EmRequestType
 import com.gxx.neworklibrary.error.impl.NoNetWorkApiException
 import com.gxx.neworklibrary.inter.*
 import com.gxx.neworklibrary.model.RqParamModel
+import com.gxx.neworklibrary.model.ToMapModel
 import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import com.gxx.neworklibrary.util.MultipartBodyUtils
 import com.gxx.neworklibrary.util.NetWorkUtil
@@ -40,7 +41,7 @@ abstract class AbsRequest(
      * @param emRequestType 请求类型
      */
     override suspend fun doRequest(
-        rqParamModel: RqParamModel,
+        rqParamModel: RqParamModel<*>,
         emRequestType: EmRequestType,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
@@ -62,11 +63,14 @@ abstract class AbsRequest(
             return
         }
 
+        val toMapModel = ToMapModel();
+        toMapModel.addParam(rqParamModel);
+
         doComposeMapRequest(
             rqParamModel.hostUrl,
             rqParamModel.funName,
-            rqParamModel.urlMap ?: mutableMapOf(),
-            rqParamModel.bodyMap ?: mutableMapOf(),
+            rqParamModel.urlMap ?: LinkedHashMap(),
+            toMapModel.returnLinkedHashMap() ?: LinkedHashMap(),
             emRequestType,
             onRequestFailListener
         )?.collect {
@@ -96,8 +100,8 @@ abstract class AbsRequest(
     private suspend fun doComposeMapRequest(
         baseUrl: String,
         funName: String,
-        urlMap: Map<String, Any> = mutableMapOf(),
-        bodyMap: Map<String, Any> = mutableMapOf(),
+        urlMap: Map<String, Any> = LinkedHashMap(),
+        bodyMap: Map<String, Any> = LinkedHashMap(),
         emRequestType: EmRequestType,
         onRequestFailListener: OnRequestFailListener?
     ): Flow<OnIParserListener?>? {
@@ -115,7 +119,7 @@ abstract class AbsRequest(
                         aipService.postJson(
                             method,
                             urlMap,
-                            mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
+                            bodyMap
                         )
                     } else {
                         aipService.postJson(method, urlMap ?: mutableMapOf())

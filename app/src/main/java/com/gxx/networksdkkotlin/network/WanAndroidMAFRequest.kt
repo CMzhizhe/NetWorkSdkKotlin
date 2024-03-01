@@ -13,8 +13,8 @@ import com.gxx.networksdkkotlin.network.error.handler.PayErrorHandler
 import com.gxx.networksdkkotlin.network.error.handler.TokenErrorHandler
 import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.OkHttpManager
-import com.gxx.neworklibrary.constans.EmResultType
 import com.gxx.neworklibrary.base.doservicedata.parse.BaseServiceDataParseCall
+import com.gxx.neworklibrary.constans.EmResultType
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.NetWorkExceptionHandle
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
