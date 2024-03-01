@@ -21,7 +21,7 @@ open class MobileRequest(
     OnMobileRequestListener {
 
     override suspend fun get(
-        rqParamModel: RqParamModel,
+        rqParamModel: RqParamModel<*>,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
@@ -35,7 +35,7 @@ open class MobileRequest(
 
 
     override suspend fun postBody(
-        rqParamModel: RqParamModel,
+        rqParamModel: RqParamModel<*>,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
@@ -48,7 +48,7 @@ open class MobileRequest(
     }
 
     override suspend fun postForm(
-        rqParamModel: RqParamModel,
+        rqParamModel: RqParamModel<*>,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
@@ -61,7 +61,7 @@ open class MobileRequest(
     }
 
     override suspend fun putBody(
-        rqParamModel: RqParamModel,
+        rqParamModel: RqParamModel<*>,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
@@ -74,7 +74,7 @@ open class MobileRequest(
     }
 
     override suspend fun putForm(
-        rqParamModel: RqParamModel,
+        rqParamModel: RqParamModel<*>,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {

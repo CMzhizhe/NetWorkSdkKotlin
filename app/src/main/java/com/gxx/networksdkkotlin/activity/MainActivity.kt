@@ -18,8 +18,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        mMainViewModel.readBanner()
-
         this.findViewById<Button>(R.id.bt_net_work_start).setOnClickListener {
             mMainViewModel.readBanner()
             mMainViewModel.readBannerFlow()
@@ -45,5 +43,10 @@ class MainActivity : AppCompatActivity() {
         this.findViewById<Button>(R.id.bt_start_second).setOnClickListener {
             startActivity(Intent(this,SecondActivity::class.java))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mMainViewModel.readBanner();
     }
 }

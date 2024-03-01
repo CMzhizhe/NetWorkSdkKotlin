@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,15 @@ public class GsonUtil {
     private static Gson gson = new Gson();
 
     private GsonUtil() {
+    }
+
+    public static <T> T fromJson(String json, Type type){
+        try {
+            return gson.fromJson(json, type);
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static String objToJson(Object object) {

@@ -15,7 +15,7 @@ interface OnRequestListener {
      * @param  requestResultValue 希望服务器给的集合的结果
      */
    suspend fun doRequest(
-        rqParamModel: RqParamModel,
+        rqParamModel: RqParamModel<*>,
         emRequestType: EmRequestType,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?

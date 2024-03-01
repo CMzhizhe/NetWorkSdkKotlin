@@ -1,5 +1,6 @@
 package com.gxx.networksdkkotlin.network
 
+import android.os.Parcelable
 import android.util.Log
 import com.gxx.networksdkkotlin.network.api.CustomApiService
 import com.gxx.networksdkkotlin.network.constant.Constant.Companion.ERROR_CODE_100
@@ -13,11 +14,12 @@ import com.gxx.networksdkkotlin.network.error.handler.PayErrorHandler
 import com.gxx.networksdkkotlin.network.error.handler.TokenErrorHandler
 import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.OkHttpManager
-import com.gxx.neworklibrary.constans.EmResultType
 import com.gxx.neworklibrary.base.doservicedata.parse.BaseServiceDataParseCall
+import com.gxx.neworklibrary.constans.EmResultType
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.NetWorkExceptionHandle
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
+import com.gxx.neworklibrary.inter.OnCommonParamsListener
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.provider.HttpConfigInitializer
 import com.gxx.neworklibrary.request.MobileRequest
@@ -41,6 +43,14 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
         mHostUrl = bean.hostUrl
         val retrofit = OkHttpManager.getInstance().createRetrofit(bean,OkHttpManager.Builder().apply {
             mIsShowNetHttpLog = BuildConfig.DEBUG
+            mOnCommonParamsListener = object : OnCommonParamsListener{
+                override fun onCommonParams(): LinkedHashMap<String, Any> {
+                    return LinkedHashMap<String, Any>().apply {
+                        put("age","12")
+                        put("sexList", mutableListOf("female","male"))
+                    }
+                }
+            }
             mErrorHandlerFactory =  ErrorHandlerFactory.Builder()
                 .setHostUrl(bean.hostUrl)
                 .addErrorHandler(LoginErrorHandler(),LoginApiException(ERROR_CODE_100.toString()))
@@ -51,6 +61,22 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
                 .build()
         })
         OkHttpManager.getInstance().putRetrofit(mHostUrl,retrofit)
+    }
+
+    suspend fun <T,M:Parcelable> postRequest(
+        model:M,
+        funName: String,
+        urlMap: Map<String, Any>? = mutableMapOf(),
+        baseServiceDataParseCall: BaseServiceDataParseCall<T>?
+    ){
+        mMobileRequest.postBody(
+            RqParamModel(
+                hostUrl = mHostUrl ,
+                funName = funName,
+                model,
+                urlMap = urlMap
+            ), baseServiceDataParseCall, baseServiceDataParseCall
+        )
     }
 
     /**

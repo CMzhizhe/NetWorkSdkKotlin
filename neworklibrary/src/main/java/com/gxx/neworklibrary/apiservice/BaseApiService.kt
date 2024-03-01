@@ -33,7 +33,7 @@ interface BaseApiService {
     suspend fun postJson(
         @Url url: String,
         @QueryMap urlMap: Map<String, Any>,
-        @Body body: RequestBody
+        @Body body: Map<String, Any>
     ): ResponseBody
 
     @JvmSuppressWildcards
