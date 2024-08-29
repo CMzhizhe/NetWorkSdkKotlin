@@ -78,23 +78,27 @@ abstract class AbsRequest(
         }
 
 
+        var  linkedHashMap:java.util.LinkedHashMap<String,Any> ? = null;
         val retrofitAndConfigModel = OkHttpManager.getRetrofitAndConfigModel(hostUrl = rqParamModel.hostUrl)!!
-        val jsonObject = JSONObject(rqParamModel.jsonBodyModel!!)
-        if (retrofitAndConfigModel.httpConfigModel.onCommonParamsListener!=null){
-            for ((key,model) in retrofitAndConfigModel.httpConfigModel.onCommonParamsListener!!.onCommonParams()) {
-                jsonObject.putOpt(key,model)
+        if (emRequestType!=EmRequestType.GET && rqParamModel.jsonBodyModel.isNullOrEmpty()){
+            val jsonObject = JSONObject(rqParamModel.jsonBodyModel!!)
+            if (retrofitAndConfigModel.httpConfigModel.onCommonParamsListener!=null){
+                for ((key,model) in retrofitAndConfigModel.httpConfigModel.onCommonParamsListener!!.onCommonParams()) {
+                    jsonObject.putOpt(key,model)
+                }
             }
+
+            //最终将公共参数与业务参数进行集合转成一个map
+            linkedHashMap = GsonUtils.fromJson(jsonObject.toString(),object : TypeToken<LinkedHashMap<String, Any>>() {}.type)
         }
 
-        //最终将公共参数与业务参数进行集合转成一个map
-        val linkedHashMap:java.util.LinkedHashMap<String,Any> = GsonUtils.fromJson(jsonObject.toString(),object : TypeToken<LinkedHashMap<String, Any>>() {}.type)
 
 
         doComposeMapRequest(
             rqParamModel.hostUrl,
             rqParamModel.funName,
             rqParamModel.urlMap ?: LinkedHashMap(),
-            linkedHashMap,
+            linkedHashMap ?: LinkedHashMap(),
             emRequestType,
             onRequestFailListener
         )?.collect {

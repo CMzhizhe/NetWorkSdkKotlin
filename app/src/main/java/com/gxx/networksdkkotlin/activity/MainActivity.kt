@@ -20,13 +20,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         this.findViewById<Button>(R.id.bt_net_work_start).setOnClickListener {
             mMainViewModel.readBanner()
-            mMainViewModel.readBannerFlow()
             lifecycleScope.launch {
                val list = mMainViewModel.methodReturn()
                 Log.d(TAG,"第一条数据=${Gson().toJson(list.first())}")
+            }
 
+            lifecycleScope.launch{
                 //合并请求
-               val deffer1 =  async {
+                val deffer1 =  async {
                     mMainViewModel.methodReturn()
                 }
                 val deffer2 =  async {
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG,"deffer2->${Gson().toJson(deffer2.await().first())}，耗时->${System.currentTimeMillis() - startTime}")
                 Log.d(TAG,"合并请求结束")
             }
+
         }
 
         this.findViewById<Button>(R.id.bt_start_second).setOnClickListener {

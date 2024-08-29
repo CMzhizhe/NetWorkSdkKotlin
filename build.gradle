@@ -5,15 +5,3 @@ plugins {
     id 'org.jetbrains.kotlin.android' version '1.6.21' apply false
 }
 
-subprojects {
-    project.configurations.all {
-        // 统一项目依赖库的版本
-        resolutionStrategy.eachDependency { details ->
-            switch (details.requested.group) {
-                case "androidx.core":
-                    details.useVersion "1.7.0"
-                    break
-            }
-        }
-    }
-}
