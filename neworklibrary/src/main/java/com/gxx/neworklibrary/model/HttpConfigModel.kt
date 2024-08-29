@@ -23,13 +23,6 @@ class HttpConfigModel(
     @SerializedName("retryOnConnection")
     var retryOnConnection:Boolean = true,
 ){
-    companion object{
-        const val PARAMS_STATUS_ASC = "ASCENDING";//升序
-        const val PARAMS_STATUS_DESC = "DESCENDING";//降序
-        const val PARAMS_STATUS_DEFAULT = "DEFAULT";//默认
-    }
-
-    var paramsStatus:String = PARAMS_STATUS_DEFAULT//请求参数排序状态
     var errorHandlerFactory: ErrorHandlerFactory? = null//异常错误处理
     var onCommonParamsListener: OnCommonParamsListener? = null//公共参数
     var onGsonFactoryListener: OnGsonFactoryListener? = null //Factory

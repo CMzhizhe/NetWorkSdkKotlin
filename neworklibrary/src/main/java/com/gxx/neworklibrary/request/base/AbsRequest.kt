@@ -86,8 +86,9 @@ abstract class AbsRequest(
             }
         }
 
-        //最终将jsonObject转LinkHashMap
+        //最终将公共参数与业务参数进行集合转成一个map
         val linkedHashMap:java.util.LinkedHashMap<String,Any> = GsonUtils.fromJson(jsonObject.toString(),object : TypeToken<LinkedHashMap<String, Any>>() {}.type)
+
 
         doComposeMapRequest(
             rqParamModel.hostUrl,

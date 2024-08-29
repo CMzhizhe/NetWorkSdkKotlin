@@ -15,7 +15,7 @@ import java.lang.reflect.ParameterizedType
  * @auther gaoxiaoxiong
  * @description 服务器数据处理
  **/
-open class BaseServiceDataParseCall<T> : AbsRequestResultImpl() {
+open class ServiceDataParseCall<T> : AbsRequestResultImpl() {
     private val TAG = "DataParseSuFaCall"
 
     /**

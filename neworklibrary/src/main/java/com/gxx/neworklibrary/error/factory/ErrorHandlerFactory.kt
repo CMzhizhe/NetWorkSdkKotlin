@@ -11,7 +11,6 @@ import com.gxx.neworklibrary.model.ErrorHandlerApiModel
 class ErrorHandlerFactory {
     private constructor()
     private constructor(builder: Builder) {
-        this.mBaseUrl = builder.getHostUrl()
         this.mOnServiceCodeErrorHandleFinishListener =
             builder.getOnServiceCodeErrorHandleFinishListener()
         this.mOnNetWorkErrorListener = builder.getOnNetWorkErrorListener()
@@ -46,7 +45,7 @@ class ErrorHandlerFactory {
     private var mOnNetWorkErrorListener: OnNetWorkErrorListener? = null//网络错误调用
     private val mServiceErrorHandlers = mutableListOf<OnErrorHandler>()//服务器的serviceHandler
     private var mServiceErrorApiExceptions = mutableListOf<AbsApiException>()//服务器的errorApi
-    private var mBaseUrl = ""
+
 
     /**
      * @author gaoxiaoxiong
@@ -115,7 +114,6 @@ class ErrorHandlerFactory {
 
 
     class Builder {
-        private var hostUrl = ""//hostUrl
         private val errorHandlerApiModels = mutableListOf<ErrorHandlerApiModel>() //添加用户额外补充的错误
         private var onServiceCodeErrorHandleFinishListener: OnServiceCodeErrorHandleFinishListener? = null//异常完成处理回调
         private var onNetWorkErrorListener: OnNetWorkErrorListener? = null
@@ -144,10 +142,7 @@ class ErrorHandlerFactory {
             return this
         }
 
-        fun setHostUrl(hostUrl: String): Builder {
-            this.hostUrl = hostUrl
-            return this
-        }
+
 
         fun getOnNetWorkErrorListener(): OnNetWorkErrorListener? {
             return onNetWorkErrorListener
@@ -161,14 +156,9 @@ class ErrorHandlerFactory {
             return errorHandlerApiModels
         }
 
-        fun getHostUrl(): String {
-            return hostUrl
-        }
+
 
         fun build(): ErrorHandlerFactory {
-            if (hostUrl.isEmpty()) {
-                throw IllegalStateException("请先设置 hostUrl")
-            }
             return ErrorHandlerFactory(this)
         }
 

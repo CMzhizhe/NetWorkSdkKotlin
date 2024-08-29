@@ -18,18 +18,20 @@ import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform
 import com.gxx.networksdkkotlin.util.AssetsHttpConfigRead
 import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.OkHttpManager
-import com.gxx.networksdkkotlin.network.parse.BaseServiceDataParseCall
+import com.gxx.networksdkkotlin.network.parse.ServiceDataParseCall
 import com.gxx.neworklibrary.constans.EmResultType
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.NetWorkExceptionHandle
 import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
 import com.gxx.neworklibrary.inter.OnCommonParamsListener
+import com.gxx.neworklibrary.inter.OnOkHttpInterceptorListener
 import com.gxx.neworklibrary.model.HttpConfigModel
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.MobileRequest
 import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import okhttp3.Interceptor
 import org.json.JSONObject
 
 /**
@@ -60,6 +62,19 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
             .setApplication(application)
             .setShowHttpLog(true)
             .setHttpConfig(HttpConfigModel(mHostUrl).apply {
+                //拦截器
+                onOkHttpInterceptorListener = object : OnOkHttpInterceptorListener {
+                    override fun normalInterceptors(): List<Interceptor> {
+                        //todo 可以在这里加解密等处理
+                        return mutableListOf()
+                    }
+
+                    override fun netWorkInterceptors(): List<Interceptor> {
+                        return mutableListOf()
+                    }
+
+                }
+                //公共参数
                 onCommonParamsListener =  object : OnCommonParamsListener{
                     override fun onCommonParams(): LinkedHashMap<String, Any> {
                         return LinkedHashMap<String, Any>().apply {
@@ -68,8 +83,8 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
                         }
                     }
                 }
+                //自定义错误
                 errorHandlerFactory = ErrorHandlerFactory.Builder()
-                    .setHostUrl(mHostUrl)
                     .addErrorHandler(LoginErrorHandler(),LoginApiException(ERROR_CODE_100.toString()))
                     .addErrorHandler(PayErrorHandler(),PayApiException(ERROR_CODE_101.toString()))
                     .addErrorHandler(TokenErrorHandler(),TokenApiException(ERROR_CODE_102.toString()))
@@ -86,7 +101,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
         funName: String,
         model:Any,
         urlMap: Map<String, Any>? = mutableMapOf(),
-        baseServiceDataParseCall: BaseServiceDataParseCall<T>?
+        serviceDataParseCall: ServiceDataParseCall<T>?
     ){
         mMobileRequest.postBody(
             RqParamModel(
@@ -94,7 +109,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
                 funName = funName,
                 jsonBodyModel = GsonUtils.toJson(model),
                 urlMap = urlMap
-            ), baseServiceDataParseCall, baseServiceDataParseCall
+            ), serviceDataParseCall, serviceDataParseCall
         )
     }
 
@@ -106,7 +121,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
     suspend fun <T> getRequest(
         funName: String,
         urlMap: Map<String, Any> = mutableMapOf(),
-        baseServiceDataParseCall: BaseServiceDataParseCall<T>
+        serviceDataParseCall: ServiceDataParseCall<T>
     ) {
         mMobileRequest.get(
             RqParamModel(
@@ -114,7 +129,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
                 funName = funName,
                 null,
                 urlMap = urlMap
-            ), baseServiceDataParseCall, baseServiceDataParseCall
+            ), serviceDataParseCall, serviceDataParseCall
         )
     }
 
@@ -124,7 +139,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
      * @description flow方式请求
      **/
     suspend inline fun <reified T> createRequestFlow(funName: String) = callbackFlow<T> {
-        val baseServiceDataParseCall = object : BaseServiceDataParseCall<T>() {
+        val serviceDataParseCall = object : ServiceDataParseCall<T>() {
             override fun onRequestDataSuccess(data: T?) {
                 super.onRequestDataSuccess(data)
                 trySend(data!!)
@@ -136,7 +151,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
                 funName = funName,
                 null,
                 urlMap = mutableMapOf()
-            ), baseServiceDataParseCall, baseServiceDataParseCall
+            ), serviceDataParseCall, serviceDataParseCall
         )
         awaitClose {}
     }
@@ -150,7 +165,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
      * @auther gxx
      * 自定义api请求的Demo
      **/
-    suspend fun <T> readBannerJson(baseServiceDataParseCall: BaseServiceDataParseCall<T>) {
+    suspend fun <T> readBannerJson(serviceDataParseCall: ServiceDataParseCall<T>) {
         val api = OkHttpManager.getApi(mHostUrl, CustomApiService::class.java)
         val url = "${mHostUrl}banner/json"
         val responseBody = api?.readBook(url, mutableMapOf())
@@ -158,7 +173,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
             mHostUrl,
             "banner/json",
             responseBody,
-            baseServiceDataParseCall
+            serviceDataParseCall
         ).collect {
             if (it == null) {
                 return@collect
@@ -167,8 +182,8 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
                 "${mHostUrl}banner/json",
                 EmResultType.REQUEST_RESULT_OWN,
                 listener = it,
-                baseServiceDataParseCall,
-                baseServiceDataParseCall
+                serviceDataParseCall,
+                serviceDataParseCall
             )
         }
     }
