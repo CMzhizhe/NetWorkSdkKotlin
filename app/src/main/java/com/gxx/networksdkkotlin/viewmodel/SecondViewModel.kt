@@ -2,9 +2,9 @@ package com.gxx.networksdkkotlin.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gxx.neworklibrary.model.BaseBean
+import com.gxx.networksdkkotlin.bean.BaseBean
 import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
-import com.gxx.neworklibrary.base.doservicedata.parse.BaseServiceDataParseCall
+import com.gxx.networksdkkotlin.network.parse.BaseServiceDataParseCall
 import com.gxx.neworklibrary.bean.Banner
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow

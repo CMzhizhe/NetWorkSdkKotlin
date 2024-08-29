@@ -1,7 +1,7 @@
-package com.gxx.neworklibrary.model
+package com.gxx.networksdkkotlin.bean
 
 import com.google.gson.JsonElement
-import com.gxx.neworklibrary.base.doservicedata.transform.BaseServiceDataTransform
+import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform.Companion.ERROR_CODE_TYPE_0
 import com.gxx.neworklibrary.inter.OnIParserListener
 
 class BaseBean(var method: String? = null,
@@ -17,6 +17,6 @@ class BaseBean(var method: String? = null,
     }
 
     override fun isSuccess(): Boolean {
-        return errorCode == BaseServiceDataTransform.ERROR_CODE_TYPE_0.toString()
+        return errorCode == ERROR_CODE_TYPE_0.toString()
     }
 }

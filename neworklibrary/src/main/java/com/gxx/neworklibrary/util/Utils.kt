@@ -2,7 +2,10 @@ package com.gxx.neworklibrary.util
 
 import android.net.Uri
 import com.gxx.neworklibrary.constans.Constant
-import com.gxx.neworklibrary.model.HttpConfigModel
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+
 
 class Utils {
 
@@ -26,8 +29,8 @@ class Utils {
          * @author gaoxiaoxiong
          * 检查是否为空的
          */
-         fun checkUrlIsEmpty(httpConfigModel: HttpConfigModel){
-            if (httpConfigModel.hostUrl.isEmpty()){
+         fun checkUrlIsEmpty(hostUrl:String){
+            if (hostUrl.isEmpty()){
                 throw IllegalStateException("RequestUrl is empty")
             }
         }
@@ -37,8 +40,8 @@ class Utils {
          * @author gaoxiaoxiong
          * 判断mRequestUrl 是否 /结尾
          */
-         fun checkUrlLast(httpConfigModel: HttpConfigModel){
-            if (httpConfigModel.hostUrl.last().toString() != "/") {
+         fun checkUrlLast(hostUrl:String){
+            if (hostUrl.last().toString() != "/") {
                 throw IllegalStateException("RequestUrl is 需要以 '/' 结尾，形如www.xxx.com/")
             }
         }
@@ -47,10 +50,26 @@ class Utils {
          * @author gaoxiaoxiong
          * 检查端口
          */
-         fun checkUrlPort(httpConfigModel: HttpConfigModel){
-            val uri = Uri.parse(httpConfigModel.hostUrl)
+         fun checkUrlPort(hostUrl:String){
+            val uri = Uri.parse(hostUrl)
             if (uri.port == Constant.DEFAULT_PORT_80 || uri.port == Constant.DEFAULT_PORT_443) {
                 throw IllegalStateException("默认端口号，不用去加上")
+            }
+        }
+
+
+        /**
+          * 是否为jsonObject
+          */
+        fun isJsonObject(jsonString: String?): Boolean {
+            if (jsonString.isNullOrEmpty()){
+                return true
+            }
+            try {
+                JSONObject(jsonString)
+                return true // 是有效的 JSONArray
+            } catch (e: JSONException) {
+                return false // 不是有效的 JSONArray
             }
         }
     }

@@ -16,7 +16,7 @@ class NetWorkUtil {
          * @description 判断网络是否连接
          **/
         fun isNetConnected(): Boolean {
-            val connectivityManager = OkHttpManager.getInstance().getContext().getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+            val connectivityManager = OkHttpManager.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
             if (connectivityManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     val capabilities =

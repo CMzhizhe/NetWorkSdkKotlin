@@ -1,7 +1,6 @@
 package com.gxx.neworklibrary.request
 
 import com.gxx.neworklibrary.constans.EmRequestType
-import com.gxx.neworklibrary.base.doservicedata.transform.BaseServiceDataTransform
 import com.gxx.neworklibrary.inter.OnMobileRequestListener
 import com.gxx.neworklibrary.inter.OnRequestFailListener
 import com.gxx.neworklibrary.inter.OnRequestSuccessListener
@@ -16,12 +15,12 @@ import com.gxx.neworklibrary.request.base.AbsRequest
  * @param mOnResponseBodyTransformJsonListener 服务器给的参数，回传给调用者
  **/
 open class MobileRequest(
-    mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener?=null
-) : AbsRequest(mOnResponseBodyTransformJsonListener ?: BaseServiceDataTransform()),
+    mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener,
+) : AbsRequest(mOnResponseBodyTransformJsonListener),
     OnMobileRequestListener {
 
     override suspend fun get(
-        rqParamModel: RqParamModel<*>,
+        rqParamModel: RqParamModel,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
@@ -35,7 +34,7 @@ open class MobileRequest(
 
 
     override suspend fun postBody(
-        rqParamModel: RqParamModel<*>,
+        rqParamModel: RqParamModel,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
@@ -48,7 +47,7 @@ open class MobileRequest(
     }
 
     override suspend fun postForm(
-        rqParamModel: RqParamModel<*>,
+        rqParamModel: RqParamModel,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
@@ -61,7 +60,7 @@ open class MobileRequest(
     }
 
     override suspend fun putBody(
-        rqParamModel: RqParamModel<*>,
+        rqParamModel: RqParamModel,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
@@ -74,7 +73,7 @@ open class MobileRequest(
     }
 
     override suspend fun putForm(
-        rqParamModel: RqParamModel<*>,
+        rqParamModel: RqParamModel,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {

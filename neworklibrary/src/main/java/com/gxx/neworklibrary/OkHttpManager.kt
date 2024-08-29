@@ -1,18 +1,17 @@
 package com.gxx.neworklibrary
 
 import android.app.Application
-import android.content.Context
-import com.gxx.neworklibrary.error.factory.ErrorHandlerFactory
-import com.gxx.neworklibrary.inter.OnCommonParamsListener
-import com.gxx.neworklibrary.inter.OnFactoryListener
-import com.gxx.neworklibrary.inter.OnInterceptorListener
+import com.blankj.utilcode.util.GsonUtils
+import com.google.gson.GsonBuilder
+import com.google.gson.ToNumberPolicy
 import com.gxx.neworklibrary.interceptor.JsonUtf8Interceptor
 import com.gxx.neworklibrary.model.HttpConfigModel
+import com.gxx.neworklibrary.model.RetrofitAndConfigModel
+import com.gxx.neworklibrary.util.Utils
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import tech.thdev.network.flowcalladapterfactory.FlowCallAdapterFactory
 import java.util.concurrent.TimeUnit
 
 /**
@@ -20,103 +19,94 @@ import java.util.concurrent.TimeUnit
  * @auther gxx
  * @description 管理所有的 Retrofit
  **/
-class OkHttpManager {
+object OkHttpManager {
     private val TAG = "OkHttpManager"
-    private lateinit var mApplication: Application
-    private lateinit var mContext: Context
-    private val mCatchHttpConfigMap = mutableMapOf<String, HttpConfigModel>()//存储配置信息，key为hostUrl
-    private val mCatchMapRetrofit = mutableMapOf<String, Retrofit>()//存储OkHttpManager，key为hostUrl
-    private val mCacheErrorHandler = mutableMapOf<String, ErrorHandlerFactory>()
-    private var mCacheOnCommonParams = mutableMapOf<String, OnCommonParamsListener>()//公共参数
 
-    companion object {
-        private var INSTANCE: OkHttpManager? = null
-        fun getInstance(): OkHttpManager {
-            if (INSTANCE == null) {
-                synchronized(OkHttpManager::class) {
-                    if (INSTANCE == null) {
-                        INSTANCE = OkHttpManager()
-                    }
-                }
+    private val mCreateRetrofitMap = mutableMapOf<String, RetrofitAndConfigModel>()//存储配置信息，key为hostUrl
+    private lateinit var mApplication: Application
+
+    class Builder {
+         var application:Application? = null
+         var isShowHttpLog = false//是否打印网络日志
+         val catchHttpConfigMap = mutableMapOf<String, HttpConfigModel>()//存储配置信息，key为hostUrl
+
+        fun setApplication(application: Application):Builder {
+            this.application = application
+            return this
+        }
+
+        fun setShowHttpLog(isShowNetHttpLog:Boolean):Builder {
+            this.isShowHttpLog = isShowNetHttpLog;
+            return this
+        }
+
+        fun setHttpConfig(httpConfigModel: HttpConfigModel):Builder {
+            catchHttpConfigMap[httpConfigModel.hostUrl] = httpConfigModel
+            return this
+        }
+
+
+        fun build(){
+            if (application == null){
+                throw IllegalStateException("未设置application")
             }
-            return INSTANCE!!
+
+            if (catchHttpConfigMap.isEmpty()){
+                throw IllegalStateException("请调用setHttpConfig")
+            }
+
+            for (httpConfigModel in catchHttpConfigMap){
+
+                 if (httpConfigModel.value.hostUrl.isEmpty()){
+                     throw IllegalStateException("未设置 hostUrl ")
+                 }
+
+                Utils.checkUrlIsEmpty(httpConfigModel.value.hostUrl)
+                Utils.checkUrlIsEmpty(httpConfigModel.value.hostUrl)
+
+                Utils.checkUrlLast(httpConfigModel.value.hostUrl)
+                Utils.checkUrlLast(httpConfigModel.value.hostUrl)
+
+                Utils.checkUrlPort(httpConfigModel.value.hostUrl)
+                Utils.checkUrlPort(httpConfigModel.value.hostUrl)
+
+            }
+
+           init(builder = this)
+        }
+
+    }
+
+    private fun init(builder: Builder){
+        this.mApplication = builder.application!!;
+        for (httpConfigModel in builder.catchHttpConfigMap){
+            val retrofit = createRetrofit(httpConfigModel = httpConfigModel.value, isShowNetHttpLog = builder.isShowHttpLog)
+            val model = RetrofitAndConfigModel(retrofit = retrofit,httpConfigModel = httpConfigModel.value)
+            mCreateRetrofitMap[httpConfigModel.value.hostUrl] = model
         }
     }
 
 
-
     /**
-     * @author gaoxiaoxiong
-     * 与application进行绑定
-     */
-    fun bindApplication(application: Application): OkHttpManager {
-        this.mApplication = application
-        this.mContext = application
-        return this
-    }
-
-    /**
-     * @author gaoxiaoxiong
-     * 配置 context
-     */
-    fun init(context: Context) {
-        this.mContext = context
-    }
-
-    /**
-     * @author gaoxiaoxiong
-     * 放置配置的clss
-     * @param keyName 字段名称
-     */
-    fun putConfig(keyName: String, httpConfigModel: HttpConfigModel) {
-        mCatchHttpConfigMap[keyName] = httpConfigModel
-    }
-
-    /**
-     * @author gaoxiaoxiong
-     * 获取 HttpConfigModel
-     * @param keyName 字段名称
-     */
-    fun getConfig(keyName: String):HttpConfigModel?{
-      return mCatchHttpConfigMap[keyName]
-    }
-
-    fun getContext(): Context {
-        return mContext
-    }
-
-    class Builder {
-        var mIsShowNetHttpLog = false//是否打印网络日志
-        var mOnFactoryListener: OnFactoryListener? = null //Factory
-        var mOnInterceptorListener: OnInterceptorListener? = null // 拦截器
-        var mErrorHandlerFactory: ErrorHandlerFactory? = null//错误Handler
-        var mOnCommonParamsListener:OnCommonParamsListener? = null;//公共参数
-    }
-
-    /**
-     * @date 创建时间: 2023/7/31
-     * @auther gaoxiaoxiong
-     * @description 初始化
-     * @param httpConfigModel 域名控制的model
-     * @param builder
-     **/
-    fun createRetrofit(httpConfigModel: HttpConfigModel,builder: Builder): Retrofit {
+      * 构建 Retrofit
+      */
+   private fun createRetrofit(httpConfigModel: HttpConfigModel,isShowNetHttpLog:Boolean): Retrofit {
         val okBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
-            .connectTimeout(httpConfigModel.connectTime.toLong(), TimeUnit.SECONDS)
-            .readTimeout(httpConfigModel.readTime.toLong(), TimeUnit.SECONDS)
-            .writeTimeout(httpConfigModel.writeTime.toLong(), TimeUnit.SECONDS)
+            .connectTimeout(httpConfigModel.connectTime, TimeUnit.MINUTES)
+            .readTimeout(httpConfigModel.readTime, TimeUnit.MINUTES)
+            .writeTimeout(httpConfigModel.writeTime, TimeUnit.MINUTES)
             .retryOnConnectionFailure(httpConfigModel.retryOnConnection)
 
         okBuilder.apply {
             //添加 application/json; charset=UTF-8
             addInterceptor(JsonUtf8Interceptor())
             //打印日志
-            if (builder.mIsShowNetHttpLog) {
+            if (isShowNetHttpLog) {
                 addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             }
             //添加拦截器
-            builder.mOnInterceptorListener?.let {
-                for (interceptor in it.interceptors()) {
+            httpConfigModel.onOkHttpInterceptorListener?.let {
+                for (interceptor in it.normalInterceptors()) {
                     addInterceptor(interceptor)
                 }
 
@@ -126,87 +116,57 @@ class OkHttpManager {
             }
         }
 
+
         val reBuilder: Retrofit.Builder = Retrofit.Builder()
             .baseUrl(httpConfigModel.hostUrl)
             .client(okBuilder.build())
 
-        reBuilder.addConverterFactory(GsonConverterFactory.create())
-        reBuilder.addCallAdapterFactory(FlowCallAdapterFactory())
+       reBuilder.apply {
+           val gson = GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LAZILY_PARSED_NUMBER).create()
+           GsonUtils.setGsonDelegate(gson)
 
-        //可以添加其他的CallAdapterFactory、ConverterFactory
-        builder.mOnFactoryListener?.let {
-            for (callAdapterFactory in it.callAdapterFactorys()) {
-                reBuilder.addCallAdapterFactory(callAdapterFactory)
-            }
+           if (httpConfigModel.onGsonFactoryListener!=null){
+               if (httpConfigModel.onGsonFactoryListener!!.converterFactoryList().isEmpty()){
+                   addConverterFactory(GsonConverterFactory.create(gson))
+               }else{
+                   for (converterFactory in httpConfigModel.onGsonFactoryListener!!.converterFactoryList()) {
+                       addConverterFactory(converterFactory)
+                   }
+               }
 
-            for (converterFactory in it.converterFactorys()) {
-                reBuilder.addConverterFactory(converterFactory)
-            }
-        }
+               for (converterFactory in httpConfigModel.onGsonFactoryListener!!.callAdapterFactoryList()) {
+                   addCallAdapterFactory(converterFactory)
+               }
 
-        builder.mErrorHandlerFactory?.let {
-            putErrorHandlerFactory(httpConfigModel.hostUrl,it)
-        }
-
-        builder.mOnCommonParamsListener?.let {
-            putCommonParamsListener(httpConfigModel.hostUrl,it);
-        }
+           }else{
+               addConverterFactory(GsonConverterFactory.create(gson))
+           }
+       }
 
         return reBuilder.build()
     }
 
-    /**
-      * 设置公共参数的接口
-      */
-    fun putCommonParamsListener(baseUrl: String,commonParamsListener: OnCommonParamsListener){
-        mCacheOnCommonParams[baseUrl] = commonParamsListener;
+    fun getApplication():Application{
+        return mApplication
     }
 
-    /**
-     * @author gaoxiaoxiong
-     * 存放 ErrorHandlerFactory
-     */
-    fun putErrorHandlerFactory(baseUrl: String,errorHandlerFactory: ErrorHandlerFactory){
-        mCacheErrorHandler[baseUrl] = errorHandlerFactory
+    fun getRetrofitAndConfigModel(hostUrl: String):RetrofitAndConfigModel?{
+        return mCreateRetrofitMap[hostUrl]
     }
 
-    fun getErrorHandlerFactory(baseUrl: String): ErrorHandlerFactory? {
-        return mCacheErrorHandler[baseUrl]
+
+    fun getCreateRetrofitMap(): MutableMap<String, RetrofitAndConfigModel> {
+        return mCreateRetrofitMap
     }
 
-    /**
-     * @date 创建时间: 2023/7/27
-     * @auther gxx
-     * @description 返回retrofit
-     * @param hostUrl
-     **/
-    fun getRetrofit(hostUrl: String): Retrofit? {
-        return mCatchMapRetrofit[hostUrl]
+
+    fun getRetrofit(hostUrl: String): Retrofit {
+        return mCreateRetrofitMap[hostUrl]!!.retrofit
     }
 
-    /**
-     * @author gaoxiaoxiong
-     * put Retrofit
-     * @param hostUrl 域名
-     */
-    fun putRetrofit(hostUrl:String,retrofit:Retrofit){
-        mCatchMapRetrofit[hostUrl] = retrofit
-    }
 
-    /**
-      * @param hostUrl 域名
-      */
-    fun getOnCommonParamsListener(hostUrl:String):OnCommonParamsListener?{
-       return mCacheOnCommonParams[hostUrl]
-    }
-
-    /**
-     * @date 创建时间: 2023/7/21
-     * @auther gxx
-     * @description 获取公共API
-     **/
-    fun <T> getApi(hostUrl: String, clazz: Class<T>): T? {
-        return getRetrofit(hostUrl)?.create(clazz)
+    fun <T> getApi(hostUrl: String, clazz: Class<T>): T {
+        return getRetrofit(hostUrl).create(clazz)
     }
 
 

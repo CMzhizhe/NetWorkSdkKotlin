@@ -9,7 +9,7 @@ import com.gxx.neworklibrary.model.RqParamModel
  **/
 interface OnMobileRequestListener {
     suspend fun get(
-        rqParamModel: RqParamModel<*>,
+        rqParamModel: RqParamModel,
         onRequestSuccessListener: OnRequestSuccessListener? = null,
         onRequestFailListener: OnRequestFailListener? = null
     )
@@ -17,14 +17,14 @@ interface OnMobileRequestListener {
 
 
     suspend fun postBody(
-        rqParamModel: RqParamModel<*>,
+        rqParamModel: RqParamModel,
         onRequestSuccessListener: OnRequestSuccessListener? = null,
         onRequestFailListener: OnRequestFailListener? = null
     )
 
 
     suspend fun postForm(
-        rqParamModel: RqParamModel<*>,
+        rqParamModel: RqParamModel,
         onRequestSuccessListener: OnRequestSuccessListener? = null,
         onRequestFailListener: OnRequestFailListener? = null
     )
@@ -32,7 +32,7 @@ interface OnMobileRequestListener {
 
 
     suspend fun putBody(
-        rqParamModel: RqParamModel<*>,
+        rqParamModel: RqParamModel,
         onRequestSuccessListener: OnRequestSuccessListener? = null,
         onRequestFailListener: OnRequestFailListener? = null
     )
@@ -40,7 +40,7 @@ interface OnMobileRequestListener {
 
 
     suspend fun putForm(
-        rqParamModel: RqParamModel<*>,
+        rqParamModel: RqParamModel,
         onRequestSuccessListener: OnRequestSuccessListener? = null,
         onRequestFailListener: OnRequestFailListener? = null
     )

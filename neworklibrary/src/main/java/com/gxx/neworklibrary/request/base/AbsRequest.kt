@@ -1,6 +1,9 @@
 package com.gxx.neworklibrary.request.base
 
-import com.google.gson.Gson
+import com.blankj.utilcode.util.GsonUtils
+import com.blankj.utilcode.util.JsonUtils
+import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
 import com.gxx.neworklibrary.OkHttpManager
 import com.gxx.neworklibrary.apiservice.BaseApiService
 import com.gxx.neworklibrary.constans.EmRequestType
@@ -11,25 +14,27 @@ import com.gxx.neworklibrary.model.ToMapModel
 import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import com.gxx.neworklibrary.util.MultipartBodyUtils
 import com.gxx.neworklibrary.util.NetWorkUtil
+import com.gxx.neworklibrary.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
+import org.json.JSONObject
+import java.util.TreeMap
 
 
 /**
  * @date 创建时间: 2023/7/21
  * @auther gxx
  * @description 请求的封装
- * @param mOnResponseBodyTransformJsonListener 处理服务器提供的数据，转换成，自己需要的baseBean
+ * @param mOnResponseBodyTransformJsonListener
  **/
 abstract class AbsRequest(
     private val mOnResponseBodyTransformJsonListener: OnResponseBodyTransformJsonListener
 ) : OnRequestListener {
     private val TAG = "MobileRequest"
-    private val mGson = Gson()
     private val mJsonParseResult = JsonParseResult()
     private val mMultipartBodyUtils = MultipartBodyUtils()
 
@@ -41,17 +46,21 @@ abstract class AbsRequest(
      * @param emRequestType 请求类型
      */
     override suspend fun doRequest(
-        rqParamModel: RqParamModel<*>,
+        rqParamModel: RqParamModel,
         emRequestType: EmRequestType,
         onRequestSuccessListener: OnRequestSuccessListener?,
         onRequestFailListener: OnRequestFailListener?
     ) {
         if (rqParamModel.hostUrl.isEmpty()) {
-            throw IllegalStateException("baseUrl 是空的")
+            throw IllegalStateException("hostUrl 是空的")
         }
 
         if (rqParamModel.funName.isEmpty()) {
             throw IllegalStateException("funName 是空的")
+        }
+
+        if (OkHttpManager.getRetrofitAndConfigModel(hostUrl = rqParamModel.hostUrl) == null) {
+            throw IllegalStateException("请调用setHttpConfig")
         }
 
         if (!NetWorkUtil.isNetConnected()) {
@@ -63,20 +72,28 @@ abstract class AbsRequest(
             return
         }
 
-        val toMapModel = ToMapModel();
-        if (rqParamModel.bodyModel!=null){
-            toMapModel.addParam(rqParamModel.bodyModel!!);
+        //检查传递的类型是否为 jsonObject
+        if (!rqParamModel.jsonBodyModel.isNullOrEmpty() && !Utils.isJsonObject(rqParamModel.jsonBodyModel)){
+            throw IllegalStateException("传递的类型，不是jsonObject，你需要将model，转成jsonObject，请调用 GsonUtils.toJson()")
         }
 
-        OkHttpManager.getInstance().getOnCommonParamsListener(hostUrl = rqParamModel.hostUrl)?.let {
-            toMapModel.addParam(it.onCommonParams())
+
+        val retrofitAndConfigModel = OkHttpManager.getRetrofitAndConfigModel(hostUrl = rqParamModel.hostUrl)!!
+        val jsonObject = JSONObject(rqParamModel.jsonBodyModel!!)
+        if (retrofitAndConfigModel.httpConfigModel.onCommonParamsListener!=null){
+            for ((key,model) in retrofitAndConfigModel.httpConfigModel.onCommonParamsListener!!.onCommonParams()) {
+                jsonObject.putOpt(key,model)
+            }
         }
+
+        //最终将jsonObject转LinkHashMap
+        val linkedHashMap:java.util.LinkedHashMap<String,Any> = GsonUtils.fromJson(jsonObject.toString(),object : TypeToken<LinkedHashMap<String, Any>>() {}.type)
 
         doComposeMapRequest(
             rqParamModel.hostUrl,
             rqParamModel.funName,
             rqParamModel.urlMap ?: LinkedHashMap(),
-            toMapModel.returnLinkedHashMap() ?: LinkedHashMap(),
+            linkedHashMap,
             emRequestType,
             onRequestFailListener
         )?.collect {
@@ -112,7 +129,7 @@ abstract class AbsRequest(
         onRequestFailListener: OnRequestFailListener?
     ): Flow<OnIParserListener?>? {
         val method = "${baseUrl}${funName}"
-        val aipService = OkHttpManager.getInstance().getRetrofit(baseUrl)?.create(BaseApiService::class.java)?:return null
+        val aipService = OkHttpManager.getRetrofit(baseUrl).create(BaseApiService::class.java)
         var responseBody: ResponseBody? = null
         kotlin.runCatching {
             responseBody = when (emRequestType) {
@@ -145,7 +162,7 @@ abstract class AbsRequest(
                         aipService.putJson(
                             method,
                             urlMap,
-                            mMultipartBodyUtils.jsonToRequestBody(mGson.toJson(bodyMap))
+                            mMultipartBodyUtils.jsonToRequestBody(GsonUtils.toJson(bodyMap))
                         )
                     } else {
                         aipService.putJson(method, urlMap)

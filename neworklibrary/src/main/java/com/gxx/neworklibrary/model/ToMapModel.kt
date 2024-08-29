@@ -1,24 +1,23 @@
 package com.gxx.neworklibrary.model
 
 import com.google.gson.reflect.TypeToken
-import com.gxx.neworklibrary.util.GsonUtil
 import java.util.LinkedHashMap
 import java.util.TreeMap
 
 class ToMapModel{
-    private var paramsList = mutableListOf<Any>()
+    //private var paramsList = mutableListOf<Any>()
 
     /**
       * 添加参数
       */
-    fun addParam(any: Any){
+   /* fun addParam(any: Any){
         paramsList.add(any)
-    }
+    }*/
 
     /**
       * 返回 linkedHashMap
       */
-    fun returnLinkedHashMap():LinkedHashMap<String,Any>{
+    /*fun toLinkedHashMap():LinkedHashMap<String,Any>{
         val linkedHashMap = LinkedHashMap<String,Any>();
         kotlin.runCatching {
             for (any in paramsList) {
@@ -29,5 +28,5 @@ class ToMapModel{
         }
 
         return  linkedHashMap
-    }
+    }*/
 }

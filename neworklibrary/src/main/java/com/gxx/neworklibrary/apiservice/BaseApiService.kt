@@ -17,9 +17,6 @@ interface BaseApiService {
         @QueryMap urlMap: Map<String, Any>
     ): ResponseBody
 
-
-    //get ============== finish
-
     @JvmSuppressWildcards
     @POST
     suspend fun postJson(

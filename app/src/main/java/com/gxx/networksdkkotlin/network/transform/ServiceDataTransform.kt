@@ -1,4 +1,4 @@
-package com.gxx.neworklibrary.base.doservicedata.transform
+package com.gxx.networksdkkotlin.network.transform
 
 import com.google.gson.JsonParser
 import com.gxx.neworklibrary.OkHttpManager
@@ -6,7 +6,7 @@ import com.gxx.neworklibrary.error.impl.RootJsonEmptyApiException
 import com.gxx.neworklibrary.error.impl.UnApiException
 import com.gxx.neworklibrary.inter.OnIParserListener
 import com.gxx.neworklibrary.inter.OnResponseBodyTransformJsonListener
-import com.gxx.neworklibrary.model.BaseBean
+import com.gxx.networksdkkotlin.bean.BaseBean
 import com.gxx.neworklibrary.util.Utils
 
 /**
@@ -19,9 +19,8 @@ import com.gxx.neworklibrary.util.Utils
  *  data:[]或者{}或者无
  *  }
  **/
-open class BaseServiceDataTransform : OnResponseBodyTransformJsonListener {
+open class ServiceDataTransform : OnResponseBodyTransformJsonListener {
     companion object {
-
         const val ERROR_CODE = "errorCode"
         const val DATA = "data"
         const val ERROR_CODE_TYPE_0 = "0"//与服务器协商的正常状态
@@ -60,7 +59,7 @@ open class BaseServiceDataTransform : OnResponseBodyTransformJsonListener {
                 //与服务器协商的异常逻辑
                 // 可以在这里抛异常，比如服务器有提供code = 201，那么可以抛出属于201的异常错误
                val baseUrl = Utils.getBaseUrlByMethod(method)
-               val errorHandlerFactory = OkHttpManager.getInstance().getErrorHandlerFactory(baseUrl)
+               val errorHandlerFactory = OkHttpManager.getRetrofitAndConfigModel(baseUrl)?.httpConfigModel?.errorHandlerFactory
                 if (errorHandlerFactory!=null){
                     for (serviceErrorApiException in errorHandlerFactory.getServiceErrorApiExceptions()) {
                         if (serviceErrorApiException.code == errorCode.toString()){

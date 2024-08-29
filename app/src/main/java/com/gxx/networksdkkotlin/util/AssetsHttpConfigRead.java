@@ -1,4 +1,4 @@
-package com.gxx.neworklibrary.util;
+package com.gxx.networksdkkotlin.util;
 
 import android.content.Context;
 import android.content.res.AssetManager;
