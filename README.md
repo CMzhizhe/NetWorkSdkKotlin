@@ -2,7 +2,6 @@
 #### 目录
 * demo案例
 * 项目介绍
-  - maven 配置
   - 依赖引入
   - 配置拦截器，自定义错误，公共参数
   - 解析服务器提供的json
@@ -33,10 +32,6 @@ viewModelScope.launch {
         }
 ```
 #### 项目介绍
-##### maven 配置
-```
-maven { url 'https://jitpack.io' }
-```
 ##### 依赖引入
 ```
 dependencies {
@@ -53,9 +48,6 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     implementation 'com.google.code.gson:gson:2.10.1'
-
-    //用于自定义返回:Flow<xxxxModel>这样的类型的，如果没有这样类型的，可以不用添加
-    implementation 'com.github.CMzhizhe:Retrofit-FlowCallAdapterFactory:v1.0.0'
 
     // Kotlin
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
