@@ -23,9 +23,14 @@ viewModelScope.launch {
                     "123", mutableListOf("11","18")
                 ),null,object :
                     ServiceDataParseCall<MutableList<Banner>>() {
-                    override fun onRequestDataSuccess(data: MutableList<Banner>?) {
-                        super.onRequestDataSuccess(data)
-
+                    override suspend fun onRequestBaseBeanSuccess(
+                        data: MutableList<Banner>?,
+                        baseBean: BaseBean
+                    ) {
+                        super.onRequestBaseBeanSuccess(data, baseBean)
+                        if (data!=null){
+                            _bannerShareFlow.emit(data!!)
+                        }
                     }
                 }
             )
@@ -54,6 +59,8 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
+    implementation "androidx.activity:activity-ktx:1.6.0"
+    implementation "androidx.fragment:fragment-ktx:1.3.6"
 
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.4.1'
     implementation "androidx.lifecycle:lifecycle-runtime:2.4.1"
@@ -194,11 +201,6 @@ class BaseBean(var method: String? = null,
 ```
 ##### 解析data里面的数据，统一错误处理，回传业务层成功与失败
 ```
-/**
- * @date 创建时间: 2023/7/22
- * @auther gaoxiaoxiong
- * @description 服务器数据处理
- **/
 open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailListener {
     private val TAG = "DataParseSuFaCall"
 
@@ -207,7 +209,7 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
      * @auther gaoxiaoxiong
      * @description 成功结果回调
      **/
-    override fun onRequestSuccess(
+    override suspend fun onRequestSuccess(
         method: String,
         targetElement: JsonElement?,
         onIParserListener: OnIParserListener
@@ -217,7 +219,7 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
             try {
                 val parameterizedType = this::class.java.genericSuperclass as ParameterizedType
                 val subType =  parameterizedType.actualTypeArguments.first() //获取泛型T
-                result = GsonUtils.fromJson(targetElement?.toString(),subType)
+                result = GsonUtils.fromJson(targetElement.toString(),subType)
             } catch (e: Exception) {
                 e.printStackTrace()
                 //处理解析异常
@@ -225,12 +227,10 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
                 return
             }
 
-            onRequestDataSuccess(if (result == null) null else result as T)
             onRequestBaseBeanSuccess(if (result == null) null else result as T,
                 onIParserListener as BaseBean
             )
         }else{
-            onRequestDataSuccess(null)
             onRequestBaseBeanSuccess(null, onIParserListener as BaseBean)
         }
     }
@@ -240,7 +240,7 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
      * @auther gaoxiaoxiong
      * @description 失败接口的调用
      **/
-    override fun onRequestFail(
+    override suspend fun onRequestFail(
         method: String,
         throwable: Throwable?,
         status: String?,
@@ -260,7 +260,7 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
             }
         }
         onRequestDataFail(status?:"", failMsg?:"", onIParserListener as BaseBean?)
-        onRequestBaseBeanFail(onIParserListener as BaseBean? )
+
     }
 
     /**
@@ -268,22 +268,9 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
      * @date 创建时间: 2023/8/6/006
      * @description  请求失败
      **/
-    open fun onRequestDataFail(code: String, msg: String, baseBean: BaseBean?=null) {}
-
-      /**
-       * @author gaoxiaoxiong
-       * @date 创建时间: 2023/8/6/006
-       * @description  请求失败
-       **/
-    open fun onRequestBaseBeanFail(baseBean: BaseBean?=null) {}
+    open suspend fun onRequestDataFail(code: String, msg: String, baseBean: BaseBean?=null) {}
 
 
-    /**
-     * @author gaoxiaoxiong
-     * @date 创建时间: 2023/8/6/006
-     * @description  请求成功
-     **/
-    open fun onRequestDataSuccess(data: T?) {}
 
    /**
     * @author gaoxiaoxiong
@@ -291,7 +278,7 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
     * @description  请求成功
     * 返回含有 BaseBean 的
     **/
-    open fun onRequestBaseBeanSuccess(data: T?, baseBean: BaseBean) {}
+    open suspend fun onRequestBaseBeanSuccess(data: T?, baseBean: BaseBean) {}
 }
 ```
 这里再定义错误收集处理方法，比如我们登录错误了
