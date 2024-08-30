@@ -14,6 +14,7 @@ import com.gxx.networksdkkotlin.network.error.exception.TokenApiException
 import com.gxx.networksdkkotlin.network.error.handler.LoginErrorHandler
 import com.gxx.networksdkkotlin.network.error.handler.PayErrorHandler
 import com.gxx.networksdkkotlin.network.error.handler.TokenErrorHandler
+import com.gxx.networksdkkotlin.network.interceptor.SortInterceptor
 import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform
 import com.gxx.networksdkkotlin.util.AssetsHttpConfigRead
 import com.gxx.neworklibrary.BuildConfig
@@ -43,6 +44,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
     ErrorHandlerFactory.OnNetWorkErrorListener {
     val TAG = "WanAndroidMAFRequest"
     val mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
+    private val mInterceptor = mutableListOf<Interceptor>(SortInterceptor())
     var mHostUrl = ""
 
     fun init(application: Application){
@@ -66,7 +68,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
                 onOkHttpInterceptorListener = object : OnOkHttpInterceptorListener {
                     override fun normalInterceptors(): List<Interceptor> {
                         //todo 可以在这里加解密等处理
-                        return mutableListOf()
+                        return mInterceptor
                     }
 
                     override fun netWorkInterceptors(): List<Interceptor> {

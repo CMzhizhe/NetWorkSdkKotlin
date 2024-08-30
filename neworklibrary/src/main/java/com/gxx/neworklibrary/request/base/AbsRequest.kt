@@ -77,7 +77,7 @@ abstract class AbsRequest(
 
         var  linkedHashMap:java.util.LinkedHashMap<String,Any> ? = null;
         val retrofitAndConfigModel = OkHttpManager.getRetrofitAndConfigModel(hostUrl = rqParamModel.hostUrl)!!
-        if (emRequestType!=EmRequestType.GET && rqParamModel.jsonBodyModel.isNullOrEmpty()){
+        if (emRequestType!=EmRequestType.GET && !rqParamModel.jsonBodyModel.isNullOrEmpty()){
             val jsonObject = JSONObject(rqParamModel.jsonBodyModel!!)
             if (retrofitAndConfigModel.httpConfigModel.onCommonParamsListener!=null){
                 for ((key,model) in retrofitAndConfigModel.httpConfigModel.onCommonParamsListener!!.onCommonParams()) {
