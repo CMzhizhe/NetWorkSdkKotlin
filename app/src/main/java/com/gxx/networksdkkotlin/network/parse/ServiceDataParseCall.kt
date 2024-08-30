@@ -4,9 +4,10 @@ import com.blankj.utilcode.util.GsonUtils
 import com.google.gson.JsonElement
 import com.gxx.networksdkkotlin.bean.BaseBean
 import com.gxx.neworklibrary.OkHttpManager
-import com.gxx.neworklibrary.base.doservicedata.resultcall.AbsRequestResultImpl
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.inter.OnIParserListener
+import com.gxx.neworklibrary.inter.OnRequestFailListener
+import com.gxx.neworklibrary.inter.OnRequestSuccessListener
 import com.gxx.neworklibrary.util.Utils
 import java.lang.reflect.ParameterizedType
 
@@ -15,7 +16,7 @@ import java.lang.reflect.ParameterizedType
  * @auther gaoxiaoxiong
  * @description 服务器数据处理
  **/
-open class ServiceDataParseCall<T> : AbsRequestResultImpl() {
+open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailListener {
     private val TAG = "DataParseSuFaCall"
 
     /**

@@ -10,7 +10,6 @@ import com.gxx.neworklibrary.constans.EmRequestType
 import com.gxx.neworklibrary.error.impl.NoNetWorkApiException
 import com.gxx.neworklibrary.inter.*
 import com.gxx.neworklibrary.model.RqParamModel
-import com.gxx.neworklibrary.model.ToMapModel
 import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import com.gxx.neworklibrary.util.MultipartBodyUtils
 import com.gxx.neworklibrary.util.NetWorkUtil
@@ -65,9 +64,7 @@ abstract class AbsRequest(
 
         if (!NetWorkUtil.isNetConnected()) {
             if (currentCoroutineContext().isActive){
-                withContext(Dispatchers.Main){
-                    onRequestFailListener?.onRequestFail("${rqParamModel.hostUrl}${rqParamModel.funName}",NoNetWorkApiException())
-                }
+                onRequestFailListener?.onRequestFail("${rqParamModel.hostUrl}${rqParamModel.funName}",NoNetWorkApiException())
             }
             return
         }
@@ -185,16 +182,14 @@ abstract class AbsRequest(
         }.onFailure {
             it.printStackTrace()
             if (currentCoroutineContext().isActive){
-                withContext(Dispatchers.Main){
-                    onRequestFailListener?.onRequestFail(
-                        method,
-                        it,
-                        null,
-                        null,
-                        null,
-                        null
-                    )
-                }
+                onRequestFailListener?.onRequestFail(
+                    method,
+                    it,
+                    null,
+                    null,
+                    null,
+                    null
+                )
             }
         }
 
@@ -233,16 +228,14 @@ abstract class AbsRequest(
             }.catch {
                 it.printStackTrace()
                 if (currentCoroutineContext().isActive){
-                    withContext(Dispatchers.Main){
-                        onRequestFailListener?.onRequestFail(
-                            method,
-                            it,
-                            null,
-                            null,
-                            null,
-                            null
-                        )
-                    }
+                    onRequestFailListener?.onRequestFail(
+                        method,
+                        it,
+                        null,
+                        null,
+                        null,
+                        null
+                    )
                 }
             }.flowOn(Dispatchers.Default)
         }
