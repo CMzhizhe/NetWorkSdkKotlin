@@ -40,7 +40,7 @@ maven { url 'https://jitpack.io' }
 ##### 依赖引入
 ```
 dependencies {
-   implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
@@ -104,11 +104,13 @@ OkHttpManager.Builder()
                     .addErrorHandler(LoginErrorHandler(),LoginApiException(ERROR_CODE_100.toString()))
                     .addErrorHandler(PayErrorHandler(),PayApiException(ERROR_CODE_101.toString()))
                     .addErrorHandler(TokenErrorHandler(),TokenApiException(ERROR_CODE_102.toString()))
-                    .setOnNetWorkErrorListener(this@WanAndroidMAFRequest)
-                    .setOnServiceCodeErrorHandleFinishListener(this@WanAndroidMAFRequest)
+                    .setOnNetWorkErrorListener(this@WanAndroidMAFRequest)//网络错误的回调
+                    .setOnServiceCodeErrorHandleFinishListener(this@WanAndroidMAFRequest)//所有的错误，可以交由一个地方处理
                     .build()
             })
             .build()
+
+ 
 ```
  
  
@@ -199,7 +201,6 @@ class BaseBean(var method: String? = null,
 }
 ```
 ##### 解析data里面的数据，统一错误处理，回传业务层成功与失败
-我们在发起网络请求的时候是这样的，new DataParseSuFaCall 传递需要的具体格式
 ```
 /**
  * @date 创建时间: 2023/7/22
