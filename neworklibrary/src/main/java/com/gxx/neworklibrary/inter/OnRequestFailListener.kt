@@ -6,7 +6,7 @@ package com.gxx.neworklibrary.inter
  * @description 失败调用
  **/
 interface OnRequestFailListener {
-    fun onRequestFail(
+   suspend fun onRequestFail(
         method:String,
         throwable: Throwable?=null,
         status: String?=null,

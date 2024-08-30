@@ -25,12 +25,12 @@ class SecondViewModel: ViewModel()  {
            viewModelScope.launch {
                WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
                    ServiceDataParseCall<MutableList<Banner>>() {
-                   override fun onRequestDataSuccess(data: MutableList<Banner>?) {
-                       super.onRequestDataSuccess(data)
+                   override suspend fun onRequestBaseBeanSuccess(
+                       data: MutableList<Banner>?,
+                       baseBean: BaseBean
+                   ) {
+                       super.onRequestBaseBeanSuccess(data, baseBean)
                        continuation.resume(data!!)
-                   }
-                   override fun onRequestBaseBeanFail(baseBean: BaseBean?) {
-                       super.onRequestBaseBeanFail(baseBean)
                    }
                })
            }

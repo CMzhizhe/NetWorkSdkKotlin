@@ -1,20 +1,23 @@
 package com.gxx.networksdkkotlin.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import com.gxx.networksdkkotlin.bean.BannerRequestModel
+import com.gxx.networksdkkotlin.bean.BaseBean
 import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
 import com.gxx.networksdkkotlin.network.parse.ServiceDataParseCall
-import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.bean.Banner
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class MainViewModel: ViewModel() {
     private val TAG = "MainViewModel"
+
+    private val  _bannerShareFlow = MutableSharedFlow<MutableList<Banner>>()
+    val bannerShareFlow = _bannerShareFlow.asSharedFlow()
 
     /**
       * @date 创建时间: 2023/7/25
@@ -29,29 +32,18 @@ class MainViewModel: ViewModel() {
                     "123", mutableListOf("11","18")
                 ),null,object :
                     ServiceDataParseCall<MutableList<Banner>>() {
-                    override fun onRequestDataSuccess(data: MutableList<Banner>?) {
-                        super.onRequestDataSuccess(data)
-
+                    override suspend fun onRequestBaseBeanSuccess(
+                        data: MutableList<Banner>?,
+                        baseBean: BaseBean
+                    ) {
+                        super.onRequestBaseBeanSuccess(data, baseBean)
+                        if (data!=null){
+                            _bannerShareFlow.emit(data!!)
+                        }
                     }
                 }
             )
         }
-
-
-        /*viewModelScope.launch{
-            WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
-                BaseServiceDataParseCall<MutableList<Banner>>() {
-                override fun onRequestDataSuccess(data: MutableList<Banner>?) {
-                    super.onRequestDataSuccess(data)
-                    if(BuildConfig.DEBUG){
-                        Log.d(TAG, "json = ${Gson().toJson(data)}");
-                    }
-                }
-                override fun onRequestBaseBeanFail(baseBean: BaseBean?) {
-                    super.onRequestBaseBeanFail(baseBean)
-                }
-            })
-        }*/
     }
 
 
@@ -66,8 +58,11 @@ class MainViewModel: ViewModel() {
             viewModelScope.launch{
                 WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
                     ServiceDataParseCall<MutableList<Banner>>() {
-                    override fun onRequestDataSuccess(data: MutableList<Banner>?) {
-                        super.onRequestDataSuccess(data)
+                    override suspend fun onRequestBaseBeanSuccess(
+                        data: MutableList<Banner>?,
+                        baseBean: BaseBean
+                    ) {
+                        super.onRequestBaseBeanSuccess(data, baseBean)
                         if (data!=null){
                             coroutine.resume(data)
                         }

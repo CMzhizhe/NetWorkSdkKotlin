@@ -8,6 +8,7 @@
     tools:context=".activity.MainActivity">
 
     <TextView
+        android:id="@+id/tv_show_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!"

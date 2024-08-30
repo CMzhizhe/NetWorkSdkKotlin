@@ -24,7 +24,7 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
      * @auther gaoxiaoxiong
      * @description 成功结果回调
      **/
-    override fun onRequestSuccess(
+    override suspend fun onRequestSuccess(
         method: String,
         targetElement: JsonElement?,
         onIParserListener: OnIParserListener
@@ -34,7 +34,7 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
             try {
                 val parameterizedType = this::class.java.genericSuperclass as ParameterizedType
                 val subType =  parameterizedType.actualTypeArguments.first() //获取泛型T
-                result = GsonUtils.fromJson(targetElement?.toString(),subType)
+                result = GsonUtils.fromJson(targetElement.toString(),subType)
             } catch (e: Exception) {
                 e.printStackTrace()
                 //处理解析异常
@@ -42,12 +42,10 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
                 return
             }
 
-            onRequestDataSuccess(if (result == null) null else result as T)
             onRequestBaseBeanSuccess(if (result == null) null else result as T,
                 onIParserListener as BaseBean
             )
         }else{
-            onRequestDataSuccess(null)
             onRequestBaseBeanSuccess(null, onIParserListener as BaseBean)
         }
     }
@@ -57,7 +55,7 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
      * @auther gaoxiaoxiong
      * @description 失败接口的调用
      **/
-    override fun onRequestFail(
+    override suspend fun onRequestFail(
         method: String,
         throwable: Throwable?,
         status: String?,
@@ -77,7 +75,7 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
             }
         }
         onRequestDataFail(status?:"", failMsg?:"", onIParserListener as BaseBean?)
-        onRequestBaseBeanFail(onIParserListener as BaseBean? )
+
     }
 
     /**
@@ -85,22 +83,9 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
      * @date 创建时间: 2023/8/6/006
      * @description  请求失败
      **/
-    open fun onRequestDataFail(code: String, msg: String, baseBean: BaseBean?=null) {}
-
-      /**
-       * @author gaoxiaoxiong
-       * @date 创建时间: 2023/8/6/006
-       * @description  请求失败
-       **/
-    open fun onRequestBaseBeanFail(baseBean: BaseBean?=null) {}
+    open suspend fun onRequestDataFail(code: String, msg: String, baseBean: BaseBean?=null) {}
 
 
-    /**
-     * @author gaoxiaoxiong
-     * @date 创建时间: 2023/8/6/006
-     * @description  请求成功
-     **/
-    open fun onRequestDataSuccess(data: T?) {}
 
    /**
     * @author gaoxiaoxiong
@@ -108,5 +93,5 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
     * @description  请求成功
     * 返回含有 BaseBean 的
     **/
-    open fun onRequestBaseBeanSuccess(data: T?, baseBean: BaseBean) {}
+    open suspend fun onRequestBaseBeanSuccess(data: T?, baseBean: BaseBean) {}
 }

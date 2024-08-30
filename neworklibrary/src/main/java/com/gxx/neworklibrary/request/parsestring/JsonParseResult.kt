@@ -22,7 +22,7 @@ class JsonParseResult() {
      * @param onRequestFailListener 失败回调
      * @param onRequestSuccessListener 成功回调
      **/
-    fun doIParseResult(
+  suspend  fun doIParseResult(
         method: String,
         emResultType: EmResultType,
         listener: OnIParserListener,

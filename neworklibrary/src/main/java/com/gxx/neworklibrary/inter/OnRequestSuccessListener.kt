@@ -15,7 +15,7 @@ interface OnRequestSuccessListener {
      * @param method 方法名
      * @param targetElement  data 里面的参数
      **/
-    fun onRequestSuccess(
+   suspend fun onRequestSuccess(
         method: String,
         targetElement: JsonElement?,
         onIParserListener: OnIParserListener

@@ -135,28 +135,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
         )
     }
 
-    /**
-     * @date 创建时间: 2023/8/10
-     * @auther gaoxiaoxiong
-     * @description flow方式请求
-     **/
-    suspend inline fun <reified T> createRequestFlow(funName: String) = callbackFlow<T> {
-        val serviceDataParseCall = object : ServiceDataParseCall<T>() {
-            override fun onRequestDataSuccess(data: T?) {
-                super.onRequestDataSuccess(data)
-                trySend(data!!)
-            }
-        }
-        mMobileRequest.get(
-            RqParamModel(
-                hostUrl = mHostUrl,
-                funName = funName,
-                null,
-                urlMap = mutableMapOf()
-            ), serviceDataParseCall, serviceDataParseCall
-        )
-        awaitClose {}
-    }
+
 
 
 
