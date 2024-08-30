@@ -4,7 +4,7 @@
 * 项目介绍
   - maven 配置
   - 依赖引入
-  - 域名，intercept，factory配置
+  - 配置拦截器，自定义错误，公共参数
   - 解析服务器提供的json
   - 自定义BaseBean
   - 解析data里面的数据，统一错误处理，回传业务层成功与失败
@@ -17,27 +17,20 @@
 
 #### demo案例
 ```
- /**
-      * @date 创建时间: 2023/7/25
-      * @auther gxx
-      * @description 发起网络请求
-      **/
-    fun readBanner(){
-        viewModelScope.launch{
-           val map = mutableMapOf<String,Any>()
-            map["userId"] = "1"
-            WanAndroidMAFRequest.getRequest("banner/json",map,object :
-                DataParseSuFaCall<MutableList<Banner>>() {
-                override fun onRequestDataSuccess(data: MutableList<Banner>?) {
-                    super.onRequestDataSuccess(data)
-                    if(BuildConfig.DEBUG){
-                        Log.d(TAG, "json = ${Gson().toJson(data)}");
-                        Log.d(TAG, "是否主线程 = ${Looper.getMainLooper() == Looper.myLooper()}");
+viewModelScope.launch {
+            WanAndroidMAFRequest.postRequest(
+                "banner/json",
+                BannerRequestModel(
+                    "123", mutableListOf("11","18")
+                ),null,object :
+                    ServiceDataParseCall<MutableList<Banner>>() {
+                    override fun onRequestDataSuccess(data: MutableList<Banner>?) {
+                        super.onRequestDataSuccess(data)
+
                     }
                 }
-            })
+            )
         }
-    }
 ```
 #### 项目介绍
 ##### maven 配置
@@ -47,126 +40,137 @@ maven { url 'https://jitpack.io' }
 ##### 依赖引入
 ```
 dependencies {
-   // Kotlin
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
+   implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 
     //okhttp
     implementation 'com.squareup.okhttp3:okhttp:4.11.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.11.0'
-    // Retrofit 库build.gradle.kts
+    // Retrofit 库
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.google.code.gson:gson:2.9.0'
 
-    // Kotlin 协程库
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    //用于自定义返回:Flow<xxxxModel>这样的类型的，如果没有这样类型的，可以不用添加
+    implementation 'com.github.CMzhizhe:Retrofit-FlowCallAdapterFactory:v1.0.0'
+
+    // Kotlin
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
 
-    implementation 'com.github.CMzhizhe:Retrofit-FlowCallAdapterFactory:v1.0.0'
-    //如果自己不设计到加密，解密，可以加上下面这个
-    implementation 'com.github.CMzhizhe:NetWorkSdkKotlin:v1.0.6'
-}
-```
-##### 域名，intercept，factory配置
-```
-object WanAndroidMAFRequest : OnBaseApiServiceListener {
-    //配置域名
-    val REQUEST_URL_FIRST = "https://www.wanandroid.com/"
-    val mMobileRequest: MobileRequest = MobileRequest(this, ServiceDataTransform())
-    val mOkHttpManager: OkHttpManager = OkHttpManager.Builder()
-        .setRequestUrl(REQUEST_URL_FIRST) //必选，如果默认端口是80 或者 443 就不用额外添加
-        .setIsDebug(BuildConfig.DEBUG) //可选
-        .setOnFactoryListener(FactoryImpl()) //可选，默认已配置GsonFactory  FlowFactory
-        .setOnInterceptorListener(InterceptImpl())  //可选
-        .build()
- //自定义错误factory的构建，后面会介绍这块配置
-    val mErrorHandlerFactory = ErrorHandlerFactory()
-        .addErrorHandler(LoginErrorHandler())
-        .addErrorHandler(PayErrorHandler())
-        .addErrorHandler(TokenErrorHandler())
-        .addErrorHandler(UnErrorHandler())
-        .init()
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.4.1'
+    implementation "androidx.lifecycle:lifecycle-runtime:2.4.1"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
 
-    override fun onGetBaseApiService(): BaseApiService? {
-        return mOkHttpManager.getApi(REQUEST_URL_FIRST,BaseApiService::class.java)
-    }
+
+    implementation 'com.blankj:utilcodex:1.31.1'
 }
 ```
-这里有其他想说的，底层里面已经配置了GsonFactory、FlowFactory类型的转换。为啥我要说单独处理对于80或者443端口的呢，目的是为了有其他开发者直接修改此库，比如加密、解密的interceptor。域名A的加密/解密跟域名B的不同密匙不同，此时就需要开发者自己去根据域名获取密匙。以下是伪代码
+##### 配置拦截器，自定义错误，公共参数
 ```
-class OkHttpManager {
-    companion object{
-        private val mCatchMapRetrofit = mutableMapOf<String, Retrofit>()//存储OkHttpManager，key为baseUrl
-        private val mObj = Any()
-        val mSecreKey = mutableMapOf<String, String>()//key为baseUrl，value为密匙 key类似=http://www.baidu.com/
-    }
-}
+private val mInterceptor = mutableListOf<Interceptor>(SortInterceptor())
+OkHttpManager.Builder()
+            .setApplication(application)
+            .setShowHttpLog(true)
+            .setHttpConfig(HttpConfigModel(mHostUrl).apply {
+                //拦截器
+                onOkHttpInterceptorListener = object : OnOkHttpInterceptorListener {
+                    override fun normalInterceptors(): List<Interceptor> {
+                        //todo 可以在这里加解密等处理
+                        return mInterceptor
+                    }
+
+                    override fun netWorkInterceptors(): List<Interceptor> {
+                        return mutableListOf()
+                    }
+
+                }
+                //公共参数
+                onCommonParamsListener =  object : OnCommonParamsListener{
+                    override fun onCommonParams(): LinkedHashMap<String, Any> {
+                        return LinkedHashMap<String, Any>().apply {
+                            put("age","12")
+                            put("sexList", mutableListOf("female","male"))
+                        }
+                    }
+                }
+                //自定义错误
+                errorHandlerFactory = ErrorHandlerFactory.Builder()
+                    .addErrorHandler(LoginErrorHandler(),LoginApiException(ERROR_CODE_100.toString()))
+                    .addErrorHandler(PayErrorHandler(),PayApiException(ERROR_CODE_101.toString()))
+                    .addErrorHandler(TokenErrorHandler(),TokenApiException(ERROR_CODE_102.toString()))
+                    .setOnNetWorkErrorListener(this@WanAndroidMAFRequest)
+                    .setOnServiceCodeErrorHandleFinishListener(this@WanAndroidMAFRequest)
+                    .build()
+            })
+            .build()
 ```
-```
-//加密
-class EncryptionInterceptor : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = builder.build()
-        val httpUrl = request.url
-        httpUrl.host //www.baidu.com
-        httpUrl.port//9999
-        httpUrl.scheme//http
-        //http://www.baidu.com:9999/
-        val port = HttpUrl.defaultPort(httpUrl.scheme)
-        var url = ""
-        if (port == 80 || port == 443) {
-            url = "${httpUrl.scheme}://${httpUrl.host}/"
-        } else {
-            url = "${httpUrl.scheme}://${httpUrl.host}:${httpUrl.port}/"
-        }
-        val secreKey = OkHttpManager.mSecreKey[url]
-        //TODO 加密
-        return chain.proceed(builder.build())
-    }
-}
-```
+ 
+ 
 ##### 解析服务器提供的json
 需要自己new 一个类，去实现 OnResponseBodyTransformJsonListener
 ```
-class ServiceDataTransform : OnResponseBodyTransformJsonListener {
+open class ServiceDataTransform : OnResponseBodyTransformJsonListener {
     companion object {
         const val ERROR_CODE = "errorCode"
         const val DATA = "data"
         const val ERROR_CODE_TYPE_0 = "0"//与服务器协商的正常状态
-        const val ERROR_CODE_TYPE_101 = "101"//与服务器协商错误的逻辑
-        const val ERROR_CODE_TYPE_102 = "102"//与服务器协商错误的逻辑
-        const val ERROR_CODE_TYPE_103 = "103"//与服务器协商错误的逻辑
     }
 
+    /**
+     * @author gaoxiaoxiong
+     * @date 创建时间: 2023/8/12/012
+     * @description
+     * @param jsString 服务器提供的根json
+     * @param method 域名+端口+接口名称
+     **/
     override fun onResponseBodyTransformJson(
         method: String,
         jsString: String
     ): OnIParserListener {
         val baseBean: BaseBean
-        if (JsonParser.parseString(jsString).isJsonObject) {//服务器提供的是jsonObject
-            val jsonObject = JsonParser.parseString(jsString).asJsonObject
+
+        if (jsString.isEmpty()){
+            throw RootJsonEmptyApiException()
+        }
+
+        val jsElement = JsonParser.parseString(jsString)
+
+        if (jsElement.isJsonObject) {//服务器提供的是jsonObject
+            val jsonObject = jsElement.asJsonObject
             val errorCode = jsonObject.get(ERROR_CODE).asInt
+
             baseBean = if (errorCode.toString() == ERROR_CODE_TYPE_0) {
                 if (jsonObject.get(DATA).isJsonArray) {
-                    BaseBean(method, jsString, jsonObject.getAsJsonArray(DATA), errorCode)
+                    BaseBean(method, jsString, jsonObject.getAsJsonArray(DATA), errorCode.toString(),"")
                 } else {
-                    BaseBean(method, jsString, jsonObject.getAsJsonObject(DATA), errorCode)
+                    BaseBean(method, jsString, jsonObject.getAsJsonObject(DATA), errorCode.toString(),"")
                 }
-            } else {//与服务器协商的异常逻辑
-                // 可以在这里抛异常
-                if (errorCode.toString() == ERROR_CODE_TYPE_101) {
-                    throw LoginApiException(errorCode.toString(), jsString, "登陆的异常")
-                } else if (errorCode.toString() == ERROR_CODE_TYPE_102) {
-                    throw PayApiException(errorCode.toString(), jsString, "支付的异常")
-                } else if (errorCode.toString() == ERROR_CODE_TYPE_103) {
-                    throw TokenApiException(errorCode.toString(), jsString, "token的异常")
-                } else {
-                    throw UnApiException(errorCode.toString(), jsString, "未跟服务器定义的异常")
+            } else {
+                //与服务器协商的异常逻辑
+                // 可以在这里抛异常，比如服务器有提供code = 201，那么可以抛出属于201的异常错误
+               val baseUrl = Utils.getBaseUrlByMethod(method)
+               val errorHandlerFactory = OkHttpManager.getRetrofitAndConfigModel(baseUrl)?.httpConfigModel?.errorHandlerFactory
+                if (errorHandlerFactory!=null){
+                    for (serviceErrorApiException in errorHandlerFactory.getServiceErrorApiExceptions()) {
+                        if (serviceErrorApiException.code == errorCode.toString()){
+                            serviceErrorApiException.jsString = jsString
+                            serviceErrorApiException.errorMessage = "这里可以写错误的信息"
+                            throw serviceErrorApiException
+                        }
+                    }
                 }
+               //未设置任何异常错误信息
+                throw UnApiException(errorCode.toString(), jsString)
             }
         } else {
-            baseBean = BaseBean(method, jsString, null, -1)
+            //理论上这是永远不会触发的
+            baseBean = BaseBean(method, jsString, jsElement, "-1","")
         }
         return baseBean
     }
@@ -177,51 +181,34 @@ class ServiceDataTransform : OnResponseBodyTransformJsonListener {
 ##### 自定义BaseBean
 自己创建一个class文件去实现OnIParserListener接口
 ```
-{
-  errorCode:0
-  data:{}
-  msg:"ok"
-}
-class BaseBean( var resourceJsonString: String? = null,
+class BaseBean(var method: String? = null,
+               var resourceJsonString: String? = null,
                var jsonElement: JsonElement? = null,
-               var errorCode:Int) : OnIParserListener {
-    //这里是获取data里面的 JsonElement
+               var errorCode:String,msg:String="") : OnIParserListener {
     override fun resultDataJsonElement(): JsonElement? {
         return jsonElement
     }
-    //这个是整个服务器提供的json格式
+
     override fun sourceJsonString(): String? {
         return resourceJsonString;
     }
-    //这里是决定，是否服务器返回的正常数据
+
     override fun isSuccess(): Boolean {
-        return errorCode == 0
+        return errorCode == ERROR_CODE_TYPE_0.toString()
     }
 }
 ```
 ##### 解析data里面的数据，统一错误处理，回传业务层成功与失败
 我们在发起网络请求的时候是这样的，new DataParseSuFaCall 传递需要的具体格式
 ```
-viewModelScope.launch{
-            val map = mutableMapOf<String,Any>()
-            map["userId"] = "1"
-            WanAndroidMAFRequest.getRequest("banner/json",map,object :
-                DataParseSuFaCall<MutableList<Banner>>() {
-                override fun onRequestDataSuccess(data: MutableList<Banner>?) {//成功回调
-                    super.onRequestDataSuccess(data)
-                }
-                override fun onRequestBaseBeanFail(baseBean: BaseBean?) {//失败回调
-                    super.onRequestBaseBeanFail(baseBean)
-                }
-            })
-        }
-
 /**
  * @date 创建时间: 2023/7/22
  * @auther gaoxiaoxiong
  * @description 服务器数据处理
  **/
-open class DataParseSuFaCall<T> : AbsRequestResultImpl() {
+open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailListener {
+    private val TAG = "DataParseSuFaCall"
+
     /**
      * @date 创建时间: 2023/7/23
      * @auther gaoxiaoxiong
@@ -237,13 +224,14 @@ open class DataParseSuFaCall<T> : AbsRequestResultImpl() {
             try {
                 val parameterizedType = this::class.java.genericSuperclass as ParameterizedType
                 val subType =  parameterizedType.actualTypeArguments.first() //获取泛型T
-                val adapter: JsonAdapter<Any> = MoshiUtil.moshi.adapter(subType)
-                result = adapter.fromJson(targetElement.toString())
+                result = GsonUtils.fromJson(targetElement?.toString(),subType)
             } catch (e: Exception) {
                 e.printStackTrace()
                 //处理解析异常
-                onRequestFail(e,"","解析异常", null,onIParserListener)
+                onRequestFail(method,e,"","解析异常", null,onIParserListener)
+                return
             }
+
             onRequestDataSuccess(if (result == null) null else result as T)
             onRequestBaseBeanSuccess(if (result == null) null else result as T,
                 onIParserListener as BaseBean
@@ -260,6 +248,7 @@ open class DataParseSuFaCall<T> : AbsRequestResultImpl() {
      * @description 失败接口的调用
      **/
     override fun onRequestFail(
+        method: String,
         throwable: Throwable?,
         status: String?,
         failMsg: String?,
@@ -267,17 +256,21 @@ open class DataParseSuFaCall<T> : AbsRequestResultImpl() {
         onIParserListener: OnIParserListener?
     ) {
         if (throwable!=null){
-            val resPoneThrowable = WanAndroidMAFRequest.mErrorHandlerFactory.netWorkException(throwable)
-            //自定义解析错误处理，这里是处理，你跟服务器之间定义好的错误信息
-            if (resPoneThrowable.code == ExceptionHandle.ERROR.UNKNOWN.toString() && throwable is AbsApiException){
-WanAndroidMAFRequest.mErrorHandlerFactory.rollGateError(WanAndroidMAFRequest.mErrorHandlerFactory.getErrorHandlers().first(),throwable)
+            val baseUrl = Utils.getBaseUrlByMethod(method)
+            val cacheHandler = OkHttpManager.getRetrofitAndConfigModel(baseUrl)?.httpConfigModel?.errorHandlerFactory
+            if (cacheHandler!=null){
+                if (throwable is AbsApiException){//处理服务器的异常
+                    cacheHandler.rollServiceCodeGateError(cacheHandler.getServiceErrorHandlers().first(),throwable)
+                }else{//处理网络异常
+                    cacheHandler.netWorkException(throwable)
+                }
             }
         }
         onRequestDataFail(status?:"", failMsg?:"", onIParserListener as BaseBean?)
         onRequestBaseBeanFail(onIParserListener as BaseBean? )
     }
 
-      /**
+    /**
      * @author gaoxiaoxiong
      * @date 创建时间: 2023/8/6/006
      * @description  请求失败
@@ -290,6 +283,7 @@ WanAndroidMAFRequest.mErrorHandlerFactory.rollGateError(WanAndroidMAFRequest.mEr
        * @description  请求失败
        **/
     open fun onRequestBaseBeanFail(baseBean: BaseBean?=null) {}
+
 
     /**
      * @author gaoxiaoxiong
