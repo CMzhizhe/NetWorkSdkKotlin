@@ -5,12 +5,13 @@ plugins {
 
 android {
     namespace 'com.gxx.neworklibrary'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 21
-        targetSdk 33
-
+        targetSdk 34
+        versionCode 107
+        versionName "1.0.7"
         consumerProguardFiles "consumer-rules.pro"
     }
 
@@ -20,10 +21,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -57,10 +60,5 @@ dependencies {
 
     //util工具类
     implementation 'com.blankj:utilcodex:1.31.1'
-    //startup
-    //implementation("androidx.startup:startup-runtime:1.1.1")
-    //implementation 'com.github.CMzhizhe:Retrofit-FlowCallAdapterFactory:v1.0.0'
-    //https://github.com/Blankj/AndroidUtilCode/blob/master/lib/utilcode/README-CN.md
-    //
-    //implementation 'com.squareup.moshi:moshi-kotlin:1.14.0'
+
 }

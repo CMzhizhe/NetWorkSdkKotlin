@@ -9,8 +9,6 @@ class Constant {
         const val ERROR_NO_NET_WORK = -98//无网络
         const val ERROR_UN_ERROR = -99//没有定义错误类型
 
-        const val ERROR_CUSTOMER_ERROR_1001 = 1001//自定义错误
-
         const val APPLICATION_JSON_UTF8 = "application/json; charset=UTF-8"
     }
 }
