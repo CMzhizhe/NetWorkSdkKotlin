@@ -68,6 +68,9 @@ dependencies {
 
 
     implementation 'com.blankj:utilcodex:1.31.1'
+
+
+    implementation 'com.github.CMzhizhe:NetWorkSdkKotlin:v1.0.7		'
 }
 ```
 ##### 配置拦截器，自定义错误，公共参数
