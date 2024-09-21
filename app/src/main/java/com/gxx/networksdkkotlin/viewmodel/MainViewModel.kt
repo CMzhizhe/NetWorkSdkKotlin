@@ -30,7 +30,7 @@ class MainViewModel: ViewModel() {
                 "banner/json",
                 BannerRequestModel(
                     "123", mutableListOf("11","18")
-                ),null,object :
+                ),serviceDataParseCall = object :
                     ServiceDataParseCall<MutableList<Banner>>() {
                     override suspend fun onRequestBaseBeanSuccess(
                         data: MutableList<Banner>?,

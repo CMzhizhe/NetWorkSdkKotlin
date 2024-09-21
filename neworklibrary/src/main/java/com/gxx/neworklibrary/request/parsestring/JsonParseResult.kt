@@ -22,7 +22,7 @@ class JsonParseResult() {
      * @param onRequestFailListener 失败回调
      * @param onRequestSuccessListener 成功回调
      **/
-  suspend  fun doIParseResult(
+  suspend fun doIParseResult(
         method: String,
         emResultType: EmResultType,
         listener: OnIParserListener,
@@ -33,7 +33,7 @@ class JsonParseResult() {
             if (listener.isSuccess()){
                 onRequestSuccessListener?.onRequestSuccess(method, listener.resultDataJsonElement(), listener)
             }else{
-                onRequestFailListener?.onRequestFail(method,null, null, null, null, listener)
+                onRequestFailListener?.onRequestFail(method = method, onIParserListener = listener)
             }
         } else {
             if (listener.isSuccess()) {
@@ -44,19 +44,19 @@ class JsonParseResult() {
                         if (listener.resultDataJsonElement() is JsonObject) {
                             onRequestSuccessListener?.onRequestSuccess(method, listener.resultDataJsonElement(), listener)
                         } else {
-                            onRequestFailListener?.onRequestFail(method,null, null, null, null, listener)
+                            onRequestFailListener?.onRequestFail(method,  onIParserListener =listener)
                         }
                     } else if (emResultType == EmResultType.REQUEST_RESULT_ARRAY) {//希望拿到数组
                         if (listener.resultDataJsonElement() is JsonArray) {
                             onRequestSuccessListener?.onRequestSuccess(method, listener.resultDataJsonElement(), listener)
                         } else {
-                            onRequestFailListener?.onRequestFail(method,null, null, null, null, listener
+                            onRequestFailListener?.onRequestFail(method =method, onIParserListener = listener
                             )
                         }
                     }
                 }
             } else {//失败处理
-                onRequestFailListener?.onRequestFail(method,null, null, null, null, listener)
+                onRequestFailListener?.onRequestFail(method =method , onIParserListener =listener)
             }
         }
     }

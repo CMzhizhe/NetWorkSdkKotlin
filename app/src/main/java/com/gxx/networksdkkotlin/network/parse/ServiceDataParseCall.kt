@@ -17,7 +17,7 @@ import java.lang.reflect.ParameterizedType
  * @description 服务器数据处理
  **/
 open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailListener {
-    private val TAG = "DataParseSuFaCall"
+    private val TAG = "ServiceDataParseCall"
 
     /**
      * @date 创建时间: 2023/7/23
@@ -30,52 +30,39 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
         onIParserListener: OnIParserListener
     ) {
         if (targetElement!=null){
-            var result:Any?=null
             try {
                 val parameterizedType = this::class.java.genericSuperclass as ParameterizedType
                 val subType =  parameterizedType.actualTypeArguments.first() //获取泛型T
-                result = GsonUtils.fromJson(targetElement.toString(),subType)
+                val result:Any? = GsonUtils.fromJson(targetElement.toString(),subType)
+                onRequestBaseBeanSuccess(if (result == null) null else result as T, onIParserListener as BaseBean)
             } catch (e: Exception) {
                 e.printStackTrace()
-                //处理解析异常
-                onRequestFail(method,e,"","解析异常", null,onIParserListener)
-                return
+                onRequestFail(method,e,onIParserListener)
             }
-
-            onRequestBaseBeanSuccess(if (result == null) null else result as T,
-                onIParserListener as BaseBean
-            )
         }else{
             onRequestBaseBeanSuccess(null, onIParserListener as BaseBean)
         }
     }
 
-    /**
-     * @date 创建时间: 2023/7/23
-     * @auther gaoxiaoxiong
-     * @description 失败接口的调用
-     **/
+
+
     override suspend fun onRequestFail(
         method: String,
-        throwable: Throwable?,
-        status: String?,
-        failMsg: String?,
-        errorJsonString: String?,
+        exception: Throwable?,
         onIParserListener: OnIParserListener?
     ) {
-        if (throwable!=null){
+        if (exception!=null){
             val baseUrl = Utils.getBaseUrlByMethod(method)
             val cacheHandler = OkHttpManager.getRetrofitAndConfigModel(baseUrl)?.httpConfigModel?.errorHandlerFactory
             if (cacheHandler!=null){
-                if (throwable is AbsApiException){//处理服务器的异常
-                    cacheHandler.rollServiceCodeGateError(cacheHandler.getServiceErrorHandlers().first(),throwable)
+                if (exception is AbsApiException){//处理服务器的异常
+                    cacheHandler.rollServiceCodeGateError(cacheHandler.getServiceErrorHandlers().first(),exception)
                 }else{//处理网络异常
-                    cacheHandler.netWorkException(throwable)
+                    cacheHandler.netWorkException(exception)
                 }
             }
         }
-        onRequestDataFail(status?:"", failMsg?:"", onIParserListener as BaseBean?)
-
+        onRequestDataFail(onIParserListener as BaseBean?)
     }
 
     /**
@@ -83,7 +70,7 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
      * @date 创建时间: 2023/8/6/006
      * @description  请求失败
      **/
-    open suspend fun onRequestDataFail(code: String, msg: String, baseBean: BaseBean?=null) {}
+    open suspend fun onRequestDataFail(baseBean: BaseBean?=null) {}
 
 
 
@@ -94,4 +81,5 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
     * 返回含有 BaseBean 的
     **/
     open suspend fun onRequestBaseBeanSuccess(data: T?, baseBean: BaseBean) {}
+
 }

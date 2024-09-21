@@ -8,6 +8,7 @@ class BaseBean(var method: String? = null,
                var resourceJsonString: String? = null,
                var jsonElement: JsonElement? = null,
                var errorCode:String,msg:String="") : OnIParserListener {
+
     override fun resultDataJsonElement(): JsonElement? {
         return jsonElement
     }

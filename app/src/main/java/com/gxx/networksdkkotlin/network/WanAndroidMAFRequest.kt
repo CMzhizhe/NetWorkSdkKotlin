@@ -15,11 +15,11 @@ import com.gxx.networksdkkotlin.network.error.handler.LoginErrorHandler
 import com.gxx.networksdkkotlin.network.error.handler.PayErrorHandler
 import com.gxx.networksdkkotlin.network.error.handler.TokenErrorHandler
 import com.gxx.networksdkkotlin.network.interceptor.SortInterceptor
+import com.gxx.networksdkkotlin.network.parse.ServiceDataParseCall
 import com.gxx.networksdkkotlin.network.transform.ServiceDataTransform
 import com.gxx.networksdkkotlin.util.AssetsHttpConfigRead
 import com.gxx.neworklibrary.BuildConfig
 import com.gxx.neworklibrary.OkHttpManager
-import com.gxx.networksdkkotlin.network.parse.ServiceDataParseCall
 import com.gxx.neworklibrary.constans.EmResultType
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.NetWorkExceptionHandle
@@ -30,8 +30,6 @@ import com.gxx.neworklibrary.model.HttpConfigModel
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.MobileRequest
 import com.gxx.neworklibrary.request.parsestring.JsonParseResult
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
 import okhttp3.Interceptor
 import org.json.JSONObject
 
@@ -43,7 +41,8 @@ import org.json.JSONObject
 object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinishListener,
     ErrorHandlerFactory.OnNetWorkErrorListener {
     val TAG = "WanAndroidMAFRequest"
-    val mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
+    private val mJsonParseResult = JsonParseResult()
+    private val mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
     private val mInterceptor = mutableListOf<Interceptor>(SortInterceptor())
     var mHostUrl = ""
 
@@ -97,6 +96,33 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
             .build()
     }
 
+    /**
+     * @date 创建时间: 2023/8/7
+     * @auther gxx
+     * 自定义api请求的Demo
+     **/
+    suspend fun <T> readBannerJson(serviceDataParseCall: ServiceDataParseCall<T>) {
+        val api = OkHttpManager.getApi(mHostUrl, CustomApiService::class.java)
+        val url = "${mHostUrl}banner/json"
+        val responseBody = api?.readBook(url, mutableMapOf())
+        mMobileRequest.responseBodyTransformJson(
+            mHostUrl,
+            "banner/json",
+            responseBody,
+            serviceDataParseCall
+        ).collect {
+            if (it == null) {
+                return@collect
+            }
+            mJsonParseResult.doIParseResult(
+                "${mHostUrl}banner/json",
+                EmResultType.REQUEST_RESULT_OWN,
+                listener = it,
+                serviceDataParseCall,
+                serviceDataParseCall
+            )
+        }
+    }
 
 
     suspend fun <T> postRequest(
@@ -135,39 +161,6 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
         )
     }
 
-
-
-
-
-    private val mJsonParseResult = JsonParseResult()
-
-    /**
-     * @date 创建时间: 2023/8/7
-     * @auther gxx
-     * 自定义api请求的Demo
-     **/
-    suspend fun <T> readBannerJson(serviceDataParseCall: ServiceDataParseCall<T>) {
-        val api = OkHttpManager.getApi(mHostUrl, CustomApiService::class.java)
-        val url = "${mHostUrl}banner/json"
-        val responseBody = api?.readBook(url, mutableMapOf())
-        mMobileRequest.responseBodyTransformJson(
-            mHostUrl,
-            "banner/json",
-            responseBody,
-            serviceDataParseCall
-        ).collect {
-            if (it == null) {
-                return@collect
-            }
-            mJsonParseResult.doIParseResult(
-                "${mHostUrl}banner/json",
-                EmResultType.REQUEST_RESULT_OWN,
-                listener = it,
-                serviceDataParseCall,
-                serviceDataParseCall
-            )
-        }
-    }
 
     override fun onNetWorkError(throwable: NetWorkExceptionHandle.ResponeThrowable) {
         if(BuildConfig.DEBUG){

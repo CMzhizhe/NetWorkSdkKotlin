@@ -64,7 +64,7 @@ abstract class AbsRequest(
 
         if (!NetWorkUtil.isNetConnected()) {
             if (currentCoroutineContext().isActive){
-                onRequestFailListener?.onRequestFail("${rqParamModel.hostUrl}${rqParamModel.funName}",NoNetWorkApiException())
+                onRequestFailListener?.onRequestFail(method = "${rqParamModel.hostUrl}${rqParamModel.funName}", exception = NoNetWorkApiException())
             }
             return
         }
@@ -88,8 +88,6 @@ abstract class AbsRequest(
             //最终将公共参数与业务参数进行集合转成一个map
             linkedHashMap = GsonUtils.fromJson(jsonObject.toString(),object : TypeToken<LinkedHashMap<String, Any>>() {}.type)
         }
-
-
 
         doComposeMapRequest(
             rqParamModel.hostUrl,
@@ -183,12 +181,8 @@ abstract class AbsRequest(
             it.printStackTrace()
             if (currentCoroutineContext().isActive){
                 onRequestFailListener?.onRequestFail(
-                    method,
-                    it,
-                    null,
-                    null,
-                    null,
-                    null
+                    method = method,
+                    exception = it
                 )
             }
         }
@@ -231,10 +225,6 @@ abstract class AbsRequest(
                     onRequestFailListener?.onRequestFail(
                         method,
                         it,
-                        null,
-                        null,
-                        null,
-                        null
                     )
                 }
             }.flowOn(Dispatchers.Default)
