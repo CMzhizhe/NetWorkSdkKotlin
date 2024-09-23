@@ -4,6 +4,10 @@ package com.gxx.neworklibrary.error.factory
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.error.exception.NetWorkExceptionHandle
 import com.gxx.neworklibrary.error.impl.*
+import com.gxx.neworklibrary.error.impl.handler.NoNetErrorHandler
+import com.gxx.neworklibrary.error.impl.handler.ParamsHandler
+import com.gxx.neworklibrary.error.impl.handler.RootJsonEmptyErrorHandler
+import com.gxx.neworklibrary.error.impl.handler.UnErrorHandler
 import com.gxx.neworklibrary.inter.OnErrorHandler
 import com.gxx.neworklibrary.model.ErrorHandlerApiModel
 
@@ -21,6 +25,10 @@ class ErrorHandlerFactory {
             mServiceErrorApiExceptions.add(serviceErrorModel.absApiException)
         }
 
+        //添加参数错误异常
+        mServiceErrorHandlers.add(ParamsHandler())
+        mServiceErrorApiExceptions.add(ParamsApiException())
+
         //添加rootJson解析错误
         mServiceErrorHandlers.add(RootJsonEmptyErrorHandler())
         mServiceErrorApiExceptions.add(RootJsonEmptyApiException())
@@ -32,6 +40,7 @@ class ErrorHandlerFactory {
         //添加未定义异常
         mServiceErrorHandlers.add(UnErrorHandler())
         mServiceErrorApiExceptions.add(UnApiException())
+
 
         mServiceErrorHandlers.reduceRight { left, right ->
             left.apply {

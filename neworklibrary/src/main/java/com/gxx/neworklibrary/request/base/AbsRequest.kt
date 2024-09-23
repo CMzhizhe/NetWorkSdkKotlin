@@ -8,6 +8,7 @@ import com.gxx.neworklibrary.OkHttpManager
 import com.gxx.neworklibrary.apiservice.BaseApiService
 import com.gxx.neworklibrary.constans.EmRequestType
 import com.gxx.neworklibrary.error.impl.NoNetWorkApiException
+import com.gxx.neworklibrary.error.impl.ParamsApiException
 import com.gxx.neworklibrary.inter.*
 import com.gxx.neworklibrary.model.RqParamModel
 import com.gxx.neworklibrary.request.parsestring.JsonParseResult
@@ -51,15 +52,15 @@ abstract class AbsRequest(
         onRequestFailListener: OnRequestFailListener?
     ) {
         if (rqParamModel.hostUrl.isEmpty()) {
-            throw IllegalStateException("hostUrl 是空的")
+            throw ParamsApiException(errorMessage = "hostUrl 是空的")
         }
 
         if (rqParamModel.funName.isEmpty()) {
-            throw IllegalStateException("funName 是空的")
+            throw ParamsApiException(errorMessage = "funName 是空的")
         }
 
         if (OkHttpManager.getRetrofitAndConfigModel(hostUrl = rqParamModel.hostUrl) == null) {
-            throw IllegalStateException("请调用setHttpConfig")
+            throw ParamsApiException(errorMessage = "请调用setHttpConfig")
         }
 
         if (!NetWorkUtil.isNetConnected()) {
@@ -71,7 +72,7 @@ abstract class AbsRequest(
 
         //检查传递的类型是否为 jsonObject
         if (!rqParamModel.jsonBodyModel.isNullOrEmpty() && !Utils.isJsonObject(rqParamModel.jsonBodyModel)){
-            throw IllegalStateException("传递的类型，不是jsonObject，你需要将model，转成jsonObject，请调用 GsonUtils.toJson()")
+            throw ParamsApiException(errorMessage = "传递的类型，不是jsonObject，你需要将model，转成jsonObject，请调用 GsonUtils.toJson()")
         }
 
 

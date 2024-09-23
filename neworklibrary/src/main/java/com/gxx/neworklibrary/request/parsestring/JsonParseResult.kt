@@ -50,13 +50,13 @@ class JsonParseResult() {
                         if (listener.resultDataJsonElement() is JsonArray) {
                             onRequestSuccessListener?.onRequestSuccess(method, listener.resultDataJsonElement(), listener)
                         } else {
-                            onRequestFailListener?.onRequestFail(method =method, onIParserListener = listener
+                            onRequestFailListener?.onRequestFail(method = method, onIParserListener = listener
                             )
                         }
                     }
                 }
             } else {//失败处理
-                onRequestFailListener?.onRequestFail(method =method , onIParserListener =listener)
+                onRequestFailListener?.onRequestFail(method = method , onIParserListener =listener)
             }
         }
     }
