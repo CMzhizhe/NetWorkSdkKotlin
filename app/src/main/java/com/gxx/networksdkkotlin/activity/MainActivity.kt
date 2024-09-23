@@ -14,7 +14,6 @@ import com.gxx.networksdkkotlin.R
 import com.gxx.networksdkkotlin.viewmodel.MainViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlin.coroutines.resume
 
 class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
@@ -23,12 +22,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         this.findViewById<Button>(R.id.bt_net_work_start).setOnClickListener {
-            mMainViewModel.readBanner()
-            lifecycleScope.launch {
-               val list = mMainViewModel.methodReturn()
-                Log.d(TAG,"第一条数据=${Gson().toJson(list.first())}")
-            }
-
             lifecycleScope.launch{
                 //合并请求
                 val deffer1 =  async {

@@ -1,7 +1,10 @@
 package com.gxx.networksdkkotlin.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.blankj.utilcode.util.GsonUtils
+import com.gxx.networksdkkotlin.BuildConfig
 import com.gxx.networksdkkotlin.bean.BannerRequestModel
 import com.gxx.networksdkkotlin.bean.BaseBean
 import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
@@ -24,25 +27,24 @@ class MainViewModel: ViewModel() {
       * @auther gxx
       * @description 发起网络请求
       **/
-    fun readBanner(){
+    fun readBanner() {
         viewModelScope.launch {
-            WanAndroidMAFRequest.postRequest(
+            WanAndroidMAFRequest.postRequest<MutableList<Banner>>(
                 "banner/json",
-                BannerRequestModel(
-                    "123", mutableListOf("11","18")
-                ),serviceDataParseCall = object :
-                    ServiceDataParseCall<MutableList<Banner>>() {
-                    override suspend fun onRequestBaseBeanSuccess(
-                        data: MutableList<Banner>?,
-                        baseBean: BaseBean
-                    ) {
-                        super.onRequestBaseBeanSuccess(data, baseBean)
-                        if (data!=null){
-                            _bannerShareFlow.emit(data!!)
-                        }
+                BannerRequestModel("123", mutableListOf("11", "18")),
+                urlMap = null,
+                success = { list, baseBean ->
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "list---->${list}");
+                        Log.d(TAG, "baseBean---->${GsonUtils.toJson(baseBean)}");
                     }
-                }
-            )
+                    if (list != null) {
+                        _bannerShareFlow.emit(list)
+                    }
+                },
+                fail = {
+
+                })
         }
     }
 
@@ -53,17 +55,17 @@ class MainViewModel: ViewModel() {
      * @date 创建时间: 2023/8/12/012
      * @description  method方法返回
      **/
-   suspend fun methodReturn():MutableList<Banner>{
-        return suspendCoroutine {coroutine->
-            viewModelScope.launch{
-                WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(),object :
+    suspend fun methodReturn(): MutableList<Banner> {
+        return suspendCoroutine { coroutine ->
+            viewModelScope.launch {
+                WanAndroidMAFRequest.getRequest("banner/json", mutableMapOf(), object :
                     ServiceDataParseCall<MutableList<Banner>>() {
                     override suspend fun onRequestBaseBeanSuccess(
                         data: MutableList<Banner>?,
                         baseBean: BaseBean
                     ) {
                         super.onRequestBaseBeanSuccess(data, baseBean)
-                        if (data!=null){
+                        if (data != null) {
                             coroutine.resume(data)
                         }
                     }
@@ -71,6 +73,4 @@ class MainViewModel: ViewModel() {
             }
         }
     }
-
-
 }

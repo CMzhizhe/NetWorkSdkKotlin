@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.blankj.utilcode.util.GsonUtils
 import com.gxx.networksdkkotlin.MyApplication.Companion.HTTP_NAME
+import com.gxx.networksdkkotlin.bean.BaseBean
 import com.gxx.networksdkkotlin.network.api.CustomApiService
 import com.gxx.networksdkkotlin.network.constant.Constant.Companion.ERROR_CODE_100
 import com.gxx.networksdkkotlin.network.constant.Constant.Companion.ERROR_CODE_101
@@ -128,9 +129,23 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
     suspend fun <T> postRequest(
         funName: String,
         model:Any,
-        urlMap: Map<String, Any>? = mutableMapOf(),
-        serviceDataParseCall: ServiceDataParseCall<T>?
+        urlMap: Map<String, Any>?,
+        success:suspend (data:T?,baseBean: BaseBean)->Unit,
+        fail:suspend (baseBean: BaseBean?)->Unit
     ){
+
+        val serviceDataParseCall: ServiceDataParseCall<T> = object :ServiceDataParseCall<T>(){
+            override suspend fun onRequestBaseBeanSuccess(data: T?, baseBean: BaseBean) {
+                super.onRequestBaseBeanSuccess(data, baseBean)
+                success(data,baseBean)
+            }
+
+            override suspend fun onRequestDataFail(baseBean: BaseBean?) {
+                fail(baseBean)
+            }
+        }
+
+
         mMobileRequest.postBody(
             RqParamModel(
                 hostUrl = mHostUrl ,
@@ -139,6 +154,8 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
                 urlMap = urlMap
             ), serviceDataParseCall, serviceDataParseCall
         )
+
+
     }
 
     /**
