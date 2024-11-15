@@ -220,7 +220,7 @@ abstract class AbsRequest(
                 emit(responseBody.string())
             }.transform<String, OnIParserListener?> {
                 emit(mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, it))
-            }.catch {
+            }.flowOn(Dispatchers.Default).catch {
                 it.printStackTrace()
                 if (currentCoroutineContext().isActive){
                     onRequestFailListener?.onRequestFail(
@@ -228,7 +228,7 @@ abstract class AbsRequest(
                         it,
                     )
                 }
-            }.flowOn(Dispatchers.Default)
+            }
         }
     }
 
