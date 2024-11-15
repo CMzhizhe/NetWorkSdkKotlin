@@ -125,6 +125,38 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
         }
     }
 
+    suspend fun <T> postRequestV2(
+        funName: String,
+        model:Any,
+        urlMap: Map<String, Any>?,
+        success: (data:T?,baseBean: BaseBean)->Unit,
+        fail: (baseBean: BaseBean?)->Unit
+    ){
+
+        val serviceDataParseCall: ServiceDataParseCall<T> = object :ServiceDataParseCall<T>(){
+            override suspend fun onRequestBaseBeanSuccess(data: T?, baseBean: BaseBean) {
+                super.onRequestBaseBeanSuccess(data, baseBean)
+                success(data,baseBean)
+            }
+
+            override suspend fun onRequestDataFail(baseBean: BaseBean?) {
+                fail(baseBean)
+            }
+        }
+
+
+        mMobileRequest.postBody(
+            RqParamModel(
+                hostUrl = mHostUrl ,
+                funName = funName,
+                jsonBodyModel = GsonUtils.toJson(model),
+                urlMap = urlMap
+            ), serviceDataParseCall, serviceDataParseCall
+        )
+
+
+    }
+
 
     suspend fun <T> postRequest(
         funName: String,
