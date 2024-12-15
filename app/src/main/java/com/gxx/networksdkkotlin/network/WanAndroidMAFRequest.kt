@@ -29,6 +29,7 @@ import com.gxx.neworklibrary.inter.OnCommonParamsListener
 import com.gxx.neworklibrary.inter.OnOkHttpInterceptorListener
 import com.gxx.neworklibrary.model.HttpConfigModel
 import com.gxx.neworklibrary.model.RqParamModel
+import com.gxx.neworklibrary.request.JavaSyncRequest
 import com.gxx.neworklibrary.request.MobileRequest
 import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import okhttp3.Interceptor
@@ -44,6 +45,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
     val TAG = "WanAndroidMAFRequest"
     private val mJsonParseResult = JsonParseResult()
     private val mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
+    private val mJavaSyncRequest = JavaSyncRequest(ServiceDataTransform())
     private val mInterceptor = mutableListOf<Interceptor>(SortInterceptor())
     var mHostUrl = ""
 
@@ -96,6 +98,8 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
             })
             .build()
     }
+
+
 
     /**
      * @date 创建时间: 2023/8/7
@@ -208,6 +212,25 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
                 urlMap = urlMap
             ), serviceDataParseCall, serviceDataParseCall
         )
+    }
+
+
+    /**
+     * @date 创建时间: 2023/7/22
+     * @auther gaoxiaoxiong
+     * @description get 请求
+     **/
+    suspend fun <T>javaSyncGetRequest(
+        funName: String,
+        urlMap: Map<String, Any> = mutableMapOf(),
+        serviceDataParseCall: ServiceDataParseCall<T>
+    ) {
+        mJavaSyncRequest.getSync(RqParamModel(
+            hostUrl = mHostUrl ,
+            funName = funName,
+            null,
+            urlMap = urlMap
+        ), serviceDataParseCall, serviceDataParseCall)
     }
 
 

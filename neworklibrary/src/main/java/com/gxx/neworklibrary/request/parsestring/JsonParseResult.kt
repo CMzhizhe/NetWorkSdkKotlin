@@ -4,6 +4,8 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.gxx.neworklibrary.constans.EmResultType
 import com.gxx.neworklibrary.inter.OnIParserListener
+import com.gxx.neworklibrary.inter.OnJavaRequestFailListener
+import com.gxx.neworklibrary.inter.OnJavaRequestSuccessListener
 import com.gxx.neworklibrary.inter.OnRequestFailListener
 import com.gxx.neworklibrary.inter.OnRequestSuccessListener
 
@@ -13,6 +15,46 @@ import com.gxx.neworklibrary.inter.OnRequestSuccessListener
  * @description json 结果处理
  **/
 class JsonParseResult() {
+
+   fun javaDoIParseResult(  method: String,
+                            emResultType: EmResultType,
+                            listener: OnIParserListener,
+                            onJavaRequestSuccessListener: OnJavaRequestSuccessListener?,
+                            onJavaRequestFailListener: OnJavaRequestFailListener?
+                            ){
+       if (emResultType == EmResultType.REQUEST_RESULT_OWN) {//自己处理
+           if (listener.isSuccess()){
+               onJavaRequestSuccessListener?.onJavaRequestSuccess(method, listener.resultDataJsonElement(), listener)
+           }else{
+               onJavaRequestFailListener?.onJavaRequestFail(method = method, onIParserListener = listener)
+           }
+       } else {
+           if (listener.isSuccess()) {
+               if (listener.resultDataJsonElement() == null) {
+                   onJavaRequestSuccessListener?.onJavaRequestSuccess(method, null, listener)
+               } else {
+                   if (emResultType == EmResultType.REQUEST_RESULT_OBJECT) {//希望拿到对象
+                       if (listener.resultDataJsonElement() is JsonObject) {
+                           onJavaRequestSuccessListener?.onJavaRequestSuccess(method, listener.resultDataJsonElement(), listener)
+                       } else {
+                           onJavaRequestFailListener?.onJavaRequestFail(method,  onIParserListener =listener)
+                       }
+                   } else if (emResultType == EmResultType.REQUEST_RESULT_ARRAY) {//希望拿到数组
+                       if (listener.resultDataJsonElement() is JsonArray) {
+                           onJavaRequestSuccessListener?.onJavaRequestSuccess(method, listener.resultDataJsonElement(), listener)
+                       } else {
+                           onJavaRequestFailListener?.onJavaRequestFail(method = method, onIParserListener = listener
+                           )
+                       }
+                   }
+               }
+           } else {//失败处理
+               onJavaRequestFailListener?.onJavaRequestFail(method = method , onIParserListener =listener)
+           }
+       }
+   }
+
+
     /**
      * @date 创建时间: 2023/7/22
      * @auther gaoxiaoxiong

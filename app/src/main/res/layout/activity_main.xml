@@ -28,4 +28,13 @@
         android:text="启动第二个activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
+
+    <Button
+        android:id="@+id/bt_java_sync_get"
+        android:text="java 同步，Get请求"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
 </LinearLayout>

@@ -10,8 +10,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.blankj.utilcode.util.GsonUtils
 import com.google.gson.Gson
+import com.gxx.networksdkkotlin.BuildConfig
 import com.gxx.networksdkkotlin.R
+import com.gxx.networksdkkotlin.bean.BaseBean
+import com.gxx.networksdkkotlin.network.WanAndroidMAFRequest
+import com.gxx.networksdkkotlin.network.parse.ServiceDataParseCall
 import com.gxx.networksdkkotlin.viewmodel.MainViewModel
+import com.gxx.neworklibrary.bean.Banner
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
@@ -21,6 +27,35 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        this.findViewById<Button>(R.id.bt_java_sync_get).setOnClickListener {
+            lifecycleScope.launch(Dispatchers.IO){
+                var listBanner:MutableList<Banner>? = null
+                WanAndroidMAFRequest.javaSyncGetRequest("banner/json", mutableMapOf(), object :
+                    ServiceDataParseCall<MutableList<Banner>>() {
+                    override fun onJavaRequestDataFail(baseBean: BaseBean?) {
+                        super.onJavaRequestDataFail(baseBean)
+                    }
+
+                    override fun onJavaRequestBaseBeanSuccess(
+                        data: MutableList<Banner>?,
+                        baseBean: BaseBean
+                    ) {
+                        super.onJavaRequestBaseBeanSuccess(data, baseBean)
+                        listBanner = data
+                    }
+                })
+
+                if(BuildConfig.DEBUG) {
+                    if (listBanner!=null){
+                        Log.d(TAG, "javaGetSync请求完成---->${GsonUtils.toJson(listBanner)}");
+                    }else{
+                        Log.d(TAG, "javaGetSync请求完成---->listBanner 是空的");
+                    }
+                }
+
+            }
+        }
+
         this.findViewById<Button>(R.id.bt_net_work_start).setOnClickListener {
             lifecycleScope.launch{
                 //合并请求

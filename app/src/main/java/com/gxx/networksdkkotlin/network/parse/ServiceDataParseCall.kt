@@ -6,6 +6,8 @@ import com.gxx.networksdkkotlin.bean.BaseBean
 import com.gxx.neworklibrary.OkHttpManager
 import com.gxx.neworklibrary.error.exception.AbsApiException
 import com.gxx.neworklibrary.inter.OnIParserListener
+import com.gxx.neworklibrary.inter.OnJavaRequestFailListener
+import com.gxx.neworklibrary.inter.OnJavaRequestSuccessListener
 import com.gxx.neworklibrary.inter.OnRequestFailListener
 import com.gxx.neworklibrary.inter.OnRequestSuccessListener
 import com.gxx.neworklibrary.util.Utils
@@ -16,7 +18,8 @@ import java.lang.reflect.ParameterizedType
  * @auther gaoxiaoxiong
  * @description 服务器数据处理
  **/
-open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailListener {
+open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailListener,
+    OnJavaRequestSuccessListener, OnJavaRequestFailListener {
     private val TAG = "ServiceDataParseCall"
 
     /**
@@ -72,8 +75,6 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
      **/
     open suspend fun onRequestDataFail(baseBean: BaseBean?=null) {}
 
-
-
    /**
     * @author gaoxiaoxiong
     * @date 创建时间: 2023/8/6/006
@@ -81,5 +82,54 @@ open class ServiceDataParseCall<T> : OnRequestSuccessListener, OnRequestFailList
     * 返回含有 BaseBean 的
     **/
     open suspend fun onRequestBaseBeanSuccess(data: T?, baseBean: BaseBean) {}
+
+
+    /**
+     * @date 创建时间: 2024/12/15
+     * @author gaoxiaoxiong
+     * @description java 使用
+     */
+    open fun onJavaRequestBaseBeanSuccess(data: T?, baseBean: BaseBean){}
+
+    open fun onJavaRequestDataFail(baseBean: BaseBean?=null) {}
+
+    override fun onJavaRequestSuccess(
+        method: String,
+        targetElement: JsonElement?,
+        onIParserListener: OnIParserListener
+    ) {
+        if (targetElement!=null){
+            try {
+                val parameterizedType = this::class.java.genericSuperclass as ParameterizedType
+                val subType =  parameterizedType.actualTypeArguments.first() //获取泛型T
+                val result:Any? = GsonUtils.fromJson(targetElement.toString(),subType)
+                onJavaRequestBaseBeanSuccess(if (result == null) null else result as T, onIParserListener as BaseBean)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                onJavaRequestFail(method,e,onIParserListener)
+            }
+        }else{
+            onJavaRequestBaseBeanSuccess(null, onIParserListener as BaseBean)
+        }
+    }
+
+    override fun onJavaRequestFail(
+        method: String,
+        exception: Throwable?,
+        onIParserListener: OnIParserListener?
+    ) {
+        if (exception!=null){
+            val baseUrl = Utils.getBaseUrlByMethod(method)
+            val cacheHandler = OkHttpManager.getRetrofitAndConfigModel(baseUrl)?.httpConfigModel?.errorHandlerFactory
+            if (cacheHandler!=null){
+                if (exception is AbsApiException){//处理服务器的异常
+                    cacheHandler.rollServiceCodeGateError(cacheHandler.getServiceErrorHandlers().first(),exception)
+                }else{//处理网络异常
+                    cacheHandler.netWorkException(exception)
+                }
+            }
+        }
+        onJavaRequestDataFail(onIParserListener as BaseBean?)
+    }
 
 }
