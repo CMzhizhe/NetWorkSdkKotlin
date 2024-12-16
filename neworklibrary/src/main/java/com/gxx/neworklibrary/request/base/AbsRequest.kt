@@ -1,8 +1,7 @@
 package com.gxx.neworklibrary.request.base
 
-import com.blankj.utilcode.util.GsonUtils
-import com.blankj.utilcode.util.JsonUtils
-import com.google.gson.JsonObject
+
+import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.gxx.neworklibrary.OkHttpManager
 import com.gxx.neworklibrary.apiservice.BaseApiService
@@ -19,10 +18,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import org.json.JSONObject
-import java.util.TreeMap
 
 
 /**
@@ -87,7 +84,7 @@ abstract class AbsRequest(
             }
 
             //最终将公共参数与业务参数进行集合转成一个map
-            linkedHashMap = GsonUtils.fromJson(jsonObject.toString(),object : TypeToken<LinkedHashMap<String, Any>>() {}.type)
+            linkedHashMap =  Gson().fromJson(jsonObject.toString(),object : TypeToken<LinkedHashMap<String, Any>>() {}.type)
         }
 
         doComposeMapRequest(
@@ -163,7 +160,7 @@ abstract class AbsRequest(
                         aipService.putJson(
                             method,
                             urlMap,
-                            mMultipartBodyUtils.jsonToRequestBody(GsonUtils.toJson(bodyMap))
+                            mMultipartBodyUtils.jsonToRequestBody(Gson().toJson(bodyMap))
                         )
                     } else {
                         aipService.putJson(method, urlMap)

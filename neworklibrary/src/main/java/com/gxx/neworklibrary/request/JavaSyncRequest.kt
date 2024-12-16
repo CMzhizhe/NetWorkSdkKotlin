@@ -1,6 +1,7 @@
 package com.gxx.neworklibrary.request
 
-import com.blankj.utilcode.util.GsonUtils
+
+import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.gxx.neworklibrary.OkHttpManager
 import com.gxx.neworklibrary.apiservice.BaseApiService
@@ -88,7 +89,7 @@ open class JavaSyncRequest(private val mOnResponseBodyTransformJsonListener: OnR
             }
 
             //最终将公共参数与业务参数进行集合转成一个map
-            linkedHashMap = GsonUtils.fromJson(jsonObject.toString(),object : TypeToken<LinkedHashMap<String, Any>>() {}.type)
+            linkedHashMap =  Gson().fromJson(jsonObject.toString(),object : TypeToken<LinkedHashMap<String, Any>>() {}.type)
         }
 
 
@@ -116,7 +117,7 @@ open class JavaSyncRequest(private val mOnResponseBodyTransformJsonListener: OnR
                 responseBody = response.body()
                 val content = responseBody?.string()
                 if (!content.isNullOrEmpty()){
-                  val listener = mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, content)
+                    val listener = mOnResponseBodyTransformJsonListener.onResponseBodyTransformJson(method, content)
                     mJsonParseResult.javaDoIParseResult(method,rqParamModel.emResultType,listener,onSuccessListener,onFailListener)
                 } else {
                     onFailListener?.onJavaRequestFail(method)

@@ -1,13 +1,11 @@
 package com.gxx.neworklibrary
 
 import android.app.Application
-import com.blankj.utilcode.util.GsonUtils
-import com.google.gson.GsonBuilder
-import com.google.gson.ToNumberPolicy
 import com.gxx.neworklibrary.interceptor.JsonUtf8Interceptor
 import com.gxx.neworklibrary.model.HttpConfigModel
 import com.gxx.neworklibrary.model.RetrofitAndConfigModel
 import com.gxx.neworklibrary.util.Utils
+import com.gxx.neworklibrary.util.converter.MGson
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -122,12 +120,9 @@ object OkHttpManager {
             .client(okBuilder.build())
 
        reBuilder.apply {
-           val gson = GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LAZILY_PARSED_NUMBER).create()
-           GsonUtils.setGsonDelegate(gson)
-
            if (httpConfigModel.onGsonFactoryListener!=null){
                if (httpConfigModel.onGsonFactoryListener!!.converterFactoryList().isEmpty()){
-                   addConverterFactory(GsonConverterFactory.create(gson))
+                   addConverterFactory(GsonConverterFactory.create(MGson.newGson()))
                }else{
                    for (converterFactory in httpConfigModel.onGsonFactoryListener!!.converterFactoryList()) {
                        addConverterFactory(converterFactory)
@@ -139,7 +134,7 @@ object OkHttpManager {
                }
 
            }else{
-               addConverterFactory(GsonConverterFactory.create(gson))
+               addConverterFactory(GsonConverterFactory.create(MGson.newGson()))
            }
        }
 
