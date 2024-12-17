@@ -90,9 +90,9 @@ object OkHttpManager {
       */
    private fun createRetrofit(httpConfigModel: HttpConfigModel,isShowNetHttpLog:Boolean): Retrofit {
         val okBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
-            .connectTimeout(httpConfigModel.connectTime, TimeUnit.MINUTES)
-            .readTimeout(httpConfigModel.readTime, TimeUnit.MINUTES)
-            .writeTimeout(httpConfigModel.writeTime, TimeUnit.MINUTES)
+            .connectTimeout(httpConfigModel.connectTime.toLong(), TimeUnit.SECONDS)
+            .readTimeout(httpConfigModel.readTime.toLong(), TimeUnit.SECONDS)
+            .writeTimeout(httpConfigModel.writeTime.toLong(), TimeUnit.SECONDS)
             .retryOnConnectionFailure(httpConfigModel.retryOnConnection)
 
         okBuilder.apply {

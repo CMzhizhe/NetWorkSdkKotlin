@@ -10,8 +10,8 @@ android {
     defaultConfig {
         minSdk 21
         targetSdk 34
-        versionCode 108
-        versionName "1.0.8"
+        versionCode 110
+        versionName "1.1.0"
         consumerProguardFiles "consumer-rules.pro"
     }
 
@@ -58,6 +58,6 @@ dependencies {
     //json解析工具
     implementation 'com.google.code.gson:gson:2.10.1'
 
-    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
+
 
 }

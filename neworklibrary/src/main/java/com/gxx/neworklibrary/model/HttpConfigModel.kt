@@ -15,11 +15,11 @@ class HttpConfigModel(
     @SerializedName("hostUrl")
     var hostUrl:String,
     @SerializedName("connectTime")
-    var connectTime:Long = 30 * 1000, //秒
+    var connectTime:Int = 15, //秒
     @SerializedName("readTime")
-    var readTime:Long  = 30 * 1000,//秒
+    var readTime:Int  = 15,//秒
     @SerializedName("writeTime")
-    var writeTime:Long  = 30 * 1000,//秒
+    var writeTime:Int  = 15,//秒
     @SerializedName("retryOnConnection")
     var retryOnConnection:Boolean = true,
 ){
