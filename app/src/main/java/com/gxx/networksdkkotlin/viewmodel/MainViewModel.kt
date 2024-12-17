@@ -36,7 +36,7 @@ class MainViewModel: ViewModel() {
         viewModelScope.launch {
             WanAndroidMAFRequest.postRequestV2<MutableList<Banner>>(
                 "banner/json",
-                BannerRequestModel("123", mutableListOf("11", "18")),
+                BannerRequestModel("123", mutableListOf("11", "18"),1,12.4f,1000.toDouble(),System.currentTimeMillis()),
                 urlMap = null,
                 success = { list, baseBean ->
                     if (BuildConfig.DEBUG) {
@@ -62,7 +62,7 @@ class MainViewModel: ViewModel() {
         viewModelScope.launch {
             WanAndroidMAFRequest.postRequest<MutableList<Banner>>(
                 "banner/json",
-                BannerRequestModel("123", mutableListOf("11", "18")),
+                BannerRequestModel("123", mutableListOf("11", "18"),1,12.4f,1000.toDouble(),System.currentTimeMillis()),
                 urlMap = null,
                 success = { list, baseBean ->
                     if (BuildConfig.DEBUG) {
@@ -84,7 +84,7 @@ class MainViewModel: ViewModel() {
         viewModelScope.launch {
             WanAndroidMAFRequest.postRequest<MutableList<Banner>>(
                 "banner/json",
-                BannerRequestModel("123", mutableListOf("11", "18")),
+                BannerRequestModel("123", mutableListOf("11", "18"),1,12.4f,1000.toDouble(),System.currentTimeMillis()),
                 urlMap = null,
                 success = { list, baseBean ->
                     if (BuildConfig.DEBUG) {

@@ -46,7 +46,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
     private val mJsonParseResult = JsonParseResult()
     private val mMobileRequest: MobileRequest = MobileRequest(ServiceDataTransform())
     private val mJavaSyncRequest = JavaSyncRequest(ServiceDataTransform())
-    private val mInterceptor = mutableListOf<Interceptor>(SortInterceptor())
+    //private val mInterceptor = mutableListOf<Interceptor>(SortInterceptor())
     var mHostUrl = ""
     public fun getMobileRequest():MobileRequest{
         return mMobileRequest
@@ -73,7 +73,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
                 onOkHttpInterceptorListener = object : OnOkHttpInterceptorListener {
                     override fun normalInterceptors(): List<Interceptor> {
                         //todo 可以在这里加解密等处理
-                        return mInterceptor
+                        return mutableListOf()
                     }
 
                     override fun netWorkInterceptors(): List<Interceptor> {

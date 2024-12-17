@@ -6,6 +6,7 @@ import com.gxx.neworklibrary.model.HttpConfigModel
 import com.gxx.neworklibrary.model.RetrofitAndConfigModel
 import com.gxx.neworklibrary.util.Utils
 import com.gxx.neworklibrary.util.converter.MGson
+import com.hjq.gson.factory.GsonFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -122,7 +123,7 @@ object OkHttpManager {
        reBuilder.apply {
            if (httpConfigModel.onGsonFactoryListener!=null){
                if (httpConfigModel.onGsonFactoryListener!!.converterFactoryList().isEmpty()){
-                   addConverterFactory(GsonConverterFactory.create(MGson.newGson()))
+                   addConverterFactory(GsonConverterFactory.create(GsonFactory.getSingletonGson()))
                }else{
                    for (converterFactory in httpConfigModel.onGsonFactoryListener!!.converterFactoryList()) {
                        addConverterFactory(converterFactory)
@@ -134,7 +135,7 @@ object OkHttpManager {
                }
 
            }else{
-               addConverterFactory(GsonConverterFactory.create(MGson.newGson()))
+               addConverterFactory(GsonConverterFactory.create(GsonFactory.getSingletonGson()))
            }
        }
 

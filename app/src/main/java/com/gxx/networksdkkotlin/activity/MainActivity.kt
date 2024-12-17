@@ -89,6 +89,5 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         mMainViewModel.readBanner();
-        mMainViewModel.readBannerV3()
     }
 }

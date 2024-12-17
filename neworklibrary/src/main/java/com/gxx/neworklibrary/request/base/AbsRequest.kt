@@ -14,6 +14,8 @@ import com.gxx.neworklibrary.request.parsestring.JsonParseResult
 import com.gxx.neworklibrary.util.MultipartBodyUtils
 import com.gxx.neworklibrary.util.NetWorkUtil
 import com.gxx.neworklibrary.util.Utils
+import com.gxx.neworklibrary.util.converter.MGson
+import com.hjq.gson.factory.GsonFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
@@ -84,7 +86,7 @@ abstract class AbsRequest(
             }
 
             //最终将公共参数与业务参数进行集合转成一个map
-            linkedHashMap =  Gson().fromJson(jsonObject.toString(),object : TypeToken<LinkedHashMap<String, Any>>() {}.type)
+            linkedHashMap = GsonFactory.getSingletonGson().fromJson(jsonObject.toString(),object : TypeToken<LinkedHashMap<String, Any>>() {}.type)
         }
 
         doComposeMapRequest(
@@ -140,7 +142,7 @@ abstract class AbsRequest(
                         aipService.postJson(
                             method,
                             urlMap,
-                            bodyMap
+                            mMultipartBodyUtils.jsonToRequestBody(GsonFactory.getSingletonGson().toJson(bodyMap))
                         )
                     } else {
                         aipService.postJson(method, urlMap ?: mutableMapOf())
@@ -160,7 +162,7 @@ abstract class AbsRequest(
                         aipService.putJson(
                             method,
                             urlMap,
-                            mMultipartBodyUtils.jsonToRequestBody(Gson().toJson(bodyMap))
+                            mMultipartBodyUtils.jsonToRequestBody(GsonFactory.getSingletonGson().toJson(bodyMap))
                         )
                     } else {
                         aipService.putJson(method, urlMap)
