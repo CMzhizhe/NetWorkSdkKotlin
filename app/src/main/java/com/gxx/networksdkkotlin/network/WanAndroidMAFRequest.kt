@@ -48,6 +48,9 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
     private val mJavaSyncRequest = JavaSyncRequest(ServiceDataTransform())
     private val mInterceptor = mutableListOf<Interceptor>(SortInterceptor())
     var mHostUrl = ""
+    public fun getMobileRequest():MobileRequest{
+        return mMobileRequest
+    }
 
     fun init(application: Application){
         val httpJson = AssetsHttpConfigRead.readHttpConfig(application, HTTP_NAME)
@@ -162,12 +165,12 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
     }
 
 
-    suspend fun <T> postRequest(
+    suspend inline fun <reified T> postRequest(
         funName: String,
         model:Any,
         urlMap: Map<String, Any>?,
-        success:suspend (data:T?,baseBean: BaseBean)->Unit,
-        fail:suspend (baseBean: BaseBean?)->Unit
+        crossinline success:suspend (data:T?, baseBean: BaseBean)->Unit,
+        crossinline fail:suspend (baseBean: BaseBean?)->Unit
     ){
 
         val serviceDataParseCall: ServiceDataParseCall<T> = object :ServiceDataParseCall<T>(){
@@ -182,7 +185,7 @@ object WanAndroidMAFRequest : ErrorHandlerFactory.OnServiceCodeErrorHandleFinish
         }
 
 
-        mMobileRequest.postBody(
+        getMobileRequest().postBody(
             RqParamModel(
                 hostUrl = mHostUrl ,
                 funName = funName,

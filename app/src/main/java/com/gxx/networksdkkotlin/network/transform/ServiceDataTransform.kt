@@ -49,11 +49,16 @@ open class ServiceDataTransform : OnResponseBodyTransformJsonListener {
             val jsonObject = jsElement.asJsonObject
             val errorCode = jsonObject.get(ERROR_CODE).asInt
 
-            baseBean = if (errorCode.toString() == ERROR_CODE_TYPE_0) {
-                if (jsonObject.get(DATA).isJsonArray) {
+            baseBean =  if (jsonObject.has(DATA)){
+                val jsonElement = jsonObject[DATA]
+                if (jsonElement.isJsonNull){
+                    BaseBean(method, jsString, null, errorCode.toString(),"")
+                }else if (jsonElement.isJsonArray){
                     BaseBean(method, jsString, jsonObject.getAsJsonArray(DATA), errorCode.toString(),"")
-                } else {
+                }else if (jsonElement.isJsonObject){
                     BaseBean(method, jsString, jsonObject.getAsJsonObject(DATA), errorCode.toString(),"")
+                }else{
+                    BaseBean(method, jsString, jsonElement, errorCode.toString(),"")
                 }
             } else {
                 //与服务器协商的异常逻辑

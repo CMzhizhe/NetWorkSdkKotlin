@@ -80,6 +80,28 @@ class MainViewModel: ViewModel() {
     }
 
 
+    fun readBannerV3() {
+        viewModelScope.launch {
+            WanAndroidMAFRequest.postRequest<MutableList<Banner>>(
+                "banner/json",
+                BannerRequestModel("123", mutableListOf("11", "18")),
+                urlMap = null,
+                success = { list, baseBean ->
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "list---->${list}");
+                        Log.d(TAG, "baseBean---->${GsonUtils.toJson(baseBean)}");
+                    }
+                    if (list != null) {
+                        _bannerShareFlow.emit(list)
+                    }
+                },
+                fail = {
+
+                })
+        }
+    }
+
+
 
     /**
      * @author gaoxiaoxiong

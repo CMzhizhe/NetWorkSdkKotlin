@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             mMainViewModel.bannerShareFlow.collect{
                 Log.d(TAG,"拿到的，banner数据=${Gson().toJson(it)}")
-                findViewById<TextView>(R.id.tv_show_data).text = GsonUtils.toJson(it)
+                findViewById<TextView>(R.id.tv_show_data).text = it.first().id.toString()
             }
         }
     }
@@ -89,5 +89,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         mMainViewModel.readBanner();
+        mMainViewModel.readBannerV3()
     }
 }
